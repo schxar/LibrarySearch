@@ -42,7 +42,7 @@
                                 if(item.cover_url) {
                                     html += "<img src='" + item.cover_url + "' alt='封面' class='img-thumbnail' style='max-width: 100px; float: left; margin-right: 10px;'>";
                                 }
-                                
+
                                 html += "<h5><strong>" + item.title + "</strong></h5>";
                                 html += "<p><strong>Author:</strong> " + item.author + "</p>";
                                 html += "<p><strong>ISBN:</strong> " + item.isbn + "</p>";
@@ -54,6 +54,14 @@
                                 html += "<p><strong>Rating:</strong> " + item.rating + "</p>";
                                 html += "<p><strong>Quality:</strong> " + item.quality + "</p>";
                                 html += " <a href='" + item.book_url + "' target='_blank'>查看详情</a>";
+                                
+                                // 播放器
+                                if(item.audioExists === "true") {
+                                    html += "<div><audio controls>";
+                                    html += "<source src='/audio/" + item.id + ".wav' type='audio/wav'>";
+                                    html += "您的浏览器不支持音频播放器。</audio></div>";
+                                }
+
                                 html += "<div style='clear: both;'></div>";
                                 html += "</li>";
                             });
