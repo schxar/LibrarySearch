@@ -2,26 +2,19 @@ package com.example.librarysearch.controller;
 
 import com.example.librarysearch.service.SearchService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.ResponseEntity;
-import org.springframework.stereotype.Controller;
-import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
-
+import org.springframework.http.ResponseEntity;
 import java.util.Map;
 
-@Controller
+@RestController
+@RequestMapping("/search")
+@CrossOrigin(origins = "http://localhost:5173") // 允许 Vite 的 URL
 public class SearchController {
 
     @Autowired
     private SearchService searchService;
 
-    @GetMapping("/")
-    public String index() {
-        return "index"; // 返回 src/main/resources/templates/index.html
-    }
-
-    @GetMapping("/search")
-    @ResponseBody
+    @GetMapping
     public ResponseEntity<?> search(@RequestParam("q") String query) {
         try {
             Map<String, Object> results = searchService.search(query);
