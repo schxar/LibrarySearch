@@ -1,81 +1,97 @@
-import React, { useState, ChangeEvent, KeyboardEvent } from 'react';
-import { SignedIn, SignedOut, SignInButton, UserButton } from '@clerk/clerk-react';
+import React, { useState } from 'react';
 import './App.css';
-import 'bootstrap/dist/css/bootstrap.min.css';
+import { SignedIn, SignedOut, SignInButton, UserButton } from '@clerk/clerk-react';
 
-interface Book {
-  id: string;
-  title: string;
+interface Result {
+  extension: string;
+  cover_url: string;
+  year: string;
   author: string;
   isbn: string;
-  publisher: string;
-  language: string;
-  year: string;
-  extension: string;
-  filesize: string;
   rating: string;
+  language: string;
+  filesize: string;
+  title: string;
   quality: string;
-  cover_url: string;
   book_url: string;
+  publisher: string;
+  id: string;
   audioExists: string;
 }
 
 const App: React.FC = () => {
-  const [query, setQuery] = useState<string>('');
-  const [results, setResults] = useState<Book[]>([]);
+  const [url, setUrl] = useState<string>('');
+  const [results, setResults] = useState<Result[]>([]);
+  const [error, setError] = useState<string | null>(null);
 
-  const handleSearch = async () => {
-    if (!query.trim()) {
-      alert("请输入搜索关键词");
+  const handleTestApi = async () => {
+    if (!url.trim()) {
+      alert("请输入测试的 URL");
       return;
     }
+    
     try {
-      const response = await fetch(`/search?q=${encodeURIComponent(query)}`);
-      const data = await response.json();
+      const res = await fetch(url);
+      if (!res.ok) {
+        throw new Error(`HTTP error! status: ${res.status}`);
+      }
+      const data = await res.json();
       setResults(data.results || []);
-    } catch (error) {
-      alert("搜索失败，请稍后再试");
+      setError(null);
+    } catch (err) {
+      console.error('Fetch error:', err);
+      setError(err instanceof Error ? err.message : 'An unknown error occurred');
+      setResults([]);
     }
   };
 
   return (
     <div className="container mt-5">
+      <h1>http://localhost:8080/search?q=dog</h1>
+      
       <header>
         <SignedOut>
           <SignInButton />
         </SignedOut>
         <SignedIn>
           <UserButton />
+          <div className="input-group mb-3">
+            <input
+              type="text"
+              className="form-control"
+              placeholder="输入需要搜索的内容 如http://localhost:8080/search?q=dog"
+              value={url}
+              onChange={(e) => setUrl(e.target.value)}
+            />
+            <button 
+              className="btn btn-primary" 
+              onClick={handleTestApi} 
+              disabled={!url.trim()}
+            >
+              发送请求
+            </button>
+          </div>
         </SignedIn>
       </header>
-      <h1>OpenDelta Z Library 搜索</h1>
-      <div className="input-group mb-3">
-        <input
-          type="text"
-          className="form-control"
-          placeholder="请输入搜索关键词"
-          value={query}
-          onChange={(e: ChangeEvent<HTMLInputElement>) => setQuery(e.target.value)}
-          onKeyPress={(e: KeyboardEvent<HTMLInputElement>) => e.key === 'Enter' && handleSearch()}
-        />
-        <button className="btn btn-primary" onClick={handleSearch}>
-          搜索
-        </button>
-      </div>
-      <div id="results">
-        {results.length > 0 ? (
+
+      {error && <div className="alert alert-danger">Error: {error}</div>}
+      {results.length > 0 ? (
+        <div className="alert alert-success">
+          <h5>Response:</h5>
           <ul className="list-group">
-            {results.map(item => (
-              <li key={item.id} className="list-group-item">
+            {results.map((item) => (
+              <li className="list-group-item" key={item.id}>
                 {item.cover_url && (
                   <img
                     src={item.cover_url}
                     alt="封面"
                     className="img-thumbnail"
-                    style={{ maxWidth: 100, float: 'left', marginRight: 10 }}
+                    style={{ maxWidth: '100px', float: 'left', marginRight: '10px' }}
                   />
                 )}
-                <h5><strong>{item.title}</strong></h5>
+                <h5>
+                  <strong>{item.title}</strong>
+                </h5>
                 <p><strong>Author:</strong> {item.author}</p>
                 <p><strong>ISBN:</strong> {item.isbn}</p>
                 <p><strong>Publisher:</strong> {item.publisher}</p>
@@ -88,17 +104,22 @@ const App: React.FC = () => {
                 <a href={item.book_url} target="_blank" rel="noopener noreferrer">
                   查看详情
                 </a>
-                {item.audioExists === "true" && (
-                  <div><audio controls>
-                    <source src={`/audio/${item.id}.wav`} type="audio/wav" />
-                    您的浏览器不支持音频播放器。
-                  </audio></div>
+                {item.audioExists === 'true' && (
+                  <div>
+                    <audio controls>
+                      <source src={`/audio/${item.id}.wav`} type="audio/wav" />
+                      您的浏览器不支持音频播放器。
+                    </audio>
+                  </div>
                 )}
+                <div style={{ clear: 'both' }}></div>
               </li>
             ))}
           </ul>
-        ) : <div className='alert alert-warning'>无搜索结果</div>}
-      </div>
+        </div>
+      ) : (
+        !error && <div className="alert alert-warning" role="alert">无搜索结果</div>
+      )}
     </div>
   );
 }
