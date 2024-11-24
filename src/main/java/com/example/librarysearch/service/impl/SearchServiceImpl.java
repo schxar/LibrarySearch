@@ -30,7 +30,7 @@ public class SearchServiceImpl implements SearchService {
 
         // 设置 ChromeDriver 为无头模式
         ChromeOptions options = new ChromeOptions();
-        //options.addArguments("--headless");
+        options.addArguments("--headless");
         options.addArguments("--disable-gpu");
         options.addArguments("--no-sandbox");
         options.addArguments("--disable-dev-shm-usage");
@@ -66,7 +66,7 @@ public class SearchServiceImpl implements SearchService {
                     String rating = item.attr("rating");
                     String quality = item.attr("quality");
                     String coverUrl = item.select("img").attr("data-src");
-                    String bookUrl = "https://lib.opendelta.org" + item.attr("href");
+                    String bookUrl = "https://zh.z-lib.gl" + item.attr("href");
 
                     // 检查音频文件是否存在
                     String audioFilePath = AUDIO_DIRECTORY + id + ".wav";
