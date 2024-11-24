@@ -30,7 +30,7 @@ public class SearchServiceImpl implements SearchService {
 
         // 设置 ChromeDriver 为无头模式
         ChromeOptions options = new ChromeOptions();
-        options.addArguments("--headless");
+        //options.addArguments("--headless");
         options.addArguments("--disable-gpu");
         options.addArguments("--no-sandbox");
         options.addArguments("--disable-dev-shm-usage");

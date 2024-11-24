@@ -107,7 +107,7 @@ const App: React.FC = () => {
                 {item.audioExists === 'true' && (
                   <div>
                     <audio controls>
-                      <source src={`/audio/${item.id}.wav`} type="audio/wav" />
+                      <source src={`http://localhost:8080/audio/${item.id}.wav`} type="audio/wav" />
                       您的浏览器不支持音频播放器。
                     </audio>
                   </div>
