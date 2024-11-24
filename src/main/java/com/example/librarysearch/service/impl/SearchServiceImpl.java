@@ -18,7 +18,7 @@ import java.util.*;
 @Service
 public class SearchServiceImpl implements SearchService {
 
-    private static final String Z_LIBRARY_SEARCH_URL = "https://lib.opendelta.org/s/";
+    private static final String Z_LIBRARY_SEARCH_URL = "https://zh.z-lib.gl/s/";
     private static final String AUDIO_DIRECTORY = System.getProperty("user.dir") + "/src/main/resources/static/audio/";
 
     @Override
