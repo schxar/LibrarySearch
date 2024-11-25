@@ -8,7 +8,7 @@ import java.util.Map;
 
 @RestController
 @RequestMapping("/search")
-@CrossOrigin(origins = "http://localhost:5173") // 允许 Vite 的 URL
+@CrossOrigin(origins = "*") // 允许所有来源（请根据需要谨慎使用）
 public class SearchController {
 
     @Autowired

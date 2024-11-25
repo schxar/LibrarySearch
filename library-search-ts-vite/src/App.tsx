@@ -23,6 +23,7 @@ const App: React.FC = () => {
   const [url, setUrl] = useState<string>('');
   const [results, setResults] = useState<Result[]>([]);
   const [error, setError] = useState<string | null>(null);
+  const [loadedAudios, setLoadedAudios] = useState<Record<string, boolean>>({}); // 记录已加载音频的状态
 
   const handleTestApi = async () => {
     if (!url.trim()) {
@@ -38,6 +39,7 @@ const App: React.FC = () => {
       const data = await res.json();
       setResults(data.results || []);
       setError(null);
+      setLoadedAudios({}); // 重置已加载音频的状态
     } catch (err) {
       console.error('Fetch error:', err);
       setError(err instanceof Error ? err.message : 'An unknown error occurred');
@@ -45,9 +47,13 @@ const App: React.FC = () => {
     }
   };
 
+  const handleLoadAudio = (id: string) => {
+    setLoadedAudios((prev) => ({ ...prev, [id]: true })); // 更新已加载音频的状态
+  };
+
   return (
     <div className="container mt-5">
-      <h1>http://localhost:8080/search?q=dog</h1>
+      <h1>http://127.0.0.1:8080/search?q=dog</h1>
       
       <header>
         <SignedOut>
@@ -59,7 +65,7 @@ const App: React.FC = () => {
             <input
               type="text"
               className="form-control"
-              placeholder="输入需要搜索的内容 如http://localhost:8080/search?q=dog"
+              placeholder="输入需要搜索的内容 如http://127.0.0.1:8080/search?q=dog"
               value={url}
               onChange={(e) => setUrl(e.target.value)}
             />
@@ -106,10 +112,19 @@ const App: React.FC = () => {
                 </a>
                 {item.audioExists === 'true' && (
                   <div>
-                    <audio controls>
-                      <source src={`http://localhost:8080/audio/${item.id}.wav`} type="audio/wav" />
-                      您的浏览器不支持音频播放器。
-                    </audio>
+                    {!loadedAudios[item.id] ? (
+                      <button 
+                        className="btn btn-secondary" 
+                        onClick={() => handleLoadAudio(item.id)}
+                      >
+                        播放音频
+                      </button>
+                    ) : (
+                      <audio controls>
+                        <source src={`http://127.0.0.1:8080/audio/${item.id}.wav`} type="audio/wav" />
+                        您的浏览器不支持音频播放器。
+                      </audio>
+                    )}
                   </div>
                 )}
                 <div style={{ clear: 'both' }}></div>

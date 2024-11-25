@@ -55,11 +55,10 @@
                                 html += "<p><strong>Quality:</strong> " + item.quality + "</p>";
                                 html += " <a href='" + item.book_url + "' target='_blank'>查看详情</a>";
                                 
-                                // 播放器
+                                // 播放器按钮 (改为按钮)
                                 if(item.audioExists === "true") {
-                                    html += "<div><audio controls>";
-                                    html += "<source src='/audio/" + item.id + ".wav' type='audio/wav'>";
-                                    html += "您的浏览器不支持音频播放器。</audio></div>";
+                                    html += "<div><button class='loadAudio btn btn-secondary' data-id='" + item.id + "'>播放音频</button>";
+                                    html += "<div class='audioContainer' id='audioContainer-" + item.id + "' style='display:none;'></div></div>"; 
                                 }
 
                                 html += "<div style='clear: both;'></div>";
@@ -70,6 +69,17 @@
                             html = "<div class='alert alert-warning' role='alert'>无搜索结果</div>";
                         }
                         $("#results").html(html);
+
+                        // 绑定按钮点击事件，加载音频
+                        $(".loadAudio").click(function(){
+                            var bookId = $(this).data("id");
+                            var audioContainer = $("#audioContainer-" + bookId);
+                            if(audioContainer.html() === ""){ // 如果音频还没加载
+                                audioContainer.html("<audio controls><source src='/audio/" + bookId + ".wav' type='audio/wav'>您的浏览器不支持音频播放器。</audio>");
+                            }
+                            audioContainer.show(); // 显示音频播放器
+                        });
+
                     },
                     error: function(){
                         alert("搜索失败，请稍后再试");
@@ -83,6 +93,7 @@
                     $("#searchButton").click();
                 }
             });
+
         });
     </script>
 </body>
