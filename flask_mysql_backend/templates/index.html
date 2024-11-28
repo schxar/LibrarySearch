@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MySQL User Test</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+    <h1>MySQL Users</h1>
+
+    <h2>添加新用户</h2>
+    <form id="addUserForm">
+        <label for="username">用户名:</label>
+        <input type="text" id="username" name="username" required><br><br>
+        <label for="email">电子邮件:</label>
+        <input type="email" id="email" name="email" required><br><br>
+        <button type="submit">添加用户</button>
+    </form>
+
+    <h2>用户列表</h2>
+    <button id="loadUsersBtn">加载用户</button>
+    <table id="usersTable">
+        <thead>
+            <tr>
+                <th>用户名</th>
+                <th>电子邮件</th>
+            </tr>
+        </thead>
+        <tbody>
+            <!-- 用户数据将在这里加载 -->
+        </tbody>
+    </table>
+
+    <script>
+        // 加载用户
+        async function loadUsers() {
+            const response = await fetch('/users');
+            const users = await response.json();
+            const tableBody = document.querySelector('#usersTable tbody');
+            tableBody.innerHTML = '';  // 清空当前表格内容
+
+            users.forEach(user => {
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td>${user.username}</td>
+                    <td>${user.email}</td>
+                `;
+                tableBody.appendChild(row);
+            });
+        }
+
+        // 提交表单添加用户
+        document.getElementById('addUserForm').addEventListener('submit', async function(event) {
+            event.preventDefault();
+
+            const username = document.getElementById('username').value;
+            const email = document.getElementById('email').value;
+
+            const response = await fetch('/users', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ username, email })
+            });
+
+            if (response.ok) {
+                alert('用户添加成功');
+                loadUsers();  // 重新加载用户列表
+            } else {
+                alert('添加用户失败');
+            }
+
+            // 清空表单
+            document.getElementById('username').value = '';
+            document.getElementById('email').value = '';
+        });
+
+        // 加载页面时自动加载用户
+        window.onload = function() {
+            loadUsers();
+        }
+
+        // 点击按钮加载用户
+        document.getElementById('loadUsersBtn').addEventListener('click', loadUsers);
+    </script>
+</body>
+</html>
