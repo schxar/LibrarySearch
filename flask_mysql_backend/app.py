@@ -1,34 +1,31 @@
-from flask import Flask, request, jsonify, render_template
+from flask import Flask, request, jsonify
 from flask_restful import Api, Resource
 import mysql.connector
 
 app = Flask(__name__)
 api = Api(app)
 
-# 数据库连接配置
 db_config = {
     'host': 'localhost',
     'port': 3306,
     'user': 'root',
     'password': '13380008373',
-    'database': 'test_db'  # 替换为你的数据库名
+    'database': 'test_db'
 }
 
-# 数据库连接函数
 def get_db_connection():
-    connection = mysql.connector.connect(**db_config)
-    return connection
+    return mysql.connector.connect(**db_config)
 
-# 示例资源
-class Users(Resource):
+class Search(Resource):
     def get(self):
-        """获取所有用户"""
+        """Retrieve cached search results for a query."""
+        query = request.args.get('query', '')
         try:
             connection = get_db_connection()
             cursor = connection.cursor(dictionary=True)
-            cursor.execute("SELECT * FROM users")  # 替换为你的表名
-            result = cursor.fetchall()
-            return jsonify(result)
+            cursor.execute("SELECT * FROM search_results WHERE query = %s", (query,))
+            results = cursor.fetchall()
+            return {'results': results}, 200
         except Exception as e:
             return {'error': str(e)}, 500
         finally:
@@ -36,31 +33,42 @@ class Users(Resource):
             connection.close()
 
     def post(self):
-        """添加新用户"""
+        """Cache new search results."""
+        data = request.get_json()
+        if not isinstance(data, list):
+            return {'error': 'Invalid data format'}, 400
         try:
-            data = request.get_json()
-            username = data.get('username')
-            email = data.get('email')
-
             connection = get_db_connection()
             cursor = connection.cursor()
-            query = "INSERT INTO users (username, email) VALUES (%s, %s)"
-            cursor.execute(query, (username, email))
+            query = "INSERT INTO search_results (id, query, title, author, isbn, publisher, language, year, extension, filesize, rating, quality, cover_url, book_url, audio_exists) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)"
+            
+            for item in data:
+                cursor.execute(query, (
+                    item.get('id'), 
+                    request.args.get('query', ''),
+                    item.get('title'), 
+                    item.get('author'), 
+                    item.get('isbn'), 
+                    item.get('publisher'), 
+                    item.get('language'), 
+                    item.get('year'), 
+                    item.get('extension'), 
+                    item.get('filesize'), 
+                    item.get('rating'), 
+                    item.get('quality'), 
+                    item.get('cover_url'), 
+                    item.get('book_url'), 
+                    item.get('audioExists')
+                ))
             connection.commit()
-            return {'message': 'User added successfully'}, 201
+            return {'message': 'Results cached successfully'}, 201
         except Exception as e:
             return {'error': str(e)}, 500
         finally:
             cursor.close()
             connection.close()
 
-# 注册资源
-api.add_resource(Users, '/users')
-
-# 渲染前端页面
-@app.route('/')
-def index():
-    return render_template('index.html')  # 确保 index.html 存在于 templates 文件夹中
+api.add_resource(Search, '/search')
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=10803, debug=True)
