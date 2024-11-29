@@ -39,7 +39,7 @@ public class SearchServiceImpl implements SearchService {
         File cachedFile = new File(CACHE_DIRECTORY + encodedQuery + ".html");
         String pageSource;
 
-        if (cachedFile.exists() && cachedFile.isFile()) {
+        if (isCacheValid(cachedFile)) {
             // Load HTML from cache
             System.out.println("Loading HTML from cache: " + cachedFile.getAbsolutePath());
             pageSource = loadHtmlFromCache(cachedFile);
@@ -154,4 +154,16 @@ public class SearchServiceImpl implements SearchService {
             System.err.println("Error saving HTML to cache: " + e.getMessage());
         }
     }
+
+
+
+	private boolean isCacheValid(File cachedFile) {
+    if (cachedFile.exists() && cachedFile.isFile()) {
+        long lastModified = cachedFile.lastModified();
+        long currentTime = System.currentTimeMillis();
+        long expirationTime = 1 * 24 * 60 * 60 * 1000L; // 1 days in milliseconds
+        return (currentTime - lastModified) < expirationTime;
+    }
+    return false;
+}
 }
