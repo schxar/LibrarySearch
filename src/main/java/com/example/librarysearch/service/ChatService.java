@@ -1,21 +1,40 @@
 package com.example.librarysearch.service;
 
-import java.util.List;
-import java.util.Map;
-
 import org.springframework.stereotype.Service;
+import org.springframework.web.client.RestTemplate;
+import org.springframework.http.*;
+import java.util.HashMap;
+import java.util.Map;
 
 @Service
 public class ChatService {
-	public Map<String, Object> processMessages(List<Map<String, String>> messages) {
-	    // 示例逻辑，处理用户消息
-	    String userMessage = messages.stream()
-	                                  .filter(msg -> "user".equals(msg.get("role")))
-	                                  .map(msg -> msg.get("content"))
-	                                  .findFirst()
-	                                  .orElse("未收到用户消息");
 
-	    // 返回响应
-	    return Map.of("response", "你发送了: " + userMessage);
-	}
+    private static final String FLASK_URL = "http://127.0.0.1:10803/generate";
+
+    public String getFlaskResponse(String message) {
+        // Create a RestTemplate instance
+        RestTemplate restTemplate = new RestTemplate();
+
+        // Prepare the request payload
+        Map<String, String> payload = new HashMap<>();
+        payload.put("message", message);
+
+        // Set HTTP headers
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_JSON);
+
+        // Create an HTTP entity with headers and body
+        HttpEntity<Map<String, String>> entity = new HttpEntity<>(payload, headers);
+
+        // Send POST request to Flask API
+        ResponseEntity<String> response = restTemplate.exchange(
+            FLASK_URL,
+            HttpMethod.POST,
+            entity,
+            String.class
+        );
+
+        // Return Flask's response body
+        return response.getBody();
+    }
 }

@@ -27,102 +27,58 @@
         <!-- Results will be dynamically loaded here -->
     </div>
 
+    <!-- Search Leaderboard -->
+    <h2 class="mt-5">Top Searches</h2>
+    <div id="leaderboard" class="mb-4">
+        <!-- Leaderboard will be dynamically loaded here -->
+    </div>
+
     <script>
-        $(document).ready(function() {
-            // Search button click event
-            $("#searchButton").click(function() {
-                performSearch();
-            });
+        $(document).ready(function () {
+            // Load leaderboard on page load
+            loadLeaderboard();
 
-            // Allow pressing Enter to trigger search
-            $("#searchQuery").keypress(function(e) {
-                if (e.which === 13) {
-                    performSearch();
-                }
-            });
-
-            function performSearch() {
-                const query = $("#searchQuery").val().trim();
-
-                if (query === "") {
-                    displayError("Please enter a search keyword.");
-                    return;
-                }
-
-                // Clear results and show loading spinner
-                $("#results").html("");
-                $("#loading").show();
-
-                // AJAX request to fetch search results
+            function loadLeaderboard() {
                 $.ajax({
-                    url: "/search",
+                    url: "/api/top-searches",
                     type: "GET",
-                    data: { q: query },
                     dataType: "json",
-                    success: function(data) {
-                        $("#loading").hide(); // Hide spinner
-                        renderResults(data);
+                    success: function (data) {
+                        renderLeaderboard(data);
                     },
-                    error: function() {
-                        $("#loading").hide(); // Hide spinner
-                        displayError("Search failed. Please try again later.");
-                    }
+                    error: function (jqXHR, textStatus, errorThrown) {
+                        console.error("Error loading leaderboard:", textStatus, errorThrown, jqXHR.responseText);
+                        $("#leaderboard").html("<div class='alert alert-danger'>Failed to load leaderboard.</div>");
+                    },
                 });
             }
 
-            function renderResults(data) {
+            function renderLeaderboard(data) {
                 let html = "";
 
-                if (data.results && data.results.length > 0) {
+                if (data && data.length > 0) {
                     html += "<ul class='list-group'>";
-                    data.results.forEach(function(item) {
+                    data.forEach(function (item, index) {
                         html += `
-                            <li class="list-group-item">
-                                <div class="d-flex">
-                                    ${item.cover_url ? `<img src="${item.cover_url}" alt="Cover" class="img-thumbnail me-3" style="max-height: 200px;" style="max-width: 200px;">` : ""}
-                                    <div>
-                                        <h5 class="fw-bold">${item.title}</h5>
-                                        <p><strong>Author:</strong> ${item.author || "N/A"}</p>
-                                        <p><strong>ISBN:</strong> ${item.isbn || "N/A"}</p>
-                                        <p><strong>Publisher:</strong> ${item.publisher || "N/A"}</p>
-                                        <p><strong>Language:</strong> ${item.language || "N/A"}</p>
-                                        <p><strong>Year:</strong> ${item.year || "N/A"}</p>
-                                        <p><strong>File Type:</strong> ${item.extension || "N/A"}</p>
-                                        <p><strong>File Size:</strong> ${item.filesize || "N/A"}</p>
-                                        <p><strong>Rating:</strong> ${item.rating || "N/A"}</p>
-                                        <p><strong>Quality:</strong> ${item.quality || "N/A"}</p>
-                                        <a href="${item.book_url}" target="_blank" class="btn btn-link">View Details</a>
-                                    </div>
-                                </div>
-                                ${item.audioExists === "true" ? `
-                                    <button class="loadAudio btn btn-secondary mt-2" data-id="${item.id}">Play Audio</button>
-                                    <div class="audioContainer" id="audioContainer-${item.id}" style="display:none;"></div>
-                                ` : ""}
+                            <li class="list-group-item d-flex justify-content-between align-items-center">
+                                <span>${index + 1}. ${item.original}</span>
+                                <span class="badge bg-primary">${item.weight} searches</span>
                             </li>
                         `;
                     });
                     html += "</ul>";
                 } else {
-                    html = "<div class='alert alert-warning' role='alert'>No results found.</div>";
+                    html = "<div class='alert alert-warning'>No top searches found.</div>";
                 }
 
-                $("#results").html(html);
-
-                // Bind play audio button click events
-                $(".loadAudio").click(function() {
-                    const bookId = $(this).data("id");
-                    const audioContainer = $(`#audioContainer-${bookId}`);
-                    if (audioContainer.html() === "") {
-                        audioContainer.html(`<audio controls><source src="/audio/${bookId}.wav" type="audio/wav">Your browser does not support the audio element.</audio>`);
-                    }
-                    audioContainer.show();
-                });
+                $("#leaderboard").html(html);
             }
 
-            function displayError(message) {
-                $("#results").html(`<div class='alert alert-danger' role='alert'>${message}</div>`);
-            }
-        });
+            $(document).ready(function () {
+                loadLeaderboard();
+            });
+
     </script>
 </body>
+
 </html>

@@ -1,6 +1,6 @@
 <html lang="zh" class="" style="--vh: 4.74px;"><head>
         <meta name="color-scheme" content="">
-                <script src="/components/zlibrary.js?0.754"></script>
+                <script src="/components/zlibrary.js?0.756"></script>
         <script type="text/javascript">
             navigator.sayswho = (function(){
                 var ua= navigator.userAgent, tem,
@@ -88,20 +88,20 @@
         <meta name="singleLanguage" value="bool(true)
 ">
 
-            <link rel="stylesheet" href="/resources/css/theme.css?0.754">
+            <link rel="stylesheet" href="/resources/css/theme.css?0.756">
 
-                    <meta name="version" value="0.754">
-            <link rel="stylesheet" type="text/css" href="/resources/build/main.css?0.754">
-            <script type="text/javascript" src="/resources/build/main.js?0.754"></script>
-                            <link rel="stylesheet" type="text/css" href="/resources/build/global.css?0.754">
-                <link rel="stylesheet" href="/resources/build/global-d.css?0.754" as="style" onload="this.onload=null;this.rel='stylesheet'">
-                <noscript><link rel="stylesheet" href="/resources/build/global-d.css?0.754"></noscript>
-                <script type="text/javascript" src="/resources/build/global.js?0.754"></script>
-                        <script type="text/javascript" src="/resources/build/bootstrap.js?0.754"></script>
-            <script type="text/javascript" src="/resources/build/global-d.js?0.754" defer=""></script>
-                                <script type="text/javascript" src="/resources/js/search_metrics.js?0.754"></script>
+                    <meta name="version" value="0.756">
+            <link rel="stylesheet" type="text/css" href="/resources/build/main.css?0.756">
+            <script type="text/javascript" src="/resources/build/main.js?0.756"></script>
+                            <link rel="stylesheet" type="text/css" href="/resources/build/global.css?0.756">
+                <link rel="stylesheet" href="/resources/build/global-d.css?0.756" as="style" onload="this.onload=null;this.rel='stylesheet'">
+                <noscript><link rel="stylesheet" href="/resources/build/global-d.css?0.756"></noscript>
+                <script type="text/javascript" src="/resources/build/global.js?0.756"></script>
+                        <script type="text/javascript" src="/resources/build/bootstrap.js?0.756"></script>
+            <script type="text/javascript" src="/resources/build/global-d.js?0.756" defer=""></script>
+                                <script type="text/javascript" src="/resources/js/search_metrics.js?0.756"></script>
         <noscript>
-            <link rel="stylesheet" type="text/css" href="/resources/css/noscript.css?0.754" />
+            <link rel="stylesheet" type="text/css" href="/resources/css/noscript.css?0.756" />
         </noscript>
 
         <script>
@@ -123,7 +123,7 @@
                         fallbackLng: 'en',
                         backend: {
                             // addPath: '/papi/translations/add-missing-key',
-                            loadPath: '/resources/build/translations-frontend/{{lng}}.json?v=0.754'
+                            loadPath: '/resources/build/translations-frontend/{{lng}}.json?v=0.756'
                         },
                         keySeparator: notLikelyString,
                         nsSeparator: notLikelyString,
@@ -172,8 +172,8 @@
         
         
         <script src="/components/zlibrary-startup-script.js"></script>
-        <link rel="stylesheet" href="/components/style.css?0.754">
-    <script src="/components/z-dropdown.js?0.754"></script><script src="/components/z-bookcard.js?0.754"></script><script src="/components/z-recommended-search.js?0.754"></script><script src="/components/z-carousel.js?0.754"></script><script src="/components/z-cover.js?0.754"></script><script src="/components/z-booklists-browser.js?0.754"></script></head>
+        <link rel="stylesheet" href="/components/style.css?0.756">
+    <script src="/components/z-dropdown.js?0.756"></script><script src="/components/z-bookcard.js?0.756"></script><script src="/components/z-recommended-search.js?0.756"></script><script src="/components/z-carousel.js?0.756"></script><script src="/components/z-cover.js?0.756"></script><script src="/components/z-booklists-browser.js?0.756"></script></head>
 
         <body style="margin:0px;padding:0px;" class="search  super-puper-main-container" data-proxy="false">
         
@@ -204,7 +204,16 @@
     <div class="navigation-search-line" nextgen="">
         <div class="input-wrap search-input-wrap"><form onsubmit="useHeaderSearch(event.target.childNodes[0].value)" action="javascript:void(0);"><input search="" placeholder="按名称、作者、ISBN、出版社、MD5...搜索。" onsubmit="useHeaderSearch(event)" onreset="this.value = ''; useHeaderSearch('')" type="text" value=""><button type="reset" class="search-input-reset" onclick="this.value = ''; useHeaderSearch('')"><span class="zlibicon-cross"></span></button><button type="submit" class="search-input-button"><span class="zlibicon-search-bold"></span></button></form></div>
     </div>
-</section>                        <section class="navigation-element navigation-user-card-element" style="position: relative;">
+</section>                    <div class="navigation-element">
+                <div class="navigation-icon" onclick="switchTheme()">
+                    <div class="color-schema-switcher">
+                        <div class="color-schema-switcher__trigger"></div>
+                        <div class="zlibicon-light color-schema-switcher__light"></div>
+                        <div class="zlibicon-dark color-schema-switcher__dark"></div>
+                    </div>
+                </div>
+            </div>
+                        <section class="navigation-element navigation-user-card-element" style="position: relative;">
             <a href="/login?redirectUrl=https%253A%252F%252Fzh.z-lib.gl%252Fs%252Fdog" data-mode="singlelogin" data-action="login">登录</a>
     </section>
 
@@ -307,92 +316,6 @@
     </div>
     
     
-
-
-    <div id="blackFridayBanner" class="black-friday-banner">
-        <div class="black-friday-banner-close btnHideBanner" data-name="blackFriday">
-            <span class="zlibicon-cross"></span>
-        </div>
-
-        <div class="black-friday-image-block">
-                            <img src="/img/banners/black-friday-title.svg" class="black-friday-image">
-                    </div>
-
-        <p>
-            Good news! In anticipation of the upcoming holidays, we decided to make a small gift for all our users. During Black Friday users who make <b>ANY</b> donation from <b>November 22</b> to <b>December 1</b> will get one-month unlimited (up to 999 daily) downloads and <span class="underlined">early access to the dark mode</span>!        </p>
-
-        <div class="black-friday-donate-url">
-                            <a href="/how-to-donate">捐款</a>
-                    </div>
-        <div class="black-friday-footer">
-            <div class="black-friday-countdown">
-                <span class="zlibicon-clock" style="width: auto;"></span>
-                <span id="fundrisingCountdown">1 day 00:23:53 left</span>
-            </div>
-
-            <div class="black-friday-donate-url">
-                                    <a href="/how-to-donate">捐款</a>
-                            </div>
-
-            <div class="black-friday-howtodonate-button">
-                <a href="/how-to-donate"><img src="/img/banners/black-friday-and-darkmode-button.svg"></a>
-            </div>
-        </div>
-    </div>
-
-
-<script type="text/javascript">
-    $(function () {
-        $(document).on('click', '.btnHideBanner', function() {
-            const bannerName = $(this).data('name')
-            hideBanner(bannerName)
-        })
-    })
-    const BlackFridayCountdown = (function () {
-        let dateUntil
-        let interval
-
-        function init(date) {
-            dateUntil = date
-            interval = setInterval(updateTimer, 200);
-        }
-
-        function updateTimer() {
-            const now = new Date().getTime()
-            const distance = dateUntil - now
-            const days = Math.floor(distance / (1000 * 60 * 60 * 24))
-            const hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60))
-            const minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60))
-            const seconds = Math.floor((distance % (1000 * 60)) / 1000)
-
-            let text = ('0' + hours).slice(-2) + ':' + ('0' + minutes).slice(-2) + ':' + ('0' + seconds).slice(-2) + ' left'
-            if (days >= 3) {
-                text = days + ' days left'
-            } else if (days > 1) {
-                text = days + ' days ' + text
-            } else if (days == 1) {
-                text = days + ' day ' + text
-            }
-
-            $('#fundrisingCountdown').text(text)
-
-            if (distance <= 0) {
-                clearInterval(interval)
-                $('#fundrisingCountdown').text('Finished!')
-                $('#fundrisingCountdown').next('span').text('')
-            }
-        }
-
-        return {
-            init: init,
-        }
-    })()
-
-    date = new Date()
-    date.setTime(1733000400000)
-    BlackFridayCountdown.init(date)
-</script>
-
 <div id="merchantPopup" class="hidden">
     <p>We're currently searching for a high-risk payment processing provider to handle bank cards and local payments.
     </p><p>
@@ -915,10 +838,10 @@
             </div>
         <div style="margin: 0 -1px -1px;position: relative;"><z-recommended-search query="2563194,2658393,5722474,5613003,1178556,2564793,5417218,7216958,1249574,836358" auto="" lazy="" class="ready"></z-recommended-search></div>            <div class="divider"></div>            <div class="book-item resItemBoxBooks exactMatch">
                 <div class="counter">11</div>
-                <z-bookcard id="2490877" isbn="9781579129811" termshash="67979cd3da9b60b6a2240d2b9c83d4e7" href="/book/2490877/4ce468/woodworking-wisdom-knowhow.html" publisher="Black Dog &amp; Leventhal" language="english" year="2014" extension="pdf" filesize="85.47 MB" rating="4.0" quality="4.0" class="ready">
-                    <img data-src="https://s3proxy.cdn-zlib.sk/covers100/collections/genesis/79eb24a9807d1f7dde54364ab27c2461dd06cb93595b01a253f97e4f35e767c6.jpg">
-                    <div slot="title">Woodworking Wisdom &amp; Know-How</div>
-                    <div slot="author">Taunton Press</div>
+                <z-bookcard id="2208966" isbn="9780823085781" termshash="39014178cae4f5a7dcf6c90d4b7c3db6" href="/book/2208966/7df007/draw-50-animals-the-stepbystep-way-to-draw-elephants-tigers-dogs-fish-birds-and-many-more.html" publisher="Watson-Guptill" language="english" year="2012" extension="epub" filesize="12.72 MB" rating="5.0" quality="5.0" class="ready">
+                    <img data-src="https://s3proxy.cdn-zlib.sk/covers100/collections/genesis/c57c6286f76f2111b74b25a2819680999a5282119107665d0e80fee6a48ecfd9.jpg">
+                    <div slot="title">Draw 50 Animals: The Step-by-Step Way to Draw Elephants, Tigers, Dogs, Fish, Birds, and Many More...</div>
+                    <div slot="author">Lee J. Ames</div>
                     <div slot="note"></div>
                     <div slot="extend" style="position: absolute;">
                                                                                             </div>
@@ -926,10 +849,10 @@
             </div>
                     <div class="divider"></div>            <div class="book-item resItemBoxBooks exactMatch">
                 <div class="counter">12</div>
-                <z-bookcard id="2208966" isbn="9780823085781" termshash="39014178cae4f5a7dcf6c90d4b7c3db6" href="/book/2208966/7df007/draw-50-animals-the-stepbystep-way-to-draw-elephants-tigers-dogs-fish-birds-and-many-more.html" publisher="Watson-Guptill" language="english" year="2012" extension="epub" filesize="12.72 MB" rating="5.0" quality="5.0" class="ready">
-                    <img data-src="https://s3proxy.cdn-zlib.sk/covers100/collections/genesis/c57c6286f76f2111b74b25a2819680999a5282119107665d0e80fee6a48ecfd9.jpg">
-                    <div slot="title">Draw 50 Animals: The Step-by-Step Way to Draw Elephants, Tigers, Dogs, Fish, Birds, and Many More...</div>
-                    <div slot="author">Lee J. Ames</div>
+                <z-bookcard id="2490877" isbn="9781579129811" termshash="67979cd3da9b60b6a2240d2b9c83d4e7" href="/book/2490877/4ce468/woodworking-wisdom-knowhow.html" publisher="Black Dog &amp; Leventhal" language="english" year="2014" extension="pdf" filesize="85.47 MB" rating="4.0" quality="4.0" class="ready">
+                    <img data-src="https://s3proxy.cdn-zlib.sk/covers100/collections/genesis/79eb24a9807d1f7dde54364ab27c2461dd06cb93595b01a253f97e4f35e767c6.jpg">
+                    <div slot="title">Woodworking Wisdom &amp; Know-How</div>
+                    <div slot="author">Taunton Press</div>
                     <div slot="note"></div>
                     <div slot="extend" style="position: absolute;">
                                                                                             </div>
@@ -1026,7 +949,7 @@
                     <div class="divider"></div>            <div class="book-item resItemBoxBooks exactMatch">
                 <div class="counter">21</div>
                 <z-bookcard id="5448520" isbn="" termshash="" href="/book/5448520/3d7064/the-complete-photoshop-manual.html" publisher="Black Dog Media" language="english" year="2020" extension="pdf" filesize="143.46 MB" rating="5.0" quality="5.0" class="ready">
-                    <img data-src="/img/cover-not-exists.png">
+                    <img data-src="https://s3proxy.cdn-zlib.sk/covers100/collections/userbooks/245baf71cde8ea9fbadeb52b2c6287e55bfa010d4adda21ef8dac02760fc8008.jpg">
                     <div slot="title">The Complete Photoshop Manual</div>
                     <div slot="author">Black Dog Media</div>
                     <div slot="note"></div>
@@ -1133,7 +1056,7 @@
                                                                                             </div>
                                                                                                 </z-bookcard>    
             </div>
-        <div style="margin: 0 -1px -1px;position: relative;"><z-recommended-search query="2490877,2208966,7216957,5764687,2693860,2938751,3417254,11935766,10983771,4973646,5448520,3497739,3489937,5765985,3188750,2720148,16706008,2479570,6117589,5989086" auto="" lazy="" class="ready"></z-recommended-search></div>            <div class="divider"></div>            <div class="book-item resItemBoxBooks exactMatch">
+        <div style="margin: 0 -1px -1px;position: relative;"><z-recommended-search query="2208966,2490877,7216957,5764687,2693860,2938751,3417254,11935766,10983771,4973646,5448520,3497739,3489937,5765985,3188750,2720148,16706008,2479570,6117589,5989086" auto="" lazy="" class="ready"></z-recommended-search></div>            <div class="divider"></div>            <div class="book-item resItemBoxBooks exactMatch">
                 <div class="counter">31</div>
                 <z-bookcard id="5808656" isbn="" termshash="" href="/book/5808656/2ccce5/the-complete-python-manual-5th-edition.html" publisher="Black Dog Media" language="english" year="2020" extension="pdf" filesize="136.77 MB" rating="3.0" quality="0.0" class="ready">
                     <img data-src="/img/cover-not-exists.png">
@@ -1246,7 +1169,7 @@
                     <div class="divider"></div>            <div class="book-item resItemBoxBooks exactMatch">
                 <div class="counter">41</div>
                 <z-bookcard id="6005493" isbn="" termshash="06abcc26cf4f324269f5b245d855be74" href="/book/6005493/692d6e/the-complete-linux-manual-expert-tutorials-to-improve-your-skills-7th-edition-october-2020.html" publisher="Black Dog Media" language="english" year="2020" extension="pdf" filesize="92.26 MB" rating="4.0" quality="5.0" class="ready">
-                    <img data-src="/img/cover-not-exists.png">
+                    <img data-src="https://s3proxy.cdn-zlib.sk/covers100/collections/userbooks/35f71bf08abb44ec9b5c2b3753bbfe0bc743f64d2501555ad8d16d8a01918cde.jpg">
                     <div slot="title">The Complete Linux Manual – Expert Tutorials To Improve Your Skills, 7th Edition October 2020</div>
                     <div slot="author">Black Dog Media</div>
                     <div slot="note"></div>
@@ -1256,10 +1179,10 @@
             </div>
                     <div class="divider"></div>            <div class="book-item resItemBoxBooks exactMatch">
                 <div class="counter">42</div>
-                <z-bookcard id="3334842" isbn="9780823014248" termshash="024de0c6f798f0ab2c809e6a278ff000" href="/book/3334842/7f65fd/the-artists-guide-to-drawing-animals-how-to-draw-cats-dogs-and-other-favorite-pets.html" publisher="Watson-Guptill" language="english" year="2012" extension="pdf" filesize="42.10 MB" rating="5.0" quality="5.0" class="ready">
-                    <img data-src="https://s3proxy.cdn-zlib.sk/covers100/collections/genesis/3b7389c6e10dd933fe24a5f19520a83b6ce7b185bc323756fcca76683b7a7d78.jpg">
-                    <div slot="title">The Artist's Guide to Drawing Animals How to Draw Cats, Dogs, and Other Favorite Pets</div>
-                    <div slot="author">J.C. Amberlyn</div>
+                <z-bookcard id="13214418" isbn="9780316472227" termshash="50d9572c4636c3ec32a6bf0492cb35fe" href="/book/13214418/91cc6c/the-story-of-sex-a-graphic-history-through-the-ages.html" publisher="Black Dog &amp; Leventhal" language="english" year="2017" extension="pdf" filesize="49.88 MB" rating="5.0" quality="5.0" class="ready">
+                    <img data-src="https://s3proxy.cdn-zlib.sk/covers100/collections/userbooks/240dd1f87b6b0541d19a6ce64a78fca0563ad244e971def9ff1a1a8beb400a88.jpg">
+                    <div slot="title">The Story of Sex: A Graphic History Through the Ages</div>
+                    <div slot="author">Philippe Brenot</div>
                     <div slot="note"></div>
                     <div slot="extend" style="position: absolute;">
                                                                                             </div>
@@ -1267,10 +1190,10 @@
             </div>
                     <div class="divider"></div>            <div class="book-item resItemBoxBooks exactMatch">
                 <div class="counter">43</div>
-                <z-bookcard id="13214418" isbn="9780316472227" termshash="50d9572c4636c3ec32a6bf0492cb35fe" href="/book/13214418/91cc6c/the-story-of-sex-a-graphic-history-through-the-ages.html" publisher="Black Dog &amp; Leventhal" language="english" year="2017" extension="pdf" filesize="49.88 MB" rating="5.0" quality="5.0" class="ready">
-                    <img data-src="https://s3proxy.cdn-zlib.sk/covers100/collections/userbooks/240dd1f87b6b0541d19a6ce64a78fca0563ad244e971def9ff1a1a8beb400a88.jpg">
-                    <div slot="title">The Story of Sex: A Graphic History Through the Ages</div>
-                    <div slot="author">Philippe Brenot</div>
+                <z-bookcard id="3334842" isbn="9780823014248" termshash="024de0c6f798f0ab2c809e6a278ff000" href="/book/3334842/7f65fd/the-artists-guide-to-drawing-animals-how-to-draw-cats-dogs-and-other-favorite-pets.html" publisher="Watson-Guptill" language="english" year="2012" extension="pdf" filesize="42.10 MB" rating="5.0" quality="5.0" class="ready">
+                    <img data-src="https://s3proxy.cdn-zlib.sk/covers100/collections/genesis/3b7389c6e10dd933fe24a5f19520a83b6ce7b185bc323756fcca76683b7a7d78.jpg">
+                    <div slot="title">The Artist's Guide to Drawing Animals How to Draw Cats, Dogs, and Other Favorite Pets</div>
+                    <div slot="author">J.C. Amberlyn</div>
                     <div slot="note"></div>
                     <div slot="extend" style="position: absolute;">
                                                                                             </div>
@@ -1353,7 +1276,7 @@
                                                                                             </div>
                                                                                                 </z-bookcard>    
             </div>
-        <div style="margin: 0 -1px -1px;position: relative;"><z-recommended-search query="5808656,5542449,17049393,11520637,1220845,678763,2537404,17837149,2924848,1064892,6005493,3334842,13214418,17262024,5808659,984875,6068855,11064584,5808660,5288101" auto="" lazy="" class="ready"></z-recommended-search></div></div>
+        <div style="margin: 0 -1px -1px;position: relative;"><z-recommended-search query="5808656,5542449,17049393,11520637,1220845,678763,2537404,17837149,2924848,1064892,6005493,13214418,3334842,17262024,5808659,984875,6068855,11064584,5808660,5288101" auto="" lazy="" class="ready"></z-recommended-search></div></div>
     
 
 <script>
@@ -1430,7 +1353,7 @@
                                     <span class="z-modal__text">Z-Alerts可以让你在有新书时根据你的搜索要求得到通知。您可以用书名、作者、ISBN等信息作为搜索查询 <a href="/msgn/zalerts" target="_blank">阅读更多关于Z-Alerts的信息</a>.</span>
                 
                                     <input id="zalertEmail" type="text" form="zalertCreateForm" class="z-text-input" placeholder="您的 Email邮箱" name="email">
-                                    <input id="zalertQuery" type="text" form="zalertCreateForm" value="dog" class="z-text-input" placeholder="请输入搜索词"><div id="tooltip-989544" class="zlib-tooltip" style="display:none"><button class="visible-xs-block close">×</button>
+                                    <input id="zalertQuery" type="text" form="zalertCreateForm" value="dog" class="z-text-input" placeholder="请输入搜索词"><div id="tooltip-327445" class="zlib-tooltip" style="display:none"><button class="visible-xs-block close">×</button>
             <span class="zlibicon-info"></span>
             如果您需要带 ISBN 的图书，<br>我们建议创建 <a href="/requests">添加书籍请求</a></div>
 
