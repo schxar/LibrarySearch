@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Top 10 Searches</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+</head>
+<body class="container mt-5">
+    <h1 class="mb-4">Top 10 Searches</h1>
+
+    <!-- Loading Spinner -->
+    <div id="loading" class="text-center mb-3" style="display: none;">
+        <div class="spinner-border" role="status">
+            <span class="visually-hidden">Loading...</span>
+        </div>
+    </div>
+
+    <!-- Top Searches Section -->
+    <div id="topSearches">
+        <!-- Top searches will be dynamically loaded here -->
+    </div>
+
+    <script>
+        $(document).ready(function() {
+            // Show loading spinner
+            $("#loading").show();
+
+            // Fetch top 10 searches
+            $.ajax({
+                url: "http://127.0.0.1:8080/search/top-searches",
+                type: "GET",
+                data: { top: 10 },
+                dataType: "json",
+                success: function(data) {
+                    $("#loading").hide(); // Hide spinner
+                    renderTopSearches(data);
+                },
+                error: function() {
+                    $("#loading").hide(); // Hide spinner
+                    $("#topSearches").html("<div class='alert alert-danger' role='alert'>Failed to load top searches. Please try again later.</div>");
+                }
+            });
+
+            function renderTopSearches(data) {
+                let html = "<ul class='list-group'>";
+                if (data && data.length > 0) {
+                    data.forEach((item, index) => {
+                        html += `<li class="list-group-item"><strong>${index + 1}. ${item}</strong></li>`;
+                    });
+                } else {
+                    html = "<div class='alert alert-warning' role='alert'>No data available.</div>";
+                }
+                html += "</ul>";
+                $("#topSearches").html(html);
+            }
+        });
+    </script>
+</body>
+</html>

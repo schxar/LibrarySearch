@@ -8,7 +8,54 @@
 </head>
 <body class="container mt-5">
     <h1 class="mb-4">OpenDelta Z Library Search</h1>
+    
+    <!-- Loading Spinner -->
+    <div id="loading" class="text-center mb-3" style="display: none;">
+        <div class="spinner-border" role="status">
+            <span class="visually-hidden">Loading...</span>
+        </div>
+    </div>
 
+    <!-- Top Searches Section -->
+    <div id="topSearches">
+        <!-- Top searches will be dynamically loaded here -->
+    </div>
+
+    <script>
+        $(document).ready(function() {
+            // Show loading spinner
+            $("#loading").show();
+
+            // Fetch top 10 searches
+            $.ajax({
+                url: "http://127.0.0.1:8080/search/top-searches",
+                type: "GET",
+                data: { top: 10 },
+                dataType: "json",
+                success: function(data) {
+                    $("#loading").hide(); // Hide spinner
+                    renderTopSearches(data);
+                },
+                error: function() {
+                    $("#loading").hide(); // Hide spinner
+                    $("#topSearches").html("<div class='alert alert-danger' role='alert'>Failed to load top searches. Please try again later.</div>");
+                }
+            });
+
+            function renderTopSearches(data) {
+                let html = "<ul class='list-group'>";
+                if (data && data.length > 0) {
+                    data.forEach((item, index) => {
+                        html += `<li class="list-group-item"><strong>${index + 1}. ${item.original}</strong> (Weight: ${item.weight})</li>`;
+                    });
+                } else {
+                    html = "<div class='alert alert-warning' role='alert'>No data available.</div>";
+                }
+                html += "</ul>";
+                $("#topSearches").html(html);
+            }
+        });
+    </script>
     <!-- Search Bar -->
     <div class="input-group mb-3">
         <input type="text" id="searchQuery" class="form-control" placeholder="Enter search keyword" aria-label="Search" />
@@ -27,58 +74,102 @@
         <!-- Results will be dynamically loaded here -->
     </div>
 
-    <!-- Search Leaderboard -->
-    <h2 class="mt-5">Top Searches</h2>
-    <div id="leaderboard" class="mb-4">
-        <!-- Leaderboard will be dynamically loaded here -->
-    </div>
-
     <script>
-        $(document).ready(function () {
-            // Load leaderboard on page load
-            loadLeaderboard();
+        $(document).ready(function() {
+            // Search button click event
+            $("#searchButton").click(function() {
+                performSearch();
+            });
 
-            function loadLeaderboard() {
+            // Allow pressing Enter to trigger search
+            $("#searchQuery").keypress(function(e) {
+                if (e.which === 13) {
+                    performSearch();
+                }
+            });
+
+            function performSearch() {
+                const query = $("#searchQuery").val().trim();
+
+                if (query === "") {
+                    displayError("Please enter a search keyword.");
+                    return;
+                }
+
+                // Clear results and show loading spinner
+                $("#results").html("");
+                $("#loading").show();
+
+                // AJAX request to fetch search results
                 $.ajax({
-                    url: "/api/top-searches",
+                    url: "/search",
                     type: "GET",
+                    data: { q: query },
                     dataType: "json",
-                    success: function (data) {
-                        renderLeaderboard(data);
+                    success: function(data) {
+                        $("#loading").hide(); // Hide spinner
+                        renderResults(data);
                     },
-                    error: function (jqXHR, textStatus, errorThrown) {
-                        console.error("Error loading leaderboard:", textStatus, errorThrown, jqXHR.responseText);
-                        $("#leaderboard").html("<div class='alert alert-danger'>Failed to load leaderboard.</div>");
-                    },
+                    error: function() {
+                        $("#loading").hide(); // Hide spinner
+                        displayError("Search failed. Please try again later.");
+                    }
                 });
             }
 
-            function renderLeaderboard(data) {
+            function renderResults(data) {
                 let html = "";
 
-                if (data && data.length > 0) {
+                if (data.results && data.results.length > 0) {
                     html += "<ul class='list-group'>";
-                    data.forEach(function (item, index) {
+                    data.results.forEach(function(item) {
                         html += `
-                            <li class="list-group-item d-flex justify-content-between align-items-center">
-                                <span>${index + 1}. ${item.original}</span>
-                                <span class="badge bg-primary">${item.weight} searches</span>
+                            <li class="list-group-item">
+                                <div class="d-flex">
+                                    ${item.cover_url ? `<img src="${item.cover_url}" alt="Cover" class="img-thumbnail me-3" style="max-height: 200px;" style="max-width: 200px;">` : ""}
+                                    <div>
+                                        <h5 class="fw-bold">${item.title}</h5>
+                                        <p><strong>Author:</strong> ${item.author || "N/A"}</p>
+                                        <p><strong>ISBN:</strong> ${item.isbn || "N/A"}</p>
+                                        <p><strong>Publisher:</strong> ${item.publisher || "N/A"}</p>
+                                        <p><strong>Language:</strong> ${item.language || "N/A"}</p>
+                                        <p><strong>Year:</strong> ${item.year || "N/A"}</p>
+                                        <p><strong>File Type:</strong> ${item.extension || "N/A"}</p>
+                                        <p><strong>File Size:</strong> ${item.filesize || "N/A"}</p>
+                                        <p><strong>Rating:</strong> ${item.rating || "N/A"}</p>
+                                        <p><strong>Quality:</strong> ${item.quality || "N/A"}</p>
+                                        <a href="${item.book_url}" target="_blank" class="btn btn-link">View Details</a>
+                                    </div>
+                                </div>
+                                ${item.audioExists === "true" ? `
+                                    <button class="loadAudio btn btn-secondary mt-2" data-id="${item.id}">Play Audio</button>
+                                    <div class="audioContainer" id="audioContainer-${item.id}" style="display:none;"></div>
+                                ` : ""}
                             </li>
                         `;
                     });
                     html += "</ul>";
                 } else {
-                    html = "<div class='alert alert-warning'>No top searches found.</div>";
+                    html = "<div class='alert alert-warning' role='alert'>No results found.</div>";
                 }
 
-                $("#leaderboard").html(html);
+                $("#results").html(html);
+
+                // Bind play audio button click events
+                $(".loadAudio").click(function() {
+                    const bookId = $(this).data("id");
+                    const audioContainer = $(`#audioContainer-${bookId}`);
+                    if (audioContainer.html() === "") {
+                        audioContainer.html(`<audio controls><source src="/audio/${bookId}.wav" type="audio/wav">Your browser does not support the audio element.</audio>`);
+                    }
+                    audioContainer.show();
+                });
             }
 
-            $(document).ready(function () {
-                loadLeaderboard();
-            });
-
+            function displayError(message) {
+                $("#results").html(`<div class='alert alert-danger' role='alert'>${message}</div>`);
+            }
+        });
     </script>
 </body>
-
 </html>
