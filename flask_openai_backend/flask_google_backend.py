@@ -1,8 +1,12 @@
 from flask import Flask, request, jsonify, render_template_string
 import google.generativeai as genai
 from google.ai.generativelanguage_v1beta.types import content
+import requests
 
 gemini_key_path = "flask_openai_backend/Gemini.txt"
+
+# 搜索 API 地址
+SEARCH_API_URL = "http://127.0.0.1:10804/search"
 
 try:
     # Open the file and read its content as a string
@@ -17,42 +21,6 @@ except IOError as e:
     print(f"Error reading the file: {e}")
 
 
-from selenium import webdriver
-from selenium.webdriver.chrome.service import Service
-from webdriver_manager.chrome import ChromeDriverManager
-from selenium.webdriver.common.by import By
-from selenium.webdriver.chrome.options import Options
-
-def get_search_results(query):
-    # 配置 Chrome 选项
-    chrome_options = Options()
-    chrome_options.add_argument("--headless")  # 无头模式
-    chrome_options.add_argument("--disable-gpu")
-    chrome_options.add_argument("--no-sandbox")
-    chrome_options.add_argument("--disable-dev-shm-usage")
-
-    # 初始化 WebDriver
-    service = Service(ChromeDriverManager().install())
-    driver = webdriver.Chrome(service=service, options=chrome_options)
-
-    try:
-        # 构建搜索 URL
-        search_url = f"https://cse.google.com/cse?cx=b7a4dfc41bb40428c&key=AIzaSyCa4mngFulV3OzlW3Dw2Y-4xAJ3DsupgMg&q={query}"
-        driver.get(search_url)
-
-        # 等待页面加载并获取结果
-        # 根据实际页面结构调整以下代码
-        results = driver.find_elements(By.CSS_SELECTOR, "div.g")  # 示例选择器
-        search_results = []
-        for result in results:
-            title = result.find_element(By.TAG_NAME, "h3").text
-            link = result.find_element(By.TAG_NAME, "a").get_attribute("href")
-            snippet = result.find_element(By.CSS_SELECTOR, "div.IsZvec").text
-            search_results.append({"title": title, "link": link, "snippet": snippet})
-
-        return search_results
-    finally:
-        driver.quit()
 
 
 # Configure the Gemini API
@@ -229,16 +197,32 @@ def generate_content():
         return jsonify({"error": "Invalid input, expected JSON with 'message' key."}), 400
 
     user_message = data['message']
-    try:
-        # Call the Gemini 1.5 model to generate a response
-        response = model.generate_content(
-            user_message,
-            safety_settings={"HARASSMENT": "block_none","SEXUALLY_EXPLICIT": "block_none",
-                             "HATE_SPEECH": "block_none"},#tools='google_search_retrieval'#
 
-            )
+    try:
+        # 调用搜索 API
+        #search_response = requests.get(SEARCH_API_URL, params={"q": user_message})
+        #if search_response.status_code == 200:###
+        #    search_results = search_response.json().get('results', [])
+        #else:
+        #    search_results = []
+        #    print(f"Search API failed with status: {search_response.status_code}, response: {search_response.text}")
+
+        # 整理搜索结果
+        #search_prompt = "\n\n".join(
+        #    [f"Title: {result.get('title')}\nLink: {result.get('link')}\nSnippet: {result.get('snippet')}" 
+        #     for result in search_results]
+        #)
+
+        # 将搜索结果添加到模型输入
+        #prompt = f"User Message: {user_message}\n\nSearch Results:\n{search_prompt}\n\nProvide a helpful and relevant response to the user."
+        
+        # 调用 Gemini 模型生成回答
+        #response = model.generate_content(prompt)
+        response = model.generate_content(user_message)
         generated_text = response.text
+
         return jsonify({"response": generated_text}), 200
+
     except Exception as e:
         return jsonify({"error": str(e)}), 500
 
