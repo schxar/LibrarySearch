@@ -1,5 +1,6 @@
 from flask import Flask, request, jsonify, render_template_string
 import google.generativeai as genai
+from google.ai.generativelanguage_v1beta.types import content
 
 gemini_key_path = "flask_openai_backend/Gemini.txt"
 
@@ -15,6 +16,45 @@ except FileNotFoundError:
 except IOError as e:
     print(f"Error reading the file: {e}")
 
+
+from selenium import webdriver
+from selenium.webdriver.chrome.service import Service
+from webdriver_manager.chrome import ChromeDriverManager
+from selenium.webdriver.common.by import By
+from selenium.webdriver.chrome.options import Options
+
+def get_search_results(query):
+    # 配置 Chrome 选项
+    chrome_options = Options()
+    chrome_options.add_argument("--headless")  # 无头模式
+    chrome_options.add_argument("--disable-gpu")
+    chrome_options.add_argument("--no-sandbox")
+    chrome_options.add_argument("--disable-dev-shm-usage")
+
+    # 初始化 WebDriver
+    service = Service(ChromeDriverManager().install())
+    driver = webdriver.Chrome(service=service, options=chrome_options)
+
+    try:
+        # 构建搜索 URL
+        search_url = f"https://cse.google.com/cse?cx=b7a4dfc41bb40428c&key=AIzaSyCa4mngFulV3OzlW3Dw2Y-4xAJ3DsupgMg&q={query}"
+        driver.get(search_url)
+
+        # 等待页面加载并获取结果
+        # 根据实际页面结构调整以下代码
+        results = driver.find_elements(By.CSS_SELECTOR, "div.g")  # 示例选择器
+        search_results = []
+        for result in results:
+            title = result.find_element(By.TAG_NAME, "h3").text
+            link = result.find_element(By.TAG_NAME, "a").get_attribute("href")
+            snippet = result.find_element(By.CSS_SELECTOR, "div.IsZvec").text
+            search_results.append({"title": title, "link": link, "snippet": snippet})
+
+        return search_results
+    finally:
+        driver.quit()
+
+
 # Configure the Gemini API
 
 genai.configure(api_key=GOOGLE_API_KEY)
@@ -23,8 +63,10 @@ genai.configure(api_key=GOOGLE_API_KEY)
 app = Flask(__name__)
 
 # Default model
-model_name = "gemini-1.5-flash"
+model_name = "gemini-1.5-flash-002"
 model = genai.GenerativeModel(model_name)
+
+
 
 # HTML template for the web interface
 html_template = """
@@ -115,8 +157,8 @@ html_template = """
         <input type="text" id="user-input" placeholder="Type your message here..." />
         <button onclick="sendMessage()">Send</button>
         <select id="model" onchange="changeModel()">
-            <option value="gemini-1.5-flash">gemini-1.5-flash</option>
-            <option value="gemini-1.5-pro">gemini-1.5-pro</option>
+            <option value="gemini-1.5-flash-002">gemini-1.5-flash-002</option>
+            <option value="gemini-1.5-pro-002">gemini-1.5-pro-002</option>
             <option value="gemini-1.0-pro">gemini-1.0-pro</option>
         </select>
     </div>
@@ -192,7 +234,7 @@ def generate_content():
         response = model.generate_content(
             user_message,
             safety_settings={"HARASSMENT": "block_none","SEXUALLY_EXPLICIT": "block_none",
-                             "HATE_SPEECH": "block_none"},
+                             "HATE_SPEECH": "block_none"},#tools='google_search_retrieval'#
 
             )
         generated_text = response.text
