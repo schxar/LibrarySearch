@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Search API</title>
+</head>
+<body>
+    <h1>Search API Interface</h1>
+    <form action="/search" method="get">
+        <label for="query">Enter your search query:</label><br>
+        <input type="text" id="query" name="q" required><br><br>
+        <button type="submit">Search</button>
+    </form>
+
+    <div id="results">
+        <!-- Results will be displayed here using JavaScript -->
+    </div>
+
+    <script>
+        const form = document.querySelector('form');
+        form.addEventListener('submit', async (event) => {
+            event.preventDefault();
+            const query = document.querySelector('#query').value;
+            const response = await fetch(`/search?q=${encodeURIComponent(query)}`);
+            const data = await response.json();
+
+            const resultsDiv = document.querySelector('#results');
+            resultsDiv.innerHTML = '';
+
+            if (data.results && data.results.length > 0) {
+                data.results.forEach(result => {
+                    const resultElement = document.createElement('div');
+                    resultElement.innerHTML = `
+                        <a href="${result.href}" target="_blank">${result.text}</a>
+                        <p>${result.html}</p>
+                    `;
+                    resultsDiv.appendChild(resultElement);
+                });
+            } else {
+                resultsDiv.innerHTML = '<p>No results found.</p>';
+            }
+        });
+    </script>
+</body>
+</html>
