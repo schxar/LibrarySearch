@@ -1,4 +1,4 @@
-from flask import Flask, request, jsonify, send_from_directory
+from flask import Flask, request, jsonify, send_from_directory, render_template_string
 from selenium import webdriver
 from selenium.webdriver.chrome.options import Options
 from selenium.webdriver.common.by import By
@@ -19,13 +19,36 @@ chrome_options.add_argument("--disable-gpu")
 chrome_options.add_argument("--no-sandbox")
 chrome_options.add_argument("--disable-dev-shm-usage")
 
+# 首页HTML模板
+HTML_TEMPLATE = """
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Book Downloader</title>
+</head>
+<body>
+    <h1>Book Downloader</h1>
+    <form method="POST" action="/download">
+        <label for="bookUrl">Book URL:</label>
+        <input type="text" id="bookUrl" name="bookUrl" required>
+        <button type="submit">Download</button>
+    </form>
+</body>
+</html>
+"""
+
+@app.route('/')
+def index():
+    return render_template_string(HTML_TEMPLATE)
+
 @app.route('/download', methods=['POST'])
 def download_book():
-    data = request.json
-    if 'bookUrl' not in data:
+    book_url = request.form.get('bookUrl')
+    if not book_url:
         return jsonify({"error": "bookUrl is required"}), 400
 
-    book_url = data['bookUrl']
     driver = webdriver.Chrome(options=chrome_options)
 
     try:
@@ -74,4 +97,4 @@ def serve_file(filename):
     return send_from_directory(download_directory, filename)
 
 if __name__ == '__main__':
-    app.run(host='0.0.0.0', port=10805)
+    app.run(host='0.0.0.0')#, port现在，该程序包含一个简单的HTML网页，用户可以通过输入书籍URL并点击“Download”按钮来测试下载功能。要测试，请运行应用程序，然后访问浏览器中的 `http://127.0.0.1:10805/`。#

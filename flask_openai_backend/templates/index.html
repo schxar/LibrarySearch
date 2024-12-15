@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Flask 搜索测试</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+        }
+        .results {
+            margin-top: 20px;
+        }
+        .result-item {
+            margin-bottom: 10px;
+        }
+        .result-item a {
+            text-decoration: none;
+            color: #1a0dab;
+        }
+    </style>
+</head>
+<body>
+    <h1>Flask 搜索测试</h1>
+    
+    <form id="searchForm">
+        <input type="text" id="searchQuery" name="q" placeholder="请输入搜索词" required>
+        <button type="submit">搜索</button>
+    </form>
+
+    <div class="results" id="results"></div>
+
+    <script>
+        document.getElementById("searchForm").addEventListener("submit", function(event) {
+            event.preventDefault();  // 阻止表单默认提交行为
+
+            const query = document.getElementById("searchQuery").value;
+            const url = `/search?q=${encodeURIComponent(query)}`;
+
+            fetch(url)
+                .then(response => response.json())
+                .then(data => {
+                    const resultsContainer = document.getElementById("results");
+                    resultsContainer.innerHTML = "";  // 清空之前的结果
+
+                    if (data.results && data.results.length > 0) {
+                        data.results.forEach(result => {
+                            const resultItem = document.createElement("div");
+                            resultItem.classList.add("result-item");
+                            resultItem.innerHTML = `
+                                <a href="${result.href}" target="${result.target || '_blank'}">${result.text}</a>
+                                <div>${result.html}</div>
+                            `;
+                            resultsContainer.appendChild(resultItem);
+                        });
+                    } else {
+                        resultsContainer.innerHTML = "<p>未找到结果。</p>";
+                    }
+                })
+                .catch(error => {
+                    console.error("搜索请求失败:", error);
+                });
+        });
+    </script>
+</body>
+</html>
