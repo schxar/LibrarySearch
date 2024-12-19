@@ -129,10 +129,19 @@ def list_files():
     else:
         return jsonify({"message": "No files found in the download directory"}), 200
 
+from flask import send_file
 # 自定义下载目录路由
 @app.route('/download/<filename>', methods=['GET'])
 def serve_file(filename):
-    return send_from_directory(download_directory, filename)
+    file_path = os.path.join(download_directory, filename)
+    if os.path.exists(file_path):
+        return send_file(
+            file_path,
+            as_attachment=True,  # 强制浏览器下载
+            download_name=filename  # 下载时的文件名
+        )
+    else:
+        return jsonify({"error": "File not found"}), 404
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=10805)
