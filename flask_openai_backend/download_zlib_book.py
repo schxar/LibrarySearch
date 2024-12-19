@@ -4,6 +4,7 @@ from selenium.webdriver.chrome.options import Options
 from selenium.webdriver.common.by import By
 import os
 import requests
+import glob
 
 app = Flask(__name__)
 
@@ -34,6 +35,18 @@ HTML_TEMPLATE = """
         <label for="bookUrl">Book URL:</label>
         <input type="text" id="bookUrl" name="bookUrl" required>
         <button type="submit">Download</button>
+    </form>
+
+    <h2>Check if Book Exists</h2>
+    <form method="GET" action="/check">
+        <label for="bookId">Book ID:</label>
+        <input type="text" id="bookId" name="book_id" required>
+        <button type="submit">Check</button>
+    </form>
+
+    <h2>List Downloaded Files</h2>
+    <form method="GET" action="/list">
+        <button type="submit">List Files</button>
     </form>
 </body>
 </html>
@@ -91,10 +104,35 @@ def download_book():
     finally:
         driver.quit()
 
+# 检查文件是否存在
+@app.route('/check', methods=['GET'])
+def check_book():
+    book_id = request.args.get('book_id')
+    if not book_id:
+        return jsonify({"error": "book_id is required"}), 400
+
+    # 使用 glob 模糊匹配文件名
+    pattern = os.path.join(download_directory, f"book_{book_id}.*")
+    matching_files = glob.glob(pattern)
+
+    if matching_files:
+        return jsonify({"exists": 1, "files": [os.path.basename(f) for f in matching_files]}), 200
+    else:
+        return jsonify({"exists": 0}), 200
+
+# 列出下载目录中的文件
+@app.route('/list', methods=['GET'])
+def list_files():
+    files = os.listdir(download_directory)
+    if files:
+        return jsonify({"files": files}), 200
+    else:
+        return jsonify({"message": "No files found in the download directory"}), 200
+
 # 自定义下载目录路由
 @app.route('/download/<filename>', methods=['GET'])
 def serve_file(filename):
     return send_from_directory(download_directory, filename)
 
 if __name__ == '__main__':
-    app.run(host='0.0.0.0')#, port现在，该程序包含一个简单的HTML网页，用户可以通过输入书籍URL并点击“Download”按钮来测试下载功能。要测试，请运行应用程序，然后访问浏览器中的 `http://127.0.0.1:10805/`。#
+    app.run(host='0.0.0.0', port=10805)
