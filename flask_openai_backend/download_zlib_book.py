@@ -15,7 +15,7 @@ if not os.path.exists(download_directory):
 
 # 设置 ChromeDriver 配置
 chrome_options = Options()
-chrome_options.add_argument("--headless")
+#chrome_options.add_argument("--headless")
 chrome_options.add_argument("--disable-gpu")
 chrome_options.add_argument("--no-sandbox")
 chrome_options.add_argument("--disable-dev-shm-usage")
@@ -67,42 +67,72 @@ def download_book():
     try:
         driver.get(book_url)
 
-        # 下载链接选择器
+        # 提取初始下载链接
         download_link_element = driver.find_element(By.CSS_SELECTOR, "a.btn.btn-default.addDownloadedBook")
-        download_link = download_link_element.get_attribute("href")
-        file_extension = download_link_element.find_element(By.CLASS_NAME, "book-property__extension").text
-        file_size = download_link_element.text.split('(')[-1].replace(')', '').strip()
+        initial_download_link = download_link_element.get_attribute("href")
 
-        if download_link:
-            # 文件名使用书籍 ID 生成
-            book_id = download_link.split('/')[-2]
-            file_name = f"book_{book_id}.{file_extension}"
-            file_path = os.path.join(download_directory, file_name)
+        # 从 Selenium 会话中获取 cookies
+        selenium_cookies = driver.get_cookies()
+        cookies = {cookie['name']: cookie['value'] for cookie in selenium_cookies}
 
-            # 下载文件
-            response = requests.get(download_link, stream=True)
-            if response.status_code == 200:
-                with open(file_path, 'wb') as f:
-                    for chunk in response.iter_content(chunk_size=1024):
-                        f.write(chunk)
+        # 获取最终的重定向下载链接
+        session = requests.Session()
+        for name, value in cookies.items():
+            session.cookies.set(name, value)
 
-                # 返回可访问的文件路径
-                public_url = f"http://127.0.0.1:10805/download/{file_name}"
-                return jsonify({
-                    "message": "Download successful",
-                    "file_url": public_url,
-                    "file_size": file_size
-                }), 200
-            else:
-                return jsonify({"error": "Failed to download the file"}), 500
+        # 设置必要的 headers，模拟浏览器行为
+        session.headers.update({
+            "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/117.0.0.0 Safari/537.36"
+        })
 
-        return jsonify({"error": "Download link not found"}), 404
+        # 通过 requests 获取最终重定向的下载链接
+        response = session.head(initial_download_link, allow_redirects=True, timeout=30)
+        if response.status_code != 200:
+            return jsonify({"error": "Failed to resolve final download link"}), 500
+        final_download_link = response.url
+
+        # 下载文件
+        file_extension = "pdf"  # 假设文件为 PDF
+        book_id = initial_download_link.split('/')[-2]
+        file_name = f"book_{book_id}.{file_extension}"
+        file_path = os.path.join(download_directory, file_name)
+
+        # 下载文件内容
+        download_response = session.get(final_download_link, stream=True, timeout=60)
+        download_response.raise_for_status()
+
+        # 检查内容类型
+        content_type = download_response.headers.get("Content-Type", "")
+        if "application" not in content_type:
+            return jsonify({"error": f"Invalid file type: {content_type}"}), 400
+
+        # 写入文件
+        with open(file_path, 'wb') as f:
+            for chunk in download_response.iter_content(chunk_size=1024):
+                if chunk:
+                    f.write(chunk)
+
+        # 检查文件大小（可选）
+        actual_file_size = os.path.getsize(file_path) / (1024 * 1024)
+        if actual_file_size < 0.1:  # 设置最小大小检查，避免下载无效文件
+            os.remove(file_path)
+            return jsonify({"error": "Downloaded file size is too small, download failed."}), 400
+
+        # 返回下载文件信息
+        public_url = f"http://127.0.0.1:10805/download/{file_name}"
+        return jsonify({
+            "message": "Download successful",
+            "file_url": public_url,
+            "file_size": f"{actual_file_size:.2f} MB"
+        }), 200
 
     except Exception as e:
         return jsonify({"error": str(e)}), 500
 
     finally:
-        driver.quit()
+        driver.quit()   
+
+
 
 # 检查文件是否存在
 @app.route('/check', methods=['GET'])
