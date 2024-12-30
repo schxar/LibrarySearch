@@ -100,80 +100,67 @@
                     }
                 });
             }
-          function renderResults(data) {
-            let html = "";
 
-            if (data.results && data.results.length > 0) {
-              html += "<ul class='list-group'>";
-              data.results.forEach(function (item) {
-                  html += `
-                      <li class="list-group-item">
-                        <div class="d-flex">
-                            ${item.cover_url ? `<img src="${item.cover_url}" alt="Cover" class="img-thumbnail me-3" style="max-height: 200px; max-width: 200px;">` : ""}
-                            <div>
-                                <h5 class="fw-bold">${item.title}</h5>
-                                <p><strong>Author:</strong> ${item.author || "N/A"}</p>
-                                <p><strong>ISBN:</strong> ${item.isbn || "N/A"}</p>
-                                <p><strong>Publisher:</strong> ${item.publisher || "N/A"}</p>
-                                <p><strong>Language:</strong> ${item.language || "N/A"}</p>
-                                <p><strong>Year:</strong> ${item.year || "N/A"}</p>
-                                <p><strong>File Type:</strong> ${item.extension || "N/A"}</p>
-                                <p><strong>File Size:</strong> ${item.filesize || "N/A"}</p>
-                                <p><strong>Rating:</strong> ${item.rating || "N/A"}</p>
-                                <p><strong>Quality:</strong> ${item.quality || "N/A"}</p>
-                                <a href="${item.book_url}" target="_blank" class="btn btn-link">View Details</a>
-                                <button class="btn btn-primary download-button" data-book-url="${item.book_url}">Download</button>
-                                <div class="download-info" style="display:none;"></div>
-                            </div>
-                        </div>
-                       </li>
-                    `;
-              });
-              html += "</ul>";
-            } else {
-              html = "<div class='alert alert-warning' role='alert'>No results found.</div>";
-            }
-            $("#results").html(html);
+            function renderResults(data) {
+                let html = "";
 
-            // Event delegation for download buttons (added after rendering)
-            $(".download-button").click(function () {
-              const bookUrl = $(this).data("book-url");
-              const downloadInfoDiv = $(this).siblings(".download-info");
-               $(this).prop('disabled',true); // Disable the download button
-              downloadInfoDiv.html("");
-             
-              // Show loading spinner
-               downloadInfoDiv.html(
-                '<div class="spinner-border spinner-border-sm" role="status"><span class="visually-hidden">Loading...</span></div>'
-              );
-              downloadInfoDiv.show();
-
-              // AJAX request to get download link
-              $.ajax({
-                url: "/getdlink",
-                type: "POST",
-                contentType: "application/json",
-                data: JSON.stringify({ bookUrl: bookUrl }),
-                dataType: "json",
-                success: function (downloadData) {
-                  if (downloadData.downloadLink) {
-                    downloadInfoDiv.html(
-                      `<p><strong>Download Link:</strong> <a href="${downloadData.downloadLink}" target="_blank">Download Now</a></p>`
-                    );
-                  } else {
-                    downloadInfoDiv.html(`<div class="alert alert-warning" role="alert">Download link not available.</div>`);
-                  }
-                },
-                error: function () {
-                    downloadInfoDiv.html(`<div class="alert alert-danger" role="alert">Failed to retrieve download link. Please try again later.</div>`);
-                },
-                complete: function(){
-                   $(".download-button").prop('disabled',false); // Re-enable the download button
+                if (data.results && data.results.length > 0) {
+                    html += "<ul class='list-group'>";
+                    data.results.forEach(function (item) {
+                        html += `
+                            <li class="list-group-item">
+                                <div class="d-flex">
+                                    ${item.cover_url ? `<img src="${item.cover_url}" alt="Cover" class="img-thumbnail me-3" style="max-height: 200px; max-width: 200px;">` : ""}
+                                    <div>
+                                        <h5 class="fw-bold">${item.title}</h5>
+                                        <p><strong>Author:</strong> ${item.author || "N/A"}</p>
+                                        <p><strong>ISBN:</strong> ${item.isbn || "N/A"}</p>
+                                        <p><strong>Publisher:</strong> ${item.publisher || "N/A"}</p>
+                                        <p><strong>Language:</strong> ${item.language || "N/A"}</p>
+                                        <p><strong>Year:</strong> ${item.year || "N/A"}</p>
+                                        <p><strong>File Type:</strong> ${item.extension || "N/A"}</p>
+                                        <p><strong>File Size:</strong> ${item.filesize || "N/A"}</p>
+                                        <p><strong>Rating:</strong> ${item.rating || "N/A"}</p>
+                                        <p><strong>Quality:</strong> ${item.quality || "N/A"}</p>
+                                        <a href="${item.book_url}" target="_blank" class="btn btn-link">View Details</a>
+                                        <button class="btn btn-primary download-button" data-book-url="${item.book_url}">Download</button>
+                                        <div class="download-info" style="display:none;"></div>
+                                        
+                                        <!-- Add audio playback button and container -->
+                                        ${item.audioExists === "true" ? `
+                                            <button class="loadAudio btn btn-secondary mt-2" data-id="${item.id}">Play Audio</button>
+                                            <div class="audioContainer" id="audioContainer-${item.id}" style="display:none;"></div>
+                                        ` : ""}
+                                    </div>
+                                </div>
+                            </li>
+                        `;
+                    });
+                    html += "</ul>";
+                } else {
+                    html = "<div class='alert alert-warning' role='alert'>No results found.</div>";
                 }
-              });
-            });
-          }
-          function displayError(message) {
+
+                $("#results").html(html);
+
+                // Bind play audio button click events
+                $(".loadAudio").click(function () {
+                    const bookId = $(this).data("id");
+                    const audioContainer = $(`#audioContainer-${bookId}`);
+                    if (audioContainer.html() === "") {
+                        // Dynamically load the audio element if it doesn't exist
+                        audioContainer.html(`
+                            <audio controls>
+                                <source src="/audio/${bookId}.wav" type="audio/wav">
+                                Your browser does not support the audio element.
+                            </audio>
+                        `);
+                    }
+                    audioContainer.show();
+                });
+            }
+
+            function displayError(message) {
                 $("#results").html(`<div class='alert alert-danger' role='alert'>${message}</div>`);
             }
         });
