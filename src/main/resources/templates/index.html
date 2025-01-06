@@ -142,6 +142,50 @@
                 }
 
                 $("#results").html(html);
+                
+                // Event delegation for download buttons (added after rendering)
+                $(".download-button").click(function () {
+                  const bookUrl = $(this).data("book-url");
+                  const downloadInfoDiv = $(this).siblings(".download-info");
+                   $(this).prop('disabled',true); // Disable the download button
+                  downloadInfoDiv.html("");
+                 
+                  // Show loading spinner
+                   downloadInfoDiv.html(
+                    '<div class="spinner-border spinner-border-sm" role="status"><span class="visually-hidden">Loading...</span></div>'
+                  );
+                  downloadInfoDiv.show();
+
+                  // AJAX request to get download link
+                  $.ajax({
+                    url: "/getdlink",
+                    type: "POST",
+                    contentType: "application/json",
+                    data: JSON.stringify({ bookUrl: bookUrl }),
+                    dataType: "json",
+                    success: function (downloadData) {
+                      if (downloadData.downloadLink) {
+                        downloadInfoDiv.html(
+                          `<p><strong>Download Link:</strong> <a href="${downloadData.downloadLink}" target="_blank">Download Now</a></p>`
+                        );
+                      } else {
+                        downloadInfoDiv.html(`<div class="alert alert-warning" role="alert">Download link not available.</div>`);
+                      }
+                    },
+                    error: function () {
+                        downloadInfoDiv.html(`<div class="alert alert-danger" role="alert">Failed to retrieve download link. Please try again later.</div>`);
+                    },
+                    complete: function(){
+                       $(".download-button").prop('disabled',false); // Re-enable the download button
+                    }
+                  });
+                });
+              }
+              function displayError(message) {
+                    $("#results").html(`<div class='alert alert-danger' role='alert'>${message}</div>`);
+                }
+            });
+        </script>
 
                 // Bind play audio button click events
                 $(".loadAudio").click(function () {

@@ -36,3 +36,4 @@ src/main/resources/application.properties
 *.properties
 *.properties
 flask_openai_backend/Gemini.txt
+*.pdf

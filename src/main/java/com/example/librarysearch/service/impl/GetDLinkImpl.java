@@ -11,27 +11,64 @@ import org.springframework.stereotype.Service;
 public class GetDLinkImpl {
 
     public String getDownloadLink(String bookUrl) {
+        // Set up ChromeOptions
         ChromeOptions options = new ChromeOptions();
-        options.addArguments("--headless");
+
+        // Specify the path to the user data directory using %USERPROFILE%
+        String userProfile = System.getenv("USERPROFILE");
+        options.addArguments("user-data-dir=" + userProfile + "\\AppData\\Local\\Google\\Chrome\\User Data");
+        
+        // Remove "--headless" if you want to see browser actions
+        //options.addArguments("--headless"); 
         options.addArguments("--disable-gpu");
         options.addArguments("--no-sandbox");
         options.addArguments("--disable-dev-shm-usage");
 
+        // Initialize WebDriver with options
         WebDriver driver = new ChromeDriver(options);
         String downloadUrl = null;
 
         try {
             driver.get(bookUrl);
 
+            // Check if login is required
+            try {
+                WebElement loginElement = driver.findElement(By.cssSelector("a[data-action='login']"));
+                if (loginElement != null) {
+                    // Open the login window
+                    loginElement.click();
+
+                    // Fill in login form
+                    //WebElement emailField = driver.findElement(By.cssSelector("input[name='email']"));
+                    //WebElement passwordField = driver.findElement(By.cssSelector("input[name='password']"));
+                    //WebElement loginButton = driver.findElement(By.cssSelector("button[name='submit']"));
+
+                    //emailField.sendKeys("EMAIL");
+                    //passwordField.sendKeys("password");
+                    //loginButton.click();
+
+                    // Wait for the page to load after login
+                    Thread.sleep(2000); // Adjust this sleep time as needed
+                }
+            } catch (Exception e) {
+                System.out.println("No login required, proceeding to fetch download link.");
+            }
+
             // Locate the download button
             WebElement downloadButton = driver.findElement(By.cssSelector("a.btn.btn-default.addDownloadedBook"));
 
             // Extract the href attribute of the download button
             downloadUrl = downloadButton.getAttribute("href");
+
+            // Click the download button to trigger the download
+            downloadButton.click();
+            Thread.sleep(222000); // Adjust this sleep time as needed
         } catch (Exception e) {
-            System.err.println("Error retrieving download URL for book: " + bookUrl + " - " + e.getMessage());
+            System.err.println("Error retrieving or clicking download URL for book: " + bookUrl + " - " + e.getMessage());
         } finally {
-            driver.quit();
+            // Temporarily comment out driver.quit() for testing purposes
+        	
+            // driver.quit();
         }
 
         return downloadUrl;
