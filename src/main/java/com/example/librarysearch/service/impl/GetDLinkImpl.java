@@ -38,14 +38,7 @@ public class GetDLinkImpl {
                     // Open the login window
                     loginElement.click();
 
-                    // Fill in login form
-                    //WebElement emailField = driver.findElement(By.cssSelector("input[name='email']"));
-                    //WebElement passwordField = driver.findElement(By.cssSelector("input[name='password']"));
-                    //WebElement loginButton = driver.findElement(By.cssSelector("button[name='submit']"));
 
-                    //emailField.sendKeys("EMAIL");
-                    //passwordField.sendKeys("password");
-                    //loginButton.click();
 
                     // Wait for the page to load after login
                     Thread.sleep(2000); // Adjust this sleep time as needed
@@ -54,6 +47,11 @@ public class GetDLinkImpl {
                 System.out.println("No login required, proceeding to fetch download link.");
             }
 
+            // Locate the book title element
+            WebElement bookTitleElement = driver.findElement(By.cssSelector("h1.book-title"));
+            String bookTitle = bookTitleElement.getText();
+            System.out.println("Book Title: " + bookTitle);
+            
             // Locate the download button
             WebElement downloadButton = driver.findElement(By.cssSelector("a.btn.btn-default.addDownloadedBook"));
 
@@ -61,14 +59,15 @@ public class GetDLinkImpl {
             downloadUrl = downloadButton.getAttribute("href");
 
             // Click the download button to trigger the download
+            Thread.sleep(4000); // Adjust this sleep time as needed
             downloadButton.click();
-            Thread.sleep(222000); // Adjust this sleep time as needed
+            Thread.sleep(122000); // Adjust this sleep time as needed
         } catch (Exception e) {
             System.err.println("Error retrieving or clicking download URL for book: " + bookUrl + " - " + e.getMessage());
         } finally {
             // Temporarily comment out driver.quit() for testing purposes
-        	
-            // driver.quit();
+        	System.out.println("Shutting Down Webdriver.");
+            driver.quit();
         }
 
         return downloadUrl;

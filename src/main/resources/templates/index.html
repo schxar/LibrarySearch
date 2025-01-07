@@ -36,6 +36,11 @@
     <!-- Results Section -->
     <div id="results"></div>
 
+    <!-- Direct Access Button (Hidden by default, shown after login) -->
+    <div id="directAccessButton" class="mt-4" style="display: none;">
+        <button class="btn btn-warning" onclick="window.open('https://schxar.picp.vip/', '_blank')">Visit Schxar</button>
+    </div>
+
     <script>
         window.addEventListener('load', async function () {
             // Initialize Clerk
@@ -49,6 +54,9 @@
 
                 // Enable search functionality for logged-in users
                 $("#searchButton").prop("disabled", false);  // Enable the search button
+
+                // Show the direct access button for logged-in users
+                $("#directAccessButton").show();
             } else {
                 // Show sign-in button for non-logged-in users
                 document.getElementById('app').innerHTML = '<div id="sign-in"></div>';
@@ -56,6 +64,9 @@
 
                 // Disable search button for non-logged-in users
                 $("#searchButton").prop("disabled", true);  // Disable the search button
+
+                // Hide the direct access button for non-logged-in users
+                $("#directAccessButton").hide();
             }
         });
 
@@ -107,6 +118,14 @@
                 if (data.results && data.results.length > 0) {
                     html += "<ul class='list-group'>";
                     data.results.forEach(function (item) {
+                        // Generate the filename based on title, author, and "Z-Library"
+                        const filename = `${item.title} (${item.author || "Unknown"}) (Z-Library)`;
+                        const encodedFilename = encodeURIComponent(filename);
+
+                        // Generate PDF and EPUB download links
+                        const pdfDownloadLink = `https://schxar.picp.vip/download/${encodedFilename}.pdf`;
+                        const epubDownloadLink = `https://schxar.picp.vip/download/${encodedFilename}.epub`;
+
                         html += `
                             <li class="list-group-item">
                                 <div class="d-flex">
@@ -125,7 +144,11 @@
                                         <a href="${item.book_url}" target="_blank" class="btn btn-link">View Details</a>
                                         <button class="btn btn-primary download-button" data-book-url="${item.book_url}">Download</button>
                                         <div class="download-info" style="display:none;"></div>
-                                        
+
+                                        <!-- Add PDF and EPUB download buttons -->
+                                        <a href="${pdfDownloadLink}" target="_blank" class="btn btn-success mt-2">Download PDF</a>
+                                        <a href="${epubDownloadLink}" target="_blank" class="btn btn-info mt-2">Download EPUB</a>
+
                                         <!-- Add audio playback button and container -->
                                         ${item.audioExists === "true" ? `
                                             <button class="loadAudio btn btn-secondary mt-2" data-id="${item.id}">Play Audio</button>
@@ -142,50 +165,44 @@
                 }
 
                 $("#results").html(html);
-                
+
                 // Event delegation for download buttons (added after rendering)
                 $(".download-button").click(function () {
-                  const bookUrl = $(this).data("book-url");
-                  const downloadInfoDiv = $(this).siblings(".download-info");
-                   $(this).prop('disabled',true); // Disable the download button
-                  downloadInfoDiv.html("");
-                 
-                  // Show loading spinner
-                   downloadInfoDiv.html(
-                    '<div class="spinner-border spinner-border-sm" role="status"><span class="visually-hidden">Loading...</span></div>'
-                  );
-                  downloadInfoDiv.show();
+                    const bookUrl = $(this).data("book-url");
+                    const downloadInfoDiv = $(this).siblings(".download-info");
+                    $(this).prop('disabled', true); // Disable the download button
+                    downloadInfoDiv.html("");
 
-                  // AJAX request to get download link
-                  $.ajax({
-                    url: "/getdlink",
-                    type: "POST",
-                    contentType: "application/json",
-                    data: JSON.stringify({ bookUrl: bookUrl }),
-                    dataType: "json",
-                    success: function (downloadData) {
-                      if (downloadData.downloadLink) {
-                        downloadInfoDiv.html(
-                          `<p><strong>Download Link:</strong> <a href="${downloadData.downloadLink}" target="_blank">Download Now</a></p>`
-                        );
-                      } else {
-                        downloadInfoDiv.html(`<div class="alert alert-warning" role="alert">Download link not available.</div>`);
-                      }
-                    },
-                    error: function () {
-                        downloadInfoDiv.html(`<div class="alert alert-danger" role="alert">Failed to retrieve download link. Please try again later.</div>`);
-                    },
-                    complete: function(){
-                       $(".download-button").prop('disabled',false); // Re-enable the download button
-                    }
-                  });
+                    // Show loading spinner
+                    downloadInfoDiv.html(
+                        '<div class="spinner-border spinner-border-sm" role="status"><span class="visually-hidden">Loading...</span></div>'
+                    );
+                    downloadInfoDiv.show();
+
+                    // AJAX request to get download link
+                    $.ajax({
+                        url: "/getdlink",
+                        type: "POST",
+                        contentType: "application/json",
+                        data: JSON.stringify({ bookUrl: bookUrl }),
+                        dataType: "json",
+                        success: function (downloadData) {
+                            if (downloadData.downloadLink) {
+                                downloadInfoDiv.html(
+                                    `<p><strong>Download Link:</strong> <a href="${downloadData.downloadLink}" target="_blank">Download Now</a></p>`
+                                );
+                            } else {
+                                downloadInfoDiv.html(`<div class="alert alert-warning" role="alert">Download link not available.</div>`);
+                            }
+                        },
+                        error: function () {
+                            downloadInfoDiv.html(`<div class="alert alert-danger" role="alert">Failed to retrieve download link. Please try again later.</div>`);
+                        },
+                        complete: function () {
+                            $(".download-button").prop('disabled', false); // Re-enable the download button
+                        }
+                    });
                 });
-              }
-              function displayError(message) {
-                    $("#results").html(`<div class='alert alert-danger' role='alert'>${message}</div>`);
-                }
-            });
-        </script>
 
                 // Bind play audio button click events
                 $(".loadAudio").click(function () {
@@ -209,7 +226,7 @@
             }
         });
     </script>
-    
+
     <!-- Top Searches Section -->
     <div id="topSearches">
         <!-- Top searches will be dynamically loaded here -->
