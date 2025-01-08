@@ -118,13 +118,8 @@
                 if (data.results && data.results.length > 0) {
                     html += "<ul class='list-group'>";
                     data.results.forEach(function (item) {
-                        // Generate the filename based on title, author, and "Z-Library"
-                        const filename = `${item.title} (${item.author || "Unknown"}) (Z-Library)`;
-                        const encodedFilename = encodeURIComponent(filename);
-
-                        // Generate PDF and EPUB download links
-                        const pdfDownloadLink = `https://schxar.picp.vip/download/${encodedFilename}.pdf`;
-                        const epubDownloadLink = `https://schxar.picp.vip/download/${encodedFilename}.epub`;
+                        // Replace semicolons with commas in author names
+                        const authorText = (item.author || "").replace(/;/g, ", ") || "N/A";
 
                         html += `
                             <li class="list-group-item">
@@ -132,7 +127,7 @@
                                     ${item.cover_url ? `<img src="${item.cover_url}" alt="Cover" class="img-thumbnail me-3" style="max-height: 200px; max-width: 200px;">` : ""}
                                     <div>
                                         <h5 class="fw-bold">${item.title}</h5>
-                                        <p><strong>Author:</strong> ${item.author || "N/A"}</p>
+                                        <p><strong>Author:</strong> ${authorText}</p>
                                         <p><strong>ISBN:</strong> ${item.isbn || "N/A"}</p>
                                         <p><strong>Publisher:</strong> ${item.publisher || "N/A"}</p>
                                         <p><strong>Language:</strong> ${item.language || "N/A"}</p>
@@ -146,8 +141,8 @@
                                         <div class="download-info" style="display:none;"></div>
 
                                         <!-- Add PDF and EPUB download buttons -->
-                                        <a href="${pdfDownloadLink}" target="_blank" class="btn btn-success mt-2">Download PDF</a>
-                                        <a href="${epubDownloadLink}" target="_blank" class="btn btn-info mt-2">Download EPUB</a>
+                                        <a href="https://schxar.picp.vip/" target="_blank" class="btn btn-success mt-2">Download PDF</a>
+                                        <a href="https://schxar.picp.vip/" target="_blank" class="btn btn-info mt-2">Download EPUB</a>
 
                                         <!-- Add audio playback button and container -->
                                         ${item.audioExists === "true" ? `

@@ -89,6 +89,7 @@ public class SearchServiceImpl implements SearchService {
                 String id = item.attr("id");
                 String title = item.select("[slot=title]").text();
                 String author = item.select("[slot=author]").text();
+                System.out.println(author);
                 String isbn = item.attr("isbn");
                 String publisher = item.attr("publisher");
                 String language = item.attr("language");
