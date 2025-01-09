@@ -61,7 +61,7 @@ public class GetDLinkImpl {
             // Click the download button to trigger the download
             Thread.sleep(4000); // Adjust this sleep time as needed
             downloadButton.click();
-            Thread.sleep(600000); // Adjust this sleep time as needed
+            Thread.sleep(120000); // Adjust this sleep time as needed
         } catch (Exception e) {
             System.err.println("Error retrieving or clicking download URL for book: " + bookUrl + " - " + e.getMessage());
         } finally {

@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Search History</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 20px;
+    }
+    form {
+      margin-bottom: 20px;
+    }
+    input[type="text"] {
+      padding: 8px;
+      width: 200px;
+      margin-right: 10px;
+    }
+    button {
+      padding: 8px 16px;
+      background-color: #007bff;
+      color: white;
+      border: none;
+      cursor: pointer;
+    }
+    button:hover {
+      background-color: #0056b3;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 20px;
+    }
+    th, td {
+      padding: 10px;
+      border: 1px solid #ddd;
+      text-align: left;
+    }
+    th {
+      background-color: #f4f4f4;
+    }
+  </style>
+</head>
+<body>
+  <h1>Search History</h1>
+
+  <!-- 表单：添加数据 -->
+  <form method="POST" action="/">
+    <input type="text" name="clerk_user_email" placeholder="Clerk User Email" required>
+    <input type="text" name="search_query" placeholder="Search Query" required>
+    <button type="submit">Add Search</button>
+  </form>
+
+  <!-- 显示数据库中的数据 -->
+  <h2>Search History Data</h2>
+  <table>
+    <thead>
+      <tr>
+        <th>ID</th>
+        <th>Clerk User Email</th>
+        <th>Search Query</th>
+        <th>Timestamp</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for entry in search_history %}
+      <tr>
+        <td>{{ entry.id }}</td>
+        <td>{{ entry.clerk_user_email }}</td>
+        <td>{{ entry.search_query }}</td>
+        <td>{{ entry.search_timestamp }}</td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</body>
+</html>
