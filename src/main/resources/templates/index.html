@@ -10,7 +10,7 @@
     <script
         async
         crossorigin="anonymous"
-        data-clerk-publishable-key="pk_test_aW50ZW5zZS1ndXBweS04LmNsZXJrLmFjY291bnRzLmRldiQ"
+        data-clerk-publishable-key="pk_test_bGFyZ2UtY3JheWZpc2gtMzIuY2xlcmsuYWNjb3VudHMuZGV2JA"
         src="https://intense-guppy-8.clerk.accounts.dev/npm/@clerk/clerk-js@latest/dist/clerk.browser.js"
         type="text/javascript"
     ></script>
@@ -38,7 +38,7 @@
 
     <!-- Direct Access Button (Hidden by default, shown after login) -->
     <div id="directAccessButton" class="mt-4" style="display: none;">
-        <button class="btn btn-warning" onclick="window.open('https://schxar.picp.vip/', '_blank')">Visit Schxar</button>
+        <button class="btn btn-warning" onclick="window.open('https://schxar.picp.vip/', '_blank')">Visit Flask File Server</button>
     </div>
 
     <script>
@@ -121,6 +121,10 @@
                         // Replace semicolons with commas in author names
                         const authorText = (item.author || "").replace(/;/g, ", ") || "N/A";
 
+                        // Extract the first word from the title
+                        const firstWord = item.title.split(" ")[0]; // Split by space and take the first word
+                        const searchUrl = `https://schxar.picp.vip/search?book_name=${encodeURIComponent(firstWord)}`;
+
                         html += `
                             <li class="list-group-item">
                                 <div class="d-flex">
@@ -137,12 +141,12 @@
                                         <p><strong>Rating:</strong> ${item.rating || "N/A"}</p>
                                         <p><strong>Quality:</strong> ${item.quality || "N/A"}</p>
                                         <a href="${item.book_url}" target="_blank" class="btn btn-link">View Details</a>
-                                        <button class="btn btn-primary download-button" data-book-url="${item.book_url}">Download</button>
+                                        <button class="btn btn-primary download-button" data-book-url="${item.book_url}">Download To Flask File Server</button>
                                         <div class="download-info" style="display:none;"></div>
 
-                                        <!-- Add PDF and EPUB download buttons -->
-                                        <a href="https://schxar.picp.vip/" target="_blank" class="btn btn-success mt-2">Download PDF</a>
-                                        <a href="https://schxar.picp.vip/" target="_blank" class="btn btn-info mt-2">Download EPUB</a>
+                                        <!-- Add PDF and EPUB download buttons with dynamic search URL -->
+                                        <a href="${searchUrl}" target="_blank" class="btn btn-success mt-2">Download PDF From File Server</a>
+                                        <a href="${searchUrl}" target="_blank" class="btn btn-info mt-2">Download EPUB From File Server</a>
 
                                         <!-- Add audio playback button and container -->
                                         ${item.audioExists === "true" ? `
@@ -184,14 +188,14 @@
                         success: function (downloadData) {
                             if (downloadData.downloadLink) {
                                 downloadInfoDiv.html(
-                                    `<p><strong>Download Link:</strong> <a href="${downloadData.downloadLink}" target="_blank">Download Now</a></p>`
+                                    `<p><strong>Direct Download Link:</strong> <a href="${downloadData.downloadLink}" target="_blank">Download Now</a></p>`
                                 );
                             } else {
                                 downloadInfoDiv.html(`<div class="alert alert-warning" role="alert">Download link not available.</div>`);
                             }
                         },
                         error: function () {
-                            downloadInfoDiv.html(`<div class="alert alert-danger" role="alert">Failed to retrieve download link. Please try again later.</div>`);
+                            downloadInfoDiv.html(`<div class="alert alert-danger" role="alert">Download to flask server done but failed to retrieve direct download link..</div>`);
                         },
                         complete: function () {
                             $(".download-button").prop('disabled', false); // Re-enable the download button

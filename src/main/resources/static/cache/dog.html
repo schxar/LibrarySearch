@@ -1,6 +1,14 @@
-<html lang="zh" class="" style="--vh: 4.26px;"><head>
+<html lang="zh" class="dark" style="--vh: 4.74px;"><head>
         <meta name="color-scheme" content="">
-                <script src="/components/zlibrary.js?0.774"></script>
+                <script>
+            if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
+                document.querySelector("html").className = "dark"
+            }
+            window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', e => {
+                document.querySelector('html').className = e.matches ? 'dark' : 'light';
+            });
+        </script>
+                        <script src="/components/zlibrary.js?0.775"></script>
         <script type="text/javascript">
             navigator.sayswho = (function(){
                 var ua= navigator.userAgent, tem,
@@ -88,28 +96,28 @@
         <meta name="singleLanguage" value="bool(true)
 ">
 
-            <link rel="stylesheet" href="/resources/css/theme.css?0.774">
+            <link rel="stylesheet" href="/resources/css/theme.css?0.775">
 
-                    <meta name="version" value="0.774">
-            <link rel="stylesheet" type="text/css" href="/resources/build/main.css?0.774">
-            <script type="text/javascript" src="/resources/build/main.js?0.774"></script>
-                            <link rel="stylesheet" type="text/css" href="/resources/build/global.css?0.774">
-                <link rel="stylesheet" href="/resources/build/global-d.css?0.774" as="style" onload="this.onload=null;this.rel='stylesheet'">
-                <noscript><link rel="stylesheet" href="/resources/build/global-d.css?0.774"></noscript>
-                <script type="text/javascript" src="/resources/build/global.js?0.774"></script>
-                        <script type="text/javascript" src="/resources/build/bootstrap.js?0.774"></script>
-            <script type="text/javascript" src="/resources/build/global-d.js?0.774" defer=""></script>
-                                <script type="text/javascript" src="/resources/js/search_metrics.js?0.774"></script>
+                    <meta name="version" value="0.775">
+            <link rel="stylesheet" type="text/css" href="/resources/build/main.css?0.775">
+            <script type="text/javascript" src="/resources/build/main.js?0.775"></script>
+                            <link rel="stylesheet" type="text/css" href="/resources/build/global.css?0.775">
+                <link rel="stylesheet" href="/resources/build/global-d.css?0.775" as="style" onload="this.onload=null;this.rel='stylesheet'">
+                <noscript><link rel="stylesheet" href="/resources/build/global-d.css?0.775"></noscript>
+                <script type="text/javascript" src="/resources/build/global.js?0.775"></script>
+                        <script type="text/javascript" src="/resources/build/bootstrap.js?0.775"></script>
+            <script type="text/javascript" src="/resources/build/global-d.js?0.775" defer=""></script>
+                                <script type="text/javascript" src="/resources/js/search_metrics.js?0.775"></script>
         <noscript>
-            <link rel="stylesheet" type="text/css" href="/resources/css/noscript.css?0.774" />
+            <link rel="stylesheet" type="text/css" href="/resources/css/noscript.css?0.775" />
         </noscript>
 
         <script>
             window != top ? window.stop() : null;
             
-            const Config = {"domainHost":"z-lib.gl","BRegion":"china","Country":"hk","accessByIp":false,"supportEmail":"support@z-lib.fm","preferredDomain":"https:\/\/z-library.sk","loginURL":"\/login?redirectUrl=https:\/\/z-lib.gl","regURL":"\/registration?redirectUrl=https:\/\/z-lib.gl","generalFilesProxy":"https:\/\/dlr1.fcdn.sk\/general-files\/","isDesktopApp":false,"desktopAppVersion":null,"isTelegramBrowser":false,"isProxy":false};
+            const Config = {"domainHost":"z-lib.gl","BRegion":"asia","Country":"sg","accessByIp":false,"supportEmail":"support@z-lib.fm","preferredDomain":"https:\/\/z-library.sk","loginURL":"\/login?redirectUrl=https:\/\/z-lib.gl","regURL":"\/registration?redirectUrl=https:\/\/z-lib.gl","generalFilesProxy":"https:\/\/dlr1.fcdn.sk\/general-files\/","isDesktopApp":false,"desktopAppVersion":null,"isTelegramBrowser":false,"isProxy":false};
             const CurrentUser = new User(null);
-            const CurrentClientIP = "124.244.227.5";
+            const CurrentClientIP = "103.190.179.36";
             const CurrentSiteMode = 'books';
             const proxiesToCheck = []; //for google verification
 
@@ -126,7 +134,7 @@
                         fallbackLng: 'en',
                         backend: {
                             // addPath: '/papi/translations/add-missing-key',
-                            loadPath: '/resources/build/translations-frontend/{{lng}}.json?v=0.774'
+                            loadPath: '/resources/build/translations-frontend/{{lng}}.json?v=0.775'
                         },
                         keySeparator: notLikelyString,
                         nsSeparator: notLikelyString,
@@ -175,8 +183,8 @@
         
         
         <script src="/components/zlibrary-startup-script.js"></script>
-        <link rel="stylesheet" href="/components/style.css?0.774">
-    <script src="/components/z-tabs.js?0.774"></script><script src="/components/z-dropdown.js?0.774"></script><script src="/components/z-bookcard.js?0.774"></script><script src="/components/z-recommended-search.js?0.774"></script><script src="/components/z-cover.js?0.774"></script><script src="/components/z-booklists-browser.js?0.774"></script><script src="/components/z-carousel.js?0.774"></script></head>
+        <link rel="stylesheet" href="/components/style.css?0.775">
+    <script src="/components/z-tabs.js?0.775"></script><script src="/components/z-dropdown.js?0.775"></script><script src="/components/z-bookcard.js?0.775"></script><script src="/components/z-recommended-search.js?0.775"></script><script src="/components/z-cover.js?0.775"></script><script src="/components/z-booklists-browser.js?0.775"></script><script src="/components/z-carousel.js?0.775"></script></head>
 
         <body style="margin:0px;padding:0px;" class="search  super-puper-main-container" data-proxy="false">
         
@@ -318,151 +326,67 @@
         </div>
     
     
-<div id="newYearBanner">
-    <i class="zlibicon-cross close-btn"></i>
-    <div class="new-year-body">
-        <div class="img"></div>
-        <a class="blogLink" href="/blog/55">Gift inside</a>
+<div id="merchantPopup" class="hidden">
+    <p>We're currently searching for a high-risk payment processing provider to handle bank cards and local payments.
+    </p><p>
+        If you know of any reliable providers, please get in touch with us via <a href="mailto:support@z-lib.fm">support@z-lib.fm</a> with the subject line <b>"High-risk merchant"</b>. Your help is greatly appreciated!
+    </p><p>Please refrain from emailing if you are not familiar with this topic.
+    </p><p>Thank you!
+    </p><div class="modal-footer">
+        <button class="btnCloseMerchantPopup">关闭</button>
     </div>
 </div>
 
-<style>
-    #newYearBanner .close-btn {
-        position: absolute;
-        right: 20px;
-        top: 15px;
-        color: #fff;
-        font-size: 11px;
-        cursor: pointer;
-        padding-left: 15px;
-        padding-bottom: 15px;
-    }
 
-    #newYearBanner .new-year-body {
-        position: absolute;
-        top: 0;
-        left: 0;
-        right: 0;
-        bottom: 24px;
-        display: flex;
-        justify-content: center;
-        align-items: flex-end;
-    }
-    @media screen and (min-width: 485px){
-        #newYearBanner {
-            width: 100%;
-            background-image: url("/img/new-year/2025/banner.png");
-            padding-top: 21.75%;
-            border-radius: 8px;
-            margin-top: 16px;
-            margin-bottom: 32px;
-            position: relative;
-            background-size: cover;
-        }
-        #newYearBanner .img{
-            width: 487px;
-            height: 183px;
-            background-image: url("/img/new-year/2025/banner-title.png");
-            margin-bottom: -24px;
-            margin-right: 32px;
-            max-width: 58%;
-            background-size: contain;
-            background-position: bottom;
-            background-repeat: no-repeat;
-        }
-    }
-    
-    @media screen and (min-width: 485px) and (min-resolution: 1.1dppx), 
-       screen and (min-width: 485px) and (-webkit-min-device-pixel-ratio: 1.1) {
-        #newYearBanner {
-            background-image: url("/img/new-year/2025/banner@2x.png");
-        }
-        #newYearBanner .img{
-            background-image: url("/img/new-year/2025/banner-title@2x.png");
-        }
-    }
-
-    @media screen and (max-width: 484px){
-        #newYearBanner {
-            width: 100%;
-            background-image: url("/img/new-year/2025/banner-mob.png");
-            padding-top: 50.26%;
-            border-radius: 8px;
-            margin-top: 16px;
-            margin-bottom: 32px;
-            position: relative;
-            background-size: cover;
-        }
-        #newYearBanner .img{
-            width: 232px;
-            height: 100px;
-            background-image: url("/img/new-year/2025/banner-title-mob.png");
-            margin-bottom: 2px;
-            max-width: 80%;
-            background-size: contain;
-            background-position: bottom;
-            background-repeat: no-repeat;
-        }
-        #newYearBanner .new-year-body {
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-            bottom: 0;
-        }
-    }   
-    @media screen and (max-width: 484px) and (min-resolution: 1.1dppx), 
-       screen and (max-width: 484px) and (-webkit-min-device-pixel-ratio: 1.1) {
-        #newYearBanner {
-            background-image: url("/img/new-year/2025/banner-mob@2x.png");
-        }
-        #newYearBanner .img{
-            background-image: url("/img/new-year/2025/banner-title-mob@2x.png");
-        }
-    }
-
-    #newYearBanner .blogLink{
-        text-decoration: none;
-        background: #DD583F;
-        border: 1px solid #FFFFFF;
-        color: #FFFFFF;
-        box-shadow: 1px 1px 0px 0px #00000040;
-        padding: 8px 24px;
-        font-size: 16px;
-        border-radius: 2px;
-    }
-    #newYearBanner .blogLink:hover{
-        background: #DD583FCC;
-    }
-
-</style>
-
-<script>
-    $(function () {
-        $(document).on('click', '#newYearBanner', function (e) {
-            const $target = $(e.target)
-            e.preventDefault()
-            if ($target.hasClass('close-btn')) {
-                return
-            }
-
-            const blogUrl = $('a.blogLink').attr('href')
-            if (!CurrentUser.id) {
-                CurrentUser.showAuthPopup('login', i18next.t('After authorization, you will be able to take a gift'), null, blogUrl)
-                return;
-            }
-
-            if (typeof blogUrl === 'string' && blogUrl.length) {
-                window.location.href = blogUrl
-            }
+<script type="text/javascript">
+    $(document).on('click', '.btnShowMerchantPopup', function() {
+        const merchantModal = new ZLibraryModal({
+            element: 'merchantPopup',
+            container: 'zlibrary-modal-styled',
         })
-        $('#newYearBanner .close-btn').on('click', function () {
-            new ZLibraryResponse('/papi/user/hide-announcement/banner25/').fetch()
-            $('#newYearBanner').slideUp(function () {
-                $(this).remove()
-            })
+        merchantModal.show()
+    })
+
+    $(document).on('click', '.btnCloseMerchantPopup', function() {
+        const merchantModal = new ZLibraryModal({
+            element: 'merchantPopup',
+            container: 'zlibrary-modal-styled',
+        })
+        merchantModal.hide()
+    })
+
+    
+    $(document).on('click', '.btnHideAnnouncement', function() {
+        let cook = getCookie('hiddenMessages');
+        let hidden = cook ? JSON.parse(cook) : [];
+        let messageHash = $(this).data('message');
+
+        if (hidden.indexOf(messageHash) === -1) {
+            hidden.push($(this).data('message'))
+        }
+
+        setCookie('hiddenMessages', JSON.stringify(hidden), 31*24*60*60*1000)
+        $('#messageBlock').hide()
+    })
+
+    $(document).on('click', '.btnHideBanner', function() {
+        const bannerName = $(this).data('name')
+        hideBanner(bannerName)
+    })
+
+    $(function () {
+        $('.feedback-modal').click(function () {
+            let modalTitle = $(this).data('title');
+            let subject = $(this).data('subject');
+            new ZLibraryModal({
+                url: '/layer/_modals/feedback?subject="' + subject + '"',
+                title: modalTitle
+            }).show()
         })
     })
 </script>
+
+
     <a name="s"></a>
 
     <form method="get" id="searchForm" action="/s/">
@@ -1188,10 +1112,10 @@
             </div>
                     <div class="divider"></div>            <div class="book-item resItemBoxBooks exactMatch">
                 <div class="counter">32</div>
-                <z-bookcard id="11520637" isbn="9781471146725" termshash="9106a14f6db748fb20eb100835b04fa7" href="/book/11520637/2c8a43/shoe-dog-a-memoir-by-the-creator-of-nike.html" publisher="Simon &amp; Schuster" language="english" year="2018" extension="mobi" filesize="769 KB" rating="5.0" quality="1.0" contenttypeparam="?content_type=book" class="ready">
-                    <img data-src="https://s3proxy.cdn-zlib.sk/covers100/collections/userbooks/e01009b3785b2c8f76844fb1d0651beb21450414df46cd29fc356f9514f9d1fe.png">
+                <z-bookcard id="17837149" isbn="B0176M1A44" termshash="6f3386e59195289761b2a4e901472668" href="/book/17837149/817f8b/shoe-dog-a-memoir-by-the-creator-of-nike.html" publisher="Scribner" language="english" year="2016" extension="epub" filesize="722 KB" rating="0.0" quality="5.0" contenttypeparam="?content_type=book" class="ready">
+                    <img data-src="https://s3proxy.cdn-zlib.sk/covers100/collections/userbooks/9bfd33243e52da28d715e75217537a4e8026de93c8c256b6893a951b1bc07170.jpg">
                     <div slot="title">Shoe Dog: A Memoir by the Creator of Nike</div>
-                    <div slot="author">Phil Knight</div>
+                    <div slot="author">Knight; Phil</div>
                     <div slot="note"></div>
                     <div slot="extend" style="position: absolute;">
                                                                                             </div>
@@ -1199,10 +1123,10 @@
             </div>
                     <div class="divider"></div>            <div class="book-item resItemBoxBooks exactMatch">
                 <div class="counter">33</div>
-                <z-bookcard id="17837149" isbn="B0176M1A44" termshash="6f3386e59195289761b2a4e901472668" href="/book/17837149/817f8b/shoe-dog-a-memoir-by-the-creator-of-nike.html" publisher="Scribner" language="english" year="2016" extension="epub" filesize="722 KB" rating="0.0" quality="5.0" contenttypeparam="?content_type=book" class="ready">
-                    <img data-src="https://s3proxy.cdn-zlib.sk/covers100/collections/userbooks/9bfd33243e52da28d715e75217537a4e8026de93c8c256b6893a951b1bc07170.jpg">
+                <z-bookcard id="11520637" isbn="9781471146725" termshash="9106a14f6db748fb20eb100835b04fa7" href="/book/11520637/2c8a43/shoe-dog-a-memoir-by-the-creator-of-nike.html" publisher="Simon &amp; Schuster" language="english" year="2018" extension="mobi" filesize="769 KB" rating="5.0" quality="1.0" contenttypeparam="?content_type=book" class="ready">
+                    <img data-src="https://s3proxy.cdn-zlib.sk/covers100/collections/userbooks/e01009b3785b2c8f76844fb1d0651beb21450414df46cd29fc356f9514f9d1fe.png">
                     <div slot="title">Shoe Dog: A Memoir by the Creator of Nike</div>
-                    <div slot="author">Knight; Phil</div>
+                    <div slot="author">Phil Knight</div>
                     <div slot="note"></div>
                     <div slot="extend" style="position: absolute;">
                                                                                             </div>
@@ -1353,10 +1277,10 @@
             </div>
                     <div class="divider"></div>            <div class="book-item resItemBoxBooks exactMatch">
                 <div class="counter">47</div>
-                <z-bookcard id="6068855" isbn="" termshash="" href="/book/6068855/618571/the-complete-raspberry-pi-manual-expert-tutorials-to-improve-your-skills-october-2020.html" publisher="Black Dog Media" language="english" year="2020" extension="pdf" filesize="94.74 MB" rating="5.0" quality="5.0" contenttypeparam="?content_type=book" class="ready">
-                    <img data-src="/img/cover-not-exists.png">
-                    <div slot="title">The Complete Raspberry Pi Manual: Expert Tutorials To Improve Your Skills – October 2020</div>
-                    <div slot="author">Black Dog Media</div>
+                <z-bookcard id="11064584" isbn="B07L9K35GM" termshash="" href="/book/11064584/c49202/dog-man-for-whom-the-ball-rolls.html" publisher="Scholastic Inc." language="english" year="2016" extension="azw3" filesize="155.66 MB" rating="5.0" quality="3.0" contenttypeparam="?content_type=book" class="ready">
+                    <img data-src="https://s3proxy.cdn-zlib.sk/covers100/collections/userbooks/12e4dd94802977f261ac98ed9aae94b98afccfeeb1557d5692933b75cae19e75.jpg">
+                    <div slot="title">Dog Man: For Whom the Ball Rolls</div>
+                    <div slot="author">Dav Pilkey</div>
                     <div slot="note"></div>
                     <div slot="extend" style="position: absolute;">
                                                                                             </div>
@@ -1364,10 +1288,10 @@
             </div>
                     <div class="divider"></div>            <div class="book-item resItemBoxBooks exactMatch">
                 <div class="counter">48</div>
-                <z-bookcard id="11064584" isbn="B07L9K35GM" termshash="" href="/book/11064584/c49202/dog-man-for-whom-the-ball-rolls.html" publisher="Scholastic Inc." language="english" year="2016" extension="azw3" filesize="155.66 MB" rating="5.0" quality="3.0" contenttypeparam="?content_type=book" class="ready">
-                    <img data-src="https://s3proxy.cdn-zlib.sk/covers100/collections/userbooks/12e4dd94802977f261ac98ed9aae94b98afccfeeb1557d5692933b75cae19e75.jpg">
-                    <div slot="title">Dog Man: For Whom the Ball Rolls</div>
-                    <div slot="author">Dav Pilkey</div>
+                <z-bookcard id="6068855" isbn="" termshash="" href="/book/6068855/618571/the-complete-raspberry-pi-manual-expert-tutorials-to-improve-your-skills-october-2020.html" publisher="Black Dog Media" language="english" year="2020" extension="pdf" filesize="94.74 MB" rating="5.0" quality="5.0" contenttypeparam="?content_type=book" class="ready">
+                    <img data-src="/img/cover-not-exists.png">
+                    <div slot="title">The Complete Raspberry Pi Manual: Expert Tutorials To Improve Your Skills – October 2020</div>
+                    <div slot="author">Black Dog Media</div>
                     <div slot="note"></div>
                     <div slot="extend" style="position: absolute;">
                                                                                             </div>
@@ -1395,7 +1319,7 @@
                                                                                             </div>
                                                                                                 </z-bookcard>    
             </div>
-        <div style="margin: 0 -1px -1px;position: relative;"><z-recommended-search query="17049393,11520637,17837149,5808656,5542449,1220845,678763,2537404,13214418,2924848,1064892,17262024,6005493,3334842,5808659,984875,6068855,11064584,25260531,5288101" auto="" lazy="" class="ready"></z-recommended-search></div></div>
+        <div style="margin: 0 -1px -1px;position: relative;"><z-recommended-search query="17049393,17837149,11520637,5808656,5542449,1220845,678763,2537404,13214418,2924848,1064892,17262024,6005493,3334842,5808659,984875,11064584,6068855,25260531,5288101" auto="" lazy="" class="ready"></z-recommended-search></div></div>
     
 
 <script>
@@ -1471,7 +1395,7 @@
                                     <span class="z-modal__text">Z-Alerts可以让你在有新书时根据你的搜索要求得到通知。您可以用书名、作者、ISBN等信息作为搜索查询 <a href="/msgn/zalerts" target="_blank">阅读更多关于Z-Alerts的信息</a>.</span>
                 
                                     <input id="zalertEmail" type="text" form="zalertCreateForm" class="z-text-input" placeholder="您的 Email邮箱" name="email">
-                                    <input id="zalertQuery" type="text" form="zalertCreateForm" value="dog" class="z-text-input" placeholder="请输入搜索词"><div id="tooltip-434698" class="zlib-tooltip" style="display:none"><button class="visible-xs-block close">×</button>
+                                    <input id="zalertQuery" type="text" form="zalertCreateForm" value="dog" class="z-text-input" placeholder="请输入搜索词"><div id="tooltip-656735" class="zlib-tooltip" style="display:none"><button class="visible-xs-block close">×</button>
             <span class="zlibicon-info"></span>
             如果您需要带 ISBN 的图书，<br>我们建议创建 <a href="/requests">添加书籍请求</a></div>
 
