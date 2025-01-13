@@ -1,4 +1,4 @@
-from flask import Flask, request, jsonify, render_template
+from flask import Flask, request, jsonify, render_template, redirect, url_for
 import mysql.connector
 
 app = Flask(__name__)
@@ -66,6 +66,22 @@ def index():
     # 渲染 HTML 页面
     return render_template('SQL.html', search_history=search_history)
 
+# 删除搜索记录
+@app.route('/delete/<int:id>', methods=['POST'])
+def delete_search_record(id):
+    conn = get_db_connection()
+    cursor = conn.cursor()
+
+    # 删除指定 ID 的记录
+    sql = 'DELETE FROM SearchHistory WHERE id = %s'
+    cursor.execute(sql, (id,))
+    conn.commit()
+    cursor.close()
+    conn.close()
+
+    # 重定向回主页
+    return redirect(url_for('index'))
+
 if __name__ == '__main__':
     create_search_history_table()
-    app.run(debug=True,host='0.0.0.0', port=10805)
+    app.run(debug=True, host='0.0.0.0', port=10805)
