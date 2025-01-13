@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>View Tickets</title>
+</head>
+<body>
+    <h1>All Tickets</h1>
+    <table border="1">
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>Book Title</th>
+                <th>Book Hash</th>
+                <th>Request Date</th>
+                <th>Clerk Email</th>
+                <th>Status</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for ticket in tickets %}
+            <tr>
+                <td>{{ ticket.id }}</td>
+                <td>{{ ticket.book_title }}</td>
+                <td>{{ ticket.book_hash }}</td>
+                <td>{{ ticket.request_date }}</td>
+                <td>{{ ticket.clerk_user_email }}</td>
+                <td>{{ ticket.status }}</td>
+                <td>
+                    <a href="/update_status/{{ ticket.id }}/pending">Pending</a>
+                    <a href="/update_status/{{ ticket.id }}/processing">Processing</a>
+                    <a href="/update_status/{{ ticket.id }}/completed">Completed</a>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</body>
+</html>
