@@ -29,7 +29,7 @@
 
     <!-- Search Bar -->
     <div class="input-group mb-3">
-        <input type="text" id="searchQuery" class="form-control" placeholder="Enter search keyword" aria-label="Search" />
+        <input type="text" id="searchQuery" class="form-control" placeholder="Enter search keyword" aria-label="Search" disabled />
         <button id="searchButton" class="btn btn-primary" disabled>Search</button>
     </div>
 
@@ -63,6 +63,7 @@
                 Clerk.mountUserButton(document.getElementById('user-button'));
 
                 // Enable search functionality for logged-in users
+                $("#searchQuery").prop("disabled", false);  // Enable the search input
                 $("#searchButton").prop("disabled", false);  // Enable the search button
 
                 // Show the direct access button for logged-in users
@@ -72,7 +73,8 @@
                 document.getElementById('app').innerHTML = '<div id="sign-in"></div>';
                 Clerk.mountSignIn(document.getElementById('sign-in'));
 
-                // Disable search button for non-logged-in users
+                // Disable search input and button for non-logged-in users
+                $("#searchQuery").prop("disabled", true);  // Disable the search input
                 $("#searchButton").prop("disabled", true);  // Disable the search button
 
                 // Hide the direct access button for non-logged-in users
@@ -83,12 +85,14 @@
         // Handle Search Functionality
         $(document).ready(function() {
             $("#searchButton").click(function() {
-                performSearch();
+                if (Clerk.user) { // Only allow search if user is logged in
+                    performSearch();
+                }
             });
 
-            // Allow pressing Enter to trigger search
+            // Allow pressing Enter to trigger search (only if logged in)
             $("#searchQuery").keypress(function(e) {
-                if (e.which === 13) {
+                if (e.which === 13 && Clerk.user) { // Only allow Enter key if logged in
                     performSearch();
                 }
             });
@@ -151,16 +155,16 @@
                                         <p><strong>Rating:</strong> ${item.rating || "N/A"}</p>
                                         <p><strong>Quality:</strong> ${item.quality || "N/A"}</p>
                                         <a href="${item.book_url}" target="_blank" class="btn btn-link">View Details</a>
-                                        <button class="btn btn-primary download-button" data-book-url="${item.book_url}">Download To Flask File Server</button>
+                                        <button class="btn btn-primary download-button" data-book-url="${item.book_url}" ${Clerk.user ? "" : "disabled"}>Download To Flask File Server</button>
                                         <div class="download-info" style="display:none;"></div>
 
                                         <!-- Add PDF and EPUB download buttons with dynamic search URL -->
-                                        <a href="${searchUrl}" target="_blank" class="btn btn-success mt-2">Download PDF From File Server</a>
-                                        <a href="${searchUrl}" target="_blank" class="btn btn-info mt-2">Download EPUB From File Server</a>
+                                        <a href="${searchUrl}" target="_blank" class="btn btn-success mt-2" ${Clerk.user ? "" : "disabled"}>Download PDF From File Server</a>
+                                        <a href="${searchUrl}" target="_blank" class="btn btn-info mt-2" ${Clerk.user ? "" : "disabled"}>Download EPUB From File Server</a>
 
                                         <!-- Add audio playback button and container -->
                                         ${item.audioExists === "true" ? `
-                                            <button class="loadAudio btn btn-secondary mt-2" data-id="${item.id}">Play Audio</button>
+                                            <button class="loadAudio btn btn-secondary mt-2" data-id="${item.id}" ${Clerk.user ? "" : "disabled"}>Play Audio</button>
                                             <div class="audioContainer" id="audioContainer-${item.id}" style="display:none;"></div>
                                         ` : ""}
                                     </div>
@@ -177,6 +181,8 @@
 
                 // Event delegation for download buttons (added after rendering)
                 $(".download-button").click(function () {
+                    if (!Clerk.user) return; // Only allow download if logged in
+
                     const bookUrl = $(this).data("book-url");
                     const downloadInfoDiv = $(this).siblings(".download-info");
                     $(this).prop('disabled', true); // Disable the download button
@@ -215,6 +221,8 @@
 
                 // Bind play audio button click events
                 $(".loadAudio").click(function () {
+                    if (!Clerk.user) return; // Only allow audio playback if logged in
+
                     const bookId = $(this).data("id");
                     const audioContainer = $(`#audioContainer-${bookId}`);
                     if (audioContainer.html() === "") {
