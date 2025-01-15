@@ -1,7 +1,10 @@
-from flask import Flask, request, jsonify, send_file, render_template_string
+from flask import Flask, request, jsonify, send_file, render_template_string, redirect, url_for
 import os
 import glob
 from math import ceil
+import mysql.connector
+import hashlib
+from datetime import datetime
 
 app = Flask(__name__)
 
@@ -9,6 +12,37 @@ app = Flask(__name__)
 download_directory = os.path.join(os.getcwd(), "C:\\Users\\PC\\eclipse-workspace\\LibrarySearch\\src\\main\\resources\\static\\books")
 if not os.path.exists(download_directory):
     os.makedirs(download_directory)
+
+# 数据库配置
+db_config = {
+    'host': 'localhost',
+    'user': 'root',
+    'password': '13380008373',
+    'database': 'library'
+}
+
+# 连接数据库
+def get_db_connection():
+    conn = mysql.connector.connect(**db_config)
+    return conn
+
+# 创建工单表
+def create_table():
+    conn = get_db_connection()
+    cursor = conn.cursor()
+    cursor.execute('''
+        CREATE TABLE IF NOT EXISTS NotebookLMAudioRequests (
+            id INT AUTO_INCREMENT PRIMARY KEY,
+            book_title VARCHAR(255) NOT NULL,
+            book_hash VARCHAR(64) NOT NULL,
+            request_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+            clerk_user_email VARCHAR(255) NOT NULL,
+            status ENUM('pending', 'processing', 'completed') DEFAULT 'pending'
+        )
+    ''')
+    conn.commit()
+    cursor.close()
+    conn.close()
 
 # 首页HTML模板
 HTML_TEMPLATE = """
@@ -71,6 +105,11 @@ HTML_TEMPLATE = """
                     <li class="list-group-item">
                         <span>{{ file }}</span>
                         <a href="/download/{{ file }}" class="btn btn-success btn-sm" target="_blank">Download</a>
+                        <form method="POST" action="/submit_ticket" style="display:inline;">
+                            <input type="hidden" name="book_title" value="{{ file }}">
+                            <input type="hidden" name="clerk_user_email" value="user@example.com">
+                            <button type="submit" class="btn btn-warning btn-sm">Submit Ticket</button>
+                        </form>
                     </li>
                     {% endfor %}
                 </ul>
@@ -142,7 +181,12 @@ def search_books():
         # 生成带有下载链接的 HTML 内容
         file_links = [
             f'<li class="list-group-item"><span>{os.path.basename(f)}</span>'
-            f'<a href="/download/{os.path.basename(f)}" class="btn btn-success btn-sm" target="_blank">Download</a></li>'
+            f'<a href="/download/{os.path.basename(f)}" class="btn btn-success btn-sm" target="_blank">Download</a>'
+            f'<form method="POST" action="/submit_ticket" style="display:inline;">'
+            f'<input type="hidden" name="book_title" value="{os.path.basename(f)}">'
+            f'<input type="hidden" name="clerk_user_email" value="user@example.com">'
+            f'<button type="submit" class="btn btn-warning btn-sm">Submit Ticket</button>'
+            f'</form></li>'
             for f in matching_files
         ]
         return render_template_string(
@@ -221,5 +265,105 @@ def serve_file(filename):
     else:
         return jsonify({"error": "File not found"}), 404
 
+# 提交工单路由
+@app.route('/submit_ticket', methods=['POST'])
+def submit_ticket():
+    book_title = request.form['book_title']
+    clerk_user_email = request.form['clerk_user_email']
+    
+    # 计算书名的哈希值
+    book_hash = hashlib.sha256(book_title.encode()).hexdigest()
+    
+    # 插入工单到数据库
+    conn = get_db_connection()
+    cursor = conn.cursor()
+    cursor.execute('''
+        INSERT INTO NotebookLMAudioRequests (book_title, book_hash, clerk_user_email)
+        VALUES (%s, %s, %s)
+    ''', (book_title, book_hash, clerk_user_email))
+    conn.commit()
+    cursor.close()
+    conn.close()
+    
+    return redirect(url_for('index'))
+
+# 查看工单路由
+@app.route('/tickets')
+def tickets():
+    conn = get_db_connection()
+    cursor = conn.cursor(dictionary=True)
+    cursor.execute('SELECT * FROM NotebookLMAudioRequests')
+    tickets = cursor.fetchall()
+    cursor.close()
+    conn.close()
+    return render_template_string(
+        """
+        <!DOCTYPE html>
+        <html lang="en">
+        <head>
+            <meta charset="UTF-8">
+            <meta name="viewport" content="width=device-width, initial-scale=1.0">
+            <title>Tickets</title>
+            <!-- Bootstrap CSS -->
+            <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+        </head>
+        <body>
+            <div class="container">
+                <h1 class="text-center mb-4">Tickets</h1>
+                <table class="table table-striped">
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Book Title</th>
+                            <th>Book Hash</th>
+                            <th>Request Date</th>
+                            <th>Clerk User Email</th>
+                            <th>Status</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for ticket in tickets %}
+                        <tr>
+                            <td>{{ ticket.id }}</td>
+                            <td>{{ ticket.book_title }}</td>
+                            <td>{{ ticket.book_hash }}</td>
+                            <td>{{ ticket.request_date }}</td>
+                            <td>{{ ticket.clerk_user_email }}</td>
+                            <td>{{ ticket.status }}</td>
+                            <td>
+                                <a href="/update_status/{{ ticket.id }}/pending" class="btn btn-warning btn-sm">Pending</a>
+                                <a href="/update_status/{{ ticket.id }}/processing" class="btn btn-info btn-sm">Processing</a>
+                                <a href="/update_status/{{ ticket.id }}/completed" class="btn btn-success btn-sm">Completed</a>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            <!-- Bootstrap JS -->
+            <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+        </body>
+        </html>
+        """,
+        tickets=tickets
+    )
+
+# 更新工单状态路由
+@app.route('/update_status/<int:ticket_id>/<status>')
+def update_status(ticket_id, status):
+    conn = get_db_connection()
+    cursor = conn.cursor()
+    cursor.execute('''
+        UPDATE NotebookLMAudioRequests
+        SET status = %s
+        WHERE id = %s
+    ''', (status, ticket_id))
+    conn.commit()
+    cursor.close()
+    conn.close()
+    return redirect(url_for('tickets'))
+
 if __name__ == '__main__':
+    create_table()
     app.run(host='0.0.0.0', port=10805)
