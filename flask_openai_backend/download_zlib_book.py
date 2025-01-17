@@ -1,4 +1,4 @@
-from flask import Flask, request, jsonify, send_file, render_template_string, redirect, url_for
+from flask import Flask, render_template, request, jsonify, send_file, render_template_string, redirect, url_for, session
 import os
 import glob
 from math import ceil
@@ -7,6 +7,9 @@ import hashlib
 from datetime import datetime
 
 app = Flask(__name__)
+
+# 设置SECRET_KEY用于session
+app.config['SECRET_KEY'] = 'your_secret_key'
 
 # 自定义下载目录
 download_directory = os.path.join(os.getcwd(), "C:\\Users\\PC\\eclipse-workspace\\LibrarySearch\\src\\main\\resources\\static\\books")
@@ -44,127 +47,161 @@ def create_table():
     cursor.close()
     conn.close()
 
-# 首页HTML模板
-HTML_TEMPLATE = """
+# 保护路由的装饰器
+def login_required(f):
+    @wraps(f)
+    def decorated_function(*args, **kwargs):
+        if 'user_email' not in session:
+            return redirect(url_for('index'))
+        return f(*args, **kwargs)
+    return decorated_function
+
+# 登录页面HTML模板
+HTML_LOGIN = """
+<!-- Updated login HTML template -->
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Book Downloader</title>
-    <!-- Bootstrap CSS -->
+    <title>Flask Test with Clerk</title>
+    <!-- Include Bootstrap CSS for styling -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-    <style>
-        body {
-            background-color: #f8f9fa;
-            padding: 20px;
-        }
-        .card {
-            margin-bottom: 20px;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-        }
-        .card-header {
-            background-color: #007bff;
-            color: white;
-        }
-        .list-group-item {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-        .pagination {
-            margin-top: 20px;
-        }
-    </style>
+    <!-- Include jQuery -->
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+    <!-- Clerk SDK -->
+    <script
+        async
+        crossorigin="anonymous"
+        data-clerk-publishable-key="pk_test_bGFyZ2UtY3JheWZpc2gtMzIuY2xlcmsuYWNjb3VudHMuZGV2JA"
+        src="https://intense-guppy-8.clerk.accounts.dev/npm/@clerk/clerk-js@latest/dist/clerk.browser.js"
+        type="text/javascript"
+    ></script>
 </head>
-<body>
-    <div class="container">
-        <h1 class="text-center mb-4">Book Downloader</h1>
+<body class="container mt-5">
+    <h1 class="mb-4">Flask Test with Clerk Authentication</h1>
 
-        <!-- Search Section -->
-        <div class="card">
-            <div class="card-header">
-                <h2 class="card-title mb-0">Search Books by Keyword</h2>
-            </div>
-            <div class="card-body">
-                <form method="GET" action="/search" class="d-flex">
-                    <input type="text" id="bookName" name="book_name" class="form-control me-2" placeholder="Enter book name keyword" required>
-                    <button type="submit" class="btn btn-primary">Search</button>
-                </form>
-            </div>
-        </div>
+    <!-- User Interface Placeholder -->
+    <div id="app"></div>
 
-        <!-- List Downloaded Files -->
-        <div class="card">
-            <div class="card-header">
-                <h2 class="card-title mb-0">List Downloaded Files</h2>
-            </div>
-            <div class="card-body">
-                <ul class="list-group">
-                    {% for file in files %}
-                    <li class="list-group-item">
-                        <span>{{ file }}</span>
-                        <a href="/download/{{ file }}" class="btn btn-success btn-sm" target="_blank">Download</a>
-                        <form method="POST" action="/submit_ticket" style="display:inline;">
-                            <input type="hidden" name="book_title" value="{{ file }}">
-                            <input type="hidden" name="clerk_user_email" value="user@example.com">
-                            <button type="submit" class="btn btn-warning btn-sm">Submit Ticket</button>
-                        </form>
-                    </li>
-                    {% endfor %}
-                </ul>
-
-                <!-- Pagination -->
-                <nav class="pagination justify-content-center">
-                    <ul class="pagination">
-                        {% if page > 1 %}
-                        <li class="page-item">
-                            <a class="page-link" href="/?page={{ page - 1 }}&per_page={{ per_page }}">Previous</a>
-                        </li>
-                        {% endif %}
-                        <li class="page-item active">
-                            <span class="page-link">Page {{ page }} of {{ total_pages }}</span>
-                        </li>
-                        {% if page < total_pages %}
-                        <li class="page-item">
-                            <a class="page-link" href="/?page={{ page + 1 }}&per_page={{ per_page }}">Next</a>
-                        </li>
-                        {% endif %}
-                    </ul>
-                </nav>
-            </div>
-        </div>
+    <!-- New Button for File Main Page (Hidden by default, shown after login) -->
+    <div id="fileMainButton" class="mt-4" style="display: none;">
+        <button class="btn btn-primary" onclick="window.location.href='/filemainpage'">Go to File Main Page</button>
     </div>
 
-    <!-- Bootstrap JS -->
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <!-- New Button for NotebookLM -->
+    <div class="mt-4 text-center">
+        <a href="https://notebooklm.google.com/" target="_blank" class="btn btn-success">Go to NotebookLM</a>
+    </div>
+
+    <script>
+        window.addEventListener('load', async function () {
+            // Initialize Clerk
+            await Clerk.load();
+
+            // Check if the user is logged in
+            if (Clerk.user) {
+                // Show user button
+                document.getElementById('app').innerHTML = '<div id="user-button"></div>';
+                Clerk.mountUserButton(document.getElementById('user-button'));
+
+                // Show the file main page button for logged-in users
+                $("#fileMainButton").show();
+
+    // Set session user_email
+    $.ajax({
+        url: '/set_user_session',
+        type: 'POST',
+        data: { email: Clerk.user.emailAddresses[0].emailAddress },
+        success: function(response) {
+            console.log('Session set:', response);
+        },
+        error: function(error) {
+            console.error('Failed to set session:', error);
+        }
+    });
+            } else {
+                // Show sign-in button for non-logged-in users
+                document.getElementById('app').innerHTML = '<div id="sign-in"></div>';
+                Clerk.mountSignIn(document.getElementById('sign-in'));
+
+                // Hide the file main page button for non-logged-in users
+                $("#fileMainButton").hide();
+            }
+        });
+    </script>
 </body>
 </html>
 """
 
-@app.route('/')
+@app.route('/', methods=['GET'])
 def index():
-    # 获取分页参数
-    page = int(request.args.get('page', 1))  # 默认第1页
-    per_page = int(request.args.get('per_page', 10))  # 默认每页10条
+    return render_template_string(HTML_LOGIN)
 
-    # 获取所有文件
+@app.route('/set_session', methods=['POST'])
+def set_session():
+    user_email = request.form.get('email')
+    if user_email:
+        session['user_email'] = user_email
+        return jsonify({'success': True})
+    else:
+        return jsonify({'success': False}), 400
+
+# 保护路由的装饰器
+from functools import wraps
+
+def login_required(f):
+    @wraps(f)
+    def decorated_function(*args, **kwargs):
+        if 'user_email' not in session:
+            return redirect(url_for('index'))
+        return f(*args, **kwargs)
+    return decorated_function
+
+# 保护原有路由
+@app.route('/list', methods=['GET'])
+@login_required
+def list_files():
     files = os.listdir(download_directory)
-    total_files = len(files)
-    total_pages = ceil(total_files / per_page)
+    if files:
+        return jsonify({"files": files}), 200
+    else:
+        return jsonify({"message": "No files found in the download directory"}), 200
 
-    # 分页逻辑
-    start = (page - 1) * per_page
-    end = start + per_page
-    paginated_files = files[start:end]
+@app.route('/download/<filename>', methods=['GET'])
+@login_required
+def serve_file(filename):
+    file_path = os.path.join(download_directory, filename)
+    if os.path.exists(file_path):
+        return send_file(
+            file_path,
+            as_attachment=True,  # 强制浏览器下载
+            download_name=filename  # 下载时的文件名
+        )
+    else:
+        return jsonify({"error": "File not found"}), 404
 
-    return render_template_string(
-        HTML_TEMPLATE,
-        files=paginated_files,
-        page=page,
-        per_page=per_page,
-        total_pages=total_pages
-    )
+@app.route('/submit_ticket', methods=['POST'])
+@login_required
+def submit_ticket():
+    book_title = request.form['book_title']
+    clerk_user_email = session.get('user_email', 'user@example.com')
+    
+    # 计算书名的哈希值
+    book_hash = hashlib.sha256(book_title.encode()).hexdigest()
+    
+    # 插入工单到数据库
+    conn = get_db_connection()
+    cursor = conn.cursor()
+    cursor.execute('''
+        INSERT INTO NotebookLMAudioRequests (book_title, book_hash, clerk_user_email)
+        VALUES (%s, %s, %s)
+    ''', (book_title, book_hash, clerk_user_email))
+    conn.commit()
+    cursor.close()
+    conn.close()
+    
+    return redirect(url_for('index'))
 
 # 搜索文件夹中的关键词
 @app.route('/search', methods=['GET'])
@@ -243,52 +280,47 @@ def search_books():
     else:
         return jsonify({"message": "No matching files found"}), 200
 
-# 列出下载目录中的文件
-@app.route('/list', methods=['GET'])
-def list_files():
+
+@app.route('/filemainpage', methods=['GET'])
+@login_required
+def filemainpage():
+    # Pagination parameters
+    page = int(request.args.get('page', 1))
+    per_page = int(request.args.get('per_page', 10))
+
+    # Fetch list of files
     files = os.listdir(download_directory)
-    if files:
-        return jsonify({"files": files}), 200
+    total_files = len(files)
+    total_pages = ceil(total_files / per_page)
+
+    # Paginate files
+    start = (page - 1) * per_page
+    end = start + per_page
+    paginated_files = files[start:end]
+
+    return render_template('filemainpage.html', files=paginated_files, page=page, per_page=per_page, total_pages=total_pages)
+
+@app.route('/set_user_session', methods=['POST'])
+def set_user_session():
+    user_email = request.form.get('email')
+    if user_email:
+        session['user_email'] = user_email
+        return jsonify({'success': True})
     else:
-        return jsonify({"message": "No files found in the download directory"}), 200
-
-# 自定义下载目录路由
-@app.route('/download/<filename>', methods=['GET'])
-def serve_file(filename):
-    file_path = os.path.join(download_directory, filename)
-    if os.path.exists(file_path):
-        return send_file(
-            file_path,
-            as_attachment=True,  # 强制浏览器下载
-            download_name=filename  # 下载时的文件名
-        )
-    else:
-        return jsonify({"error": "File not found"}), 404
-
-# 提交工单路由
-@app.route('/submit_ticket', methods=['POST'])
-def submit_ticket():
-    book_title = request.form['book_title']
-    clerk_user_email = request.form['clerk_user_email']
+        return jsonify({'success': False}), 400
     
-    # 计算书名的哈希值
-    book_hash = hashlib.sha256(book_title.encode()).hexdigest()
-    
-    # 插入工单到数据库
-    conn = get_db_connection()
-    cursor = conn.cursor()
-    cursor.execute('''
-        INSERT INTO NotebookLMAudioRequests (book_title, book_hash, clerk_user_email)
-        VALUES (%s, %s, %s)
-    ''', (book_title, book_hash, clerk_user_email))
-    conn.commit()
-    cursor.close()
-    conn.close()
-    
-    return redirect(url_for('index'))
+from functools import wraps
 
-# 查看工单路由
+def login_required(f):
+    @wraps(f)
+    def decorated_function(*args, **kwargs):
+        if 'user_email' not in session:
+            return redirect(url_for('index'))
+        return f(*args, **kwargs)
+    return decorated_function
+
 @app.route('/tickets')
+@login_required
 def tickets():
     conn = get_db_connection()
     cursor = conn.cursor(dictionary=True)
@@ -349,8 +381,8 @@ def tickets():
         tickets=tickets
     )
 
-# 更新工单状态路由
 @app.route('/update_status/<int:ticket_id>/<status>')
+@login_required
 def update_status(ticket_id, status):
     conn = get_db_connection()
     cursor = conn.cursor()
