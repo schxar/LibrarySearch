@@ -162,6 +162,8 @@ def login_required(f):
 @app.route('/list', methods=['GET'])
 @login_required
 def list_files():
+    user_email = session.get('user_email', 'Unknown')
+    print(f"User email (list files): {user_email}")
     files = os.listdir(download_directory)
     if files:
         return jsonify({"files": files}), 200
@@ -171,6 +173,8 @@ def list_files():
 @app.route('/download/<filename>', methods=['GET'])
 @login_required
 def serve_file(filename):
+    user_email = session.get('user_email', 'Unknown')
+    print(f"User downloaded " + filename + ": email = "+ user_email)
     file_path = os.path.join(download_directory, filename)
     if os.path.exists(file_path):
         return send_file(
