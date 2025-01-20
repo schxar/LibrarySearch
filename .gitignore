@@ -39,3 +39,5 @@ flask_openai_backend/Gemini.txt
 *.pdf
 *.epub
 /src/main/resources/static/cache
+/src/main/resources/static/SearchHistory
+/src/main/resources/static/SearchHistory

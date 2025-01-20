@@ -1,6 +1,7 @@
 package com.example.librarysearch.service.impl;
 
 import com.example.librarysearch.Entry.SearchHistoryEntry;
+import com.example.librarysearch.Mapper.SearchCountMapper;
 import com.example.librarysearch.Mapper.SearchHistoryMapper;
 import com.example.librarysearch.service.SearchService;
 import com.google.gson.Gson;
@@ -36,6 +37,9 @@ public class SearchServiceImpl implements SearchService {
     
     @Autowired
     private SearchHistoryMapper searchHistoryMapper;
+    
+    @Autowired
+    private SearchCountMapper searchCountMapper; // Autowire the new mapper
     
     public Map<String, Object> search(String query) throws Exception {
         // Encode the search query
@@ -219,7 +223,7 @@ public class SearchServiceImpl implements SearchService {
 
             // Increment search count and check if sorting is needed
             int searchCount = incrementSearchCount();
-            if (searchCount % 10 == 0) {
+            if (searchCount % 5 == 0) {
                 sortAndSaveHistory(searchHistory, historyFile);
             }
         } catch (IOException e) {
@@ -247,6 +251,7 @@ public class SearchServiceImpl implements SearchService {
             writer.write(String.valueOf(count));
         }
 
+        System.out.println("Current search count: " + count); // 添加日志
         return count;
     }
 
@@ -269,15 +274,27 @@ public class SearchServiceImpl implements SearchService {
         
         // 保存到数据库
         for (Map.Entry<String, Map<String, Object>> entry : sortedEntries) {
-            SearchHistoryEntry dbEntry = new SearchHistoryEntry();
-            dbEntry.setHash(entry.getKey());
-            dbEntry.setOriginalQuery((String) entry.getValue().get("original"));
-            dbEntry.setWeight(((Number) entry.getValue().get("weight")).intValue());
-         // 在 sortAndSaveHistory 方法中修改：
-            dbEntry.setSearchDate(new java.sql.Date(System.currentTimeMillis()));  // 使用 SQL Date 类型
+            try {
+                SearchHistoryEntry dbEntry = new SearchHistoryEntry();
+                dbEntry.setHash(entry.getKey());
+                dbEntry.setOriginalQuery((String) entry.getValue().get("original"));
+                dbEntry.setWeight(((Number) entry.getValue().get("weight")).intValue());
+                dbEntry.setSearchDate(new java.sql.Date(System.currentTimeMillis())); // 使用当前时间
+
+                try {
+                    // 构建并插入记录
+                    searchHistoryMapper.insertOrUpdate(dbEntry);
+                } catch (Exception e) {
+                    System.err.println("数据库操作失败: " + e.getMessage());
+                    e.printStackTrace();
+                }
             
-            searchHistoryMapper.insertOrUpdate(dbEntry);
-            System.out.println("uploaded into mysql.");
+                
+                System.out.println("Uploaded into MySQL: " + dbEntry.getHash());
+            } catch (Exception e) {
+                System.err.println("Error inserting/updating record: " + e.getMessage());
+                e.printStackTrace();
+            }
         }
 
         // Save the sorted history back to the file
@@ -285,7 +302,7 @@ public class SearchServiceImpl implements SearchService {
             new Gson().toJson(sortedHistory, writer);
         }
 
-        System.out.println("Search history sorted and saved after 10 searches.");
+        System.out.println("Search history sorted and saved after 5 searches.");
     }
 
 

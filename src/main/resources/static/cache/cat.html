@@ -1,6 +1,14 @@
-<html lang="zh" class="" style="--vh: 4.74px;"><head>
+<html lang="zh" class="dark" style="--vh: 4.74px;"><head>
         <meta name="color-scheme" content="">
-                <script src="/components/zlibrary.js?0.774"></script>
+                <script>
+            if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
+                document.querySelector("html").className = "dark"
+            }
+            window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', e => {
+                document.querySelector('html').className = e.matches ? 'dark' : 'light';
+            });
+        </script>
+                        <script src="/components/zlibrary.js?0.777"></script>
         <script type="text/javascript">
             navigator.sayswho = (function(){
                 var ua= navigator.userAgent, tem,
@@ -88,28 +96,28 @@
         <meta name="singleLanguage" value="bool(true)
 ">
 
-            <link rel="stylesheet" href="/resources/css/theme.css?0.774">
+            <link rel="stylesheet" href="/resources/css/theme.css?0.777">
 
-                    <meta name="version" value="0.774">
-            <link rel="stylesheet" type="text/css" href="/resources/build/main.css?0.774">
-            <script type="text/javascript" src="/resources/build/main.js?0.774"></script>
-                            <link rel="stylesheet" type="text/css" href="/resources/build/global.css?0.774">
-                <link rel="stylesheet" href="/resources/build/global-d.css?0.774" as="style" onload="this.onload=null;this.rel='stylesheet'">
-                <noscript><link rel="stylesheet" href="/resources/build/global-d.css?0.774"></noscript>
-                <script type="text/javascript" src="/resources/build/global.js?0.774"></script>
-                        <script type="text/javascript" src="/resources/build/bootstrap.js?0.774"></script>
-            <script type="text/javascript" src="/resources/build/global-d.js?0.774" defer=""></script>
-                                <script type="text/javascript" src="/resources/js/search_metrics.js?0.774"></script>
+                    <meta name="version" value="0.777">
+            <link rel="stylesheet" type="text/css" href="/resources/build/main.css?0.777">
+            <script type="text/javascript" src="/resources/build/main.js?0.777"></script>
+                            <link rel="stylesheet" type="text/css" href="/resources/build/global.css?0.777">
+                <link rel="stylesheet" href="/resources/build/global-d.css?0.777" as="style" onload="this.onload=null;this.rel='stylesheet'">
+                <noscript><link rel="stylesheet" href="/resources/build/global-d.css?0.777"></noscript>
+                <script type="text/javascript" src="/resources/build/global.js?0.777"></script>
+                        <script type="text/javascript" src="/resources/build/bootstrap.js?0.777"></script>
+            <script type="text/javascript" src="/resources/build/global-d.js?0.777" defer=""></script>
+                                <script type="text/javascript" src="/resources/js/search_metrics.js?0.777"></script>
         <noscript>
-            <link rel="stylesheet" type="text/css" href="/resources/css/noscript.css?0.774" />
+            <link rel="stylesheet" type="text/css" href="/resources/css/noscript.css?0.777" />
         </noscript>
 
         <script>
             window != top ? window.stop() : null;
             
-            const Config = {"domainHost":"z-lib.gl","BRegion":"asia","Country":"sg","accessByIp":false,"supportEmail":"support@z-lib.fm","preferredDomain":"https:\/\/z-library.sk","loginURL":"\/login?redirectUrl=https:\/\/z-lib.gl","regURL":"\/registration?redirectUrl=https:\/\/z-lib.gl","generalFilesProxy":"https:\/\/dlr1.fcdn.sk\/general-files\/","isDesktopApp":false,"desktopAppVersion":null,"isTelegramBrowser":false,"isProxy":false};
+            const Config = {"domainHost":"z-lib.gl","BRegion":"highrisk","Country":"us","accessByIp":false,"supportEmail":"support@z-lib.fm","preferredDomain":"https:\/\/z-library.sk","loginURL":"\/login?redirectUrl=https:\/\/z-lib.gl","regURL":"\/registration?redirectUrl=https:\/\/z-lib.gl","generalFilesProxy":"https:\/\/dlr1.ncdn.ec\/general-files\/","isDesktopApp":false,"desktopAppVersion":null,"isTelegramBrowser":false,"isProxy":false};
             const CurrentUser = new User(null);
-            const CurrentClientIP = "103.190.179.37";
+            const CurrentClientIP = "149.112.117.51";
             const CurrentSiteMode = 'books';
             const proxiesToCheck = []; //for google verification
 
@@ -126,7 +134,7 @@
                         fallbackLng: 'en',
                         backend: {
                             // addPath: '/papi/translations/add-missing-key',
-                            loadPath: '/resources/build/translations-frontend/{{lng}}.json?v=0.774'
+                            loadPath: '/resources/build/translations-frontend/{{lng}}.json?v=0.777'
                         },
                         keySeparator: notLikelyString,
                         nsSeparator: notLikelyString,
@@ -175,8 +183,8 @@
         
         
         <script src="/components/zlibrary-startup-script.js"></script>
-        <link rel="stylesheet" href="/components/style.css?0.774">
-    <script src="/components/z-tabs.js?0.774"></script><script src="/components/z-dropdown.js?0.774"></script><script src="/components/z-bookcard.js?0.774"></script><script src="/components/z-recommended-search.js?0.774"></script><script src="/components/z-carousel.js?0.774"></script><script src="/components/z-cover.js?0.774"></script><script src="/components/z-booklists-browser.js?0.774"></script></head>
+        <link rel="stylesheet" href="/components/style.css?0.777">
+    <script src="/components/z-tabs.js?0.777"></script><script src="/components/z-dropdown.js?0.777"></script><script src="/components/z-bookcard.js?0.777"></script><script src="/components/z-recommended-search.js?0.777"></script><script src="/components/z-carousel.js?0.777"></script><script src="/components/z-cover.js?0.777"></script><script src="/components/z-booklists-browser.js?0.777"></script></head>
 
         <body style="margin:0px;padding:0px;" class="search  super-puper-main-container" data-proxy="false">
         
@@ -318,151 +326,67 @@
         </div>
     
     
-<div id="newYearBanner">
-    <i class="zlibicon-cross close-btn"></i>
-    <div class="new-year-body">
-        <div class="img"></div>
-        <a class="blogLink" href="/blog/55">Gift inside</a>
+<div id="merchantPopup" class="hidden">
+    <p>We're currently searching for a high-risk payment processing provider to handle bank cards and local payments.
+    </p><p>
+        If you know of any reliable providers, please get in touch with us via <a href="mailto:support@z-lib.fm">support@z-lib.fm</a> with the subject line <b>"High-risk merchant"</b>. Your help is greatly appreciated!
+    </p><p>Please refrain from emailing if you are not familiar with this topic.
+    </p><p>Thank you!
+    </p><div class="modal-footer">
+        <button class="btnCloseMerchantPopup">关闭</button>
     </div>
 </div>
 
-<style>
-    #newYearBanner .close-btn {
-        position: absolute;
-        right: 20px;
-        top: 15px;
-        color: #fff;
-        font-size: 11px;
-        cursor: pointer;
-        padding-left: 15px;
-        padding-bottom: 15px;
-    }
 
-    #newYearBanner .new-year-body {
-        position: absolute;
-        top: 0;
-        left: 0;
-        right: 0;
-        bottom: 24px;
-        display: flex;
-        justify-content: center;
-        align-items: flex-end;
-    }
-    @media screen and (min-width: 485px){
-        #newYearBanner {
-            width: 100%;
-            background-image: url("/img/new-year/2025/banner.png");
-            padding-top: 21.75%;
-            border-radius: 8px;
-            margin-top: 16px;
-            margin-bottom: 32px;
-            position: relative;
-            background-size: cover;
-        }
-        #newYearBanner .img{
-            width: 487px;
-            height: 183px;
-            background-image: url("/img/new-year/2025/banner-title.png");
-            margin-bottom: -24px;
-            margin-right: 32px;
-            max-width: 58%;
-            background-size: contain;
-            background-position: bottom;
-            background-repeat: no-repeat;
-        }
-    }
-    
-    @media screen and (min-width: 485px) and (min-resolution: 1.1dppx), 
-       screen and (min-width: 485px) and (-webkit-min-device-pixel-ratio: 1.1) {
-        #newYearBanner {
-            background-image: url("/img/new-year/2025/banner@2x.png");
-        }
-        #newYearBanner .img{
-            background-image: url("/img/new-year/2025/banner-title@2x.png");
-        }
-    }
-
-    @media screen and (max-width: 484px){
-        #newYearBanner {
-            width: 100%;
-            background-image: url("/img/new-year/2025/banner-mob.png");
-            padding-top: 50.26%;
-            border-radius: 8px;
-            margin-top: 16px;
-            margin-bottom: 32px;
-            position: relative;
-            background-size: cover;
-        }
-        #newYearBanner .img{
-            width: 232px;
-            height: 100px;
-            background-image: url("/img/new-year/2025/banner-title-mob.png");
-            margin-bottom: 2px;
-            max-width: 80%;
-            background-size: contain;
-            background-position: bottom;
-            background-repeat: no-repeat;
-        }
-        #newYearBanner .new-year-body {
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-            bottom: 0;
-        }
-    }   
-    @media screen and (max-width: 484px) and (min-resolution: 1.1dppx), 
-       screen and (max-width: 484px) and (-webkit-min-device-pixel-ratio: 1.1) {
-        #newYearBanner {
-            background-image: url("/img/new-year/2025/banner-mob@2x.png");
-        }
-        #newYearBanner .img{
-            background-image: url("/img/new-year/2025/banner-title-mob@2x.png");
-        }
-    }
-
-    #newYearBanner .blogLink{
-        text-decoration: none;
-        background: #DD583F;
-        border: 1px solid #FFFFFF;
-        color: #FFFFFF;
-        box-shadow: 1px 1px 0px 0px #00000040;
-        padding: 8px 24px;
-        font-size: 16px;
-        border-radius: 2px;
-    }
-    #newYearBanner .blogLink:hover{
-        background: #DD583FCC;
-    }
-
-</style>
-
-<script>
-    $(function () {
-        $(document).on('click', '#newYearBanner', function (e) {
-            const $target = $(e.target)
-            e.preventDefault()
-            if ($target.hasClass('close-btn')) {
-                return
-            }
-
-            const blogUrl = $('a.blogLink').attr('href')
-            if (!CurrentUser.id) {
-                CurrentUser.showAuthPopup('login', i18next.t('After authorization, you will be able to take a gift'), null, blogUrl)
-                return;
-            }
-
-            if (typeof blogUrl === 'string' && blogUrl.length) {
-                window.location.href = blogUrl
-            }
+<script type="text/javascript">
+    $(document).on('click', '.btnShowMerchantPopup', function() {
+        const merchantModal = new ZLibraryModal({
+            element: 'merchantPopup',
+            container: 'zlibrary-modal-styled',
         })
-        $('#newYearBanner .close-btn').on('click', function () {
-            new ZLibraryResponse('/papi/user/hide-announcement/banner25/').fetch()
-            $('#newYearBanner').slideUp(function () {
-                $(this).remove()
-            })
+        merchantModal.show()
+    })
+
+    $(document).on('click', '.btnCloseMerchantPopup', function() {
+        const merchantModal = new ZLibraryModal({
+            element: 'merchantPopup',
+            container: 'zlibrary-modal-styled',
+        })
+        merchantModal.hide()
+    })
+
+    
+    $(document).on('click', '.btnHideAnnouncement', function() {
+        let cook = getCookie('hiddenMessages');
+        let hidden = cook ? JSON.parse(cook) : [];
+        let messageHash = $(this).data('message');
+
+        if (hidden.indexOf(messageHash) === -1) {
+            hidden.push($(this).data('message'))
+        }
+
+        setCookie('hiddenMessages', JSON.stringify(hidden), 31*24*60*60*1000)
+        $('#messageBlock').hide()
+    })
+
+    $(document).on('click', '.btnHideBanner', function() {
+        const bannerName = $(this).data('name')
+        hideBanner(bannerName)
+    })
+
+    $(function () {
+        $('.feedback-modal').click(function () {
+            let modalTitle = $(this).data('title');
+            let subject = $(this).data('subject');
+            new ZLibraryModal({
+                url: '/layer/_modals/feedback?subject="' + subject + '"',
+                title: modalTitle
+            }).show()
         })
     })
 </script>
+
+
     <a name="s"></a>
 
     <form method="get" id="searchForm" action="/s/">
@@ -854,7 +778,7 @@
                     <div slot="note"></div>
                     <div slot="extend" style="position: absolute;">
                                                                                             </div>
-                                                                                                </z-bookcard>    
+                                                                                                </z-bookcard>
             </div>
                     <div class="divider"></div>            <div class="book-item resItemBoxBooks exactMatch">
                 <div class="counter">2</div>
@@ -865,7 +789,7 @@
                     <div slot="note"></div>
                     <div slot="extend" style="position: absolute;">
                                                                                             </div>
-                                                                                                </z-bookcard>    
+                                                                                                </z-bookcard>
             </div>
                     <div class="divider"></div>            <div class="book-item resItemBoxBooks exactMatch">
                 <div class="counter">3</div>
@@ -876,7 +800,7 @@
                     <div slot="note"></div>
                     <div slot="extend" style="position: absolute;">
                                                                                             </div>
-                                                                                                </z-bookcard>    
+                                                                                                </z-bookcard>
             </div>
                     <div class="divider"></div>            <div class="book-item resItemBoxBooks exactMatch">
                 <div class="counter">4</div>
@@ -887,7 +811,7 @@
                     <div slot="note"></div>
                     <div slot="extend" style="position: absolute;">
                                                                                             </div>
-                                                                                                </z-bookcard>    
+                                                                                                </z-bookcard>
             </div>
                     <div class="divider"></div>            <div class="book-item resItemBoxBooks exactMatch">
                 <div class="counter">5</div>
@@ -898,7 +822,7 @@
                     <div slot="note"></div>
                     <div slot="extend" style="position: absolute;">
                                                                                             </div>
-                                                                                                </z-bookcard>    
+                                                                                                </z-bookcard>
             </div>
                     <div class="divider"></div>            <div class="book-item resItemBoxBooks exactMatch">
                 <div class="counter">6</div>
@@ -909,7 +833,7 @@
                     <div slot="note"></div>
                     <div slot="extend" style="position: absolute;">
                                                                                             </div>
-                                                                                                </z-bookcard>    
+                                                                                                </z-bookcard>
             </div>
                     <div class="divider"></div>            <div class="book-item resItemBoxBooks exactMatch">
                 <div class="counter">7</div>
@@ -920,7 +844,7 @@
                     <div slot="note"></div>
                     <div slot="extend" style="position: absolute;">
                                                                                             </div>
-                                                                                                </z-bookcard>    
+                                                                                                </z-bookcard>
             </div>
                     <div class="divider"></div>            <div class="book-item resItemBoxBooks exactMatch">
                 <div class="counter">8</div>
@@ -931,7 +855,7 @@
                     <div slot="note"></div>
                     <div slot="extend" style="position: absolute;">
                                                                                             </div>
-                                                                                                </z-bookcard>    
+                                                                                                </z-bookcard>
             </div>
                     <div class="divider"></div>            <div class="book-item resItemBoxBooks exactMatch">
                 <div class="counter">9</div>
@@ -942,7 +866,7 @@
                     <div slot="note"></div>
                     <div slot="extend" style="position: absolute;">
                                                                                             </div>
-                                                                                                </z-bookcard>    
+                                                                                                </z-bookcard>
             </div>
                     <div class="divider"></div>            <div class="book-item resItemBoxBooks exactMatch">
                 <div class="counter">10</div>
@@ -953,7 +877,7 @@
                     <div slot="note"></div>
                     <div slot="extend" style="position: absolute;">
                                                                                             </div>
-                                                                                                </z-bookcard>    
+                                                                                                </z-bookcard>
             </div>
         <div style="margin: 0 -1px -1px;position: relative;"><z-recommended-search query="19072481,18700080,11808033,19095179,2075092,2365054,1071494,4823698,5235772,2579921" auto="" lazy="" class="ready"></z-recommended-search></div>            <div class="divider"></div>            <div class="book-item resItemBoxBooks exactMatch">
                 <div class="counter">11</div>
@@ -964,7 +888,7 @@
                     <div slot="note"></div>
                     <div slot="extend" style="position: absolute;">
                                                                                             </div>
-                                                                                                </z-bookcard>    
+                                                                                                </z-bookcard>
             </div>
                     <div class="divider"></div>            <div class="book-item resItemBoxBooks exactMatch">
                 <div class="counter">12</div>
@@ -975,7 +899,7 @@
                     <div slot="note"></div>
                     <div slot="extend" style="position: absolute;">
                                                                                             </div>
-                                                                                                </z-bookcard>    
+                                                                                                </z-bookcard>
             </div>
                     <div class="divider"></div>            <div class="book-item resItemBoxBooks exactMatch">
                 <div class="counter">13</div>
@@ -986,7 +910,7 @@
                     <div slot="note"></div>
                     <div slot="extend" style="position: absolute;">
                                                                                             </div>
-                                                                                                </z-bookcard>    
+                                                                                                </z-bookcard>
             </div>
                     <div class="divider"></div>            <div class="book-item resItemBoxBooks exactMatch">
                 <div class="counter">14</div>
@@ -997,21 +921,10 @@
                     <div slot="note"></div>
                     <div slot="extend" style="position: absolute;">
                                                                                             </div>
-                                                                                                </z-bookcard>    
+                                                                                                </z-bookcard>
             </div>
                     <div class="divider"></div>            <div class="book-item resItemBoxBooks exactMatch">
                 <div class="counter">15</div>
-                <z-bookcard id="2927348" isbn="" termshash="d2b2b7b8cb130f26cb718b31fe36ca21" href="/book/2927348/d5abdc/how-to-prepare-for-logical-reasoning-for-the-cat.html" publisher="" language="english" year="0" extension="pdf" filesize="9.74 MB" rating="5.0" quality="0.0" contenttypeparam="?content_type=book" class="ready">
-                    <img data-src="https://s3proxy.cdn-zlib.sk/covers100/collections/genesis/bb7286d918fedca45e4745be54ed9d96b07ceef09822bfe1f90f85659fe6d724.jpg">
-                    <div slot="title">How to prepare for Logical Reasoning for the CAT</div>
-                    <div slot="author">Arun Sharma</div>
-                    <div slot="note"></div>
-                    <div slot="extend" style="position: absolute;">
-                                                                                            </div>
-                                                                                                </z-bookcard>    
-            </div>
-                    <div class="divider"></div>            <div class="book-item resItemBoxBooks exactMatch">
-                <div class="counter">16</div>
                 <z-bookcard id="23713734" isbn="" termshash="39729f59527469afcb015af40bf88adf" href="/book/23713734/860752/she-and-her-cat-stories-kanojo-to-kanojo-no-neko.html" publisher="Atria Books, Simon and Schuster" language="english" year="2022" extension="epub" filesize="2.31 MB" rating="5.0" quality="5.0" contenttypeparam="?content_type=book" class="ready">
                     <img data-src="https://s3proxy.cdn-zlib.sk/covers100/collections/userbooks/ec31b2e560813b28f31b74b34409a623ff0b9b1eb6e1a10c64d50f413e86ce28.jpg">
                     <div slot="title">She and Her Cat: Stories (Kanojo to Kanojo no Neko) </div>
@@ -1019,7 +932,18 @@
                     <div slot="note"></div>
                     <div slot="extend" style="position: absolute;">
                                                                                             </div>
-                                                                                                </z-bookcard>    
+                                                                                                </z-bookcard>
+            </div>
+                    <div class="divider"></div>            <div class="book-item resItemBoxBooks exactMatch">
+                <div class="counter">16</div>
+                <z-bookcard id="2927348" isbn="" termshash="d2b2b7b8cb130f26cb718b31fe36ca21" href="/book/2927348/d5abdc/how-to-prepare-for-logical-reasoning-for-the-cat.html" publisher="" language="english" year="0" extension="pdf" filesize="9.74 MB" rating="5.0" quality="0.0" contenttypeparam="?content_type=book" class="ready">
+                    <img data-src="https://s3proxy.cdn-zlib.sk/covers100/collections/genesis/bb7286d918fedca45e4745be54ed9d96b07ceef09822bfe1f90f85659fe6d724.jpg">
+                    <div slot="title">How to prepare for Logical Reasoning for the CAT</div>
+                    <div slot="author">Arun Sharma</div>
+                    <div slot="note"></div>
+                    <div slot="extend" style="position: absolute;">
+                                                                                            </div>
+                                                                                                </z-bookcard>
             </div>
                     <div class="divider"></div>            <div class="book-item resItemBoxBooks exactMatch">
                 <div class="counter">17</div>
@@ -1030,7 +954,7 @@
                     <div slot="note"></div>
                     <div slot="extend" style="position: absolute;">
                                                                                             </div>
-                                                                                                </z-bookcard>    
+                                                                                                </z-bookcard>
             </div>
                     <div class="divider"></div>            <div class="book-item resItemBoxBooks exactMatch">
                 <div class="counter">18</div>
@@ -1041,7 +965,7 @@
                     <div slot="note"></div>
                     <div slot="extend" style="position: absolute;">
                                                                                             </div>
-                                                                                                </z-bookcard>    
+                                                                                                </z-bookcard>
             </div>
                     <div class="divider"></div>            <div class="book-item resItemBoxBooks exactMatch">
                 <div class="counter">19</div>
@@ -1052,7 +976,7 @@
                     <div slot="note"></div>
                     <div slot="extend" style="position: absolute;">
                                                                                             </div>
-                                                                                                </z-bookcard>    
+                                                                                                </z-bookcard>
             </div>
                     <div class="divider"></div>            <div class="book-item resItemBoxBooks exactMatch">
                 <div class="counter">20</div>
@@ -1063,7 +987,7 @@
                     <div slot="note"></div>
                     <div slot="extend" style="position: absolute;">
                                                                                             </div>
-                                                                                                </z-bookcard>    
+                                                                                                </z-bookcard>
             </div>
                     <div class="divider"></div>            <div class="book-item resItemBoxBooks exactMatch">
                 <div class="counter">21</div>
@@ -1074,21 +998,10 @@
                     <div slot="note"></div>
                     <div slot="extend" style="position: absolute;">
                                                                                             </div>
-                                                                                                </z-bookcard>    
+                                                                                                </z-bookcard>
             </div>
                     <div class="divider"></div>            <div class="book-item resItemBoxBooks exactMatch">
                 <div class="counter">22</div>
-                <z-bookcard id="3526349" isbn="" termshash="d8a5984525f67084d9bbdc02c31f5802" href="/book/3526349/65efde/how-to-prepare-for-quantitative-aptitude-for-the-cat.html" publisher="McGraw-Hill Education (India)" language="english" year="0" extension="pdf" filesize="19.75 MB" rating="2.5" quality="0.0" contenttypeparam="?content_type=book" class="ready">
-                    <img data-src="https://s3proxy.cdn-zlib.sk/covers100/collections/genesis/039e35e62f287abff9e416eff22876becb255dcfeccf33f909c2bc552ae2d187.jpg">
-                    <div slot="title">How to Prepare for Quantitative Aptitude for the CAT</div>
-                    <div slot="author">Arun Sharma</div>
-                    <div slot="note"></div>
-                    <div slot="extend" style="position: absolute;">
-                                                                                            </div>
-                                                                                                </z-bookcard>    
-            </div>
-                    <div class="divider"></div>            <div class="book-item resItemBoxBooks exactMatch">
-                <div class="counter">23</div>
                 <z-bookcard id="1841249" isbn="9781462901753" termshash="3ba339bb49a218e413eeb6356d59c038" href="/book/1841249/51191c/i-am-a-cat.html" publisher="Tuttle Publishing" language="english" year="2011" extension="epub" filesize="1.05 MB" rating="4.5" quality="5.0" contenttypeparam="?content_type=book" class="ready">
                     <img data-src="https://s3proxy.cdn-zlib.sk/covers100/collections/foreignfiction/ea6ae7d4c3733710d94595ce34ee37f719588320155cf9cf7ca7f8a388d9e132.jpg">
                     <div slot="title">I Am A Cat</div>
@@ -1096,7 +1009,18 @@
                     <div slot="note"></div>
                     <div slot="extend" style="position: absolute;">
                                                                                             </div>
-                                                                                                </z-bookcard>    
+                                                                                                </z-bookcard>
+            </div>
+                    <div class="divider"></div>            <div class="book-item resItemBoxBooks exactMatch">
+                <div class="counter">23</div>
+                <z-bookcard id="3526349" isbn="" termshash="d8a5984525f67084d9bbdc02c31f5802" href="/book/3526349/65efde/how-to-prepare-for-quantitative-aptitude-for-the-cat.html" publisher="McGraw-Hill Education (India)" language="english" year="0" extension="pdf" filesize="19.75 MB" rating="2.5" quality="0.0" contenttypeparam="?content_type=book" class="ready">
+                    <img data-src="https://s3proxy.cdn-zlib.sk/covers100/collections/genesis/039e35e62f287abff9e416eff22876becb255dcfeccf33f909c2bc552ae2d187.jpg">
+                    <div slot="title">How to Prepare for Quantitative Aptitude for the CAT</div>
+                    <div slot="author">Arun Sharma</div>
+                    <div slot="note"></div>
+                    <div slot="extend" style="position: absolute;">
+                                                                                            </div>
+                                                                                                </z-bookcard>
             </div>
                     <div class="divider"></div>            <div class="book-item resItemBoxBooks exactMatch">
                 <div class="counter">24</div>
@@ -1107,7 +1031,7 @@
                     <div slot="note"></div>
                     <div slot="extend" style="position: absolute;">
                                                                                             </div>
-                                                                                                </z-bookcard>    
+                                                                                                </z-bookcard>
             </div>
                     <div class="divider"></div>            <div class="book-item resItemBoxBooks exactMatch">
                 <div class="counter">25</div>
@@ -1118,7 +1042,7 @@
                     <div slot="note"></div>
                     <div slot="extend" style="position: absolute;">
                                                                                             </div>
-                                                                                                </z-bookcard>    
+                                                                                                </z-bookcard>
             </div>
                     <div class="divider"></div>            <div class="book-item resItemBoxBooks exactMatch">
                 <div class="counter">26</div>
@@ -1129,21 +1053,10 @@
                     <div slot="note"></div>
                     <div slot="extend" style="position: absolute;">
                                                                                             </div>
-                                                                                                </z-bookcard>    
+                                                                                                </z-bookcard>
             </div>
                     <div class="divider"></div>            <div class="book-item resItemBoxBooks exactMatch">
                 <div class="counter">27</div>
-                <z-bookcard id="5362498" isbn="" termshash="" href="/book/5362498/8ea71f/herding-cats.html" publisher="" language="english" year="0" extension="pdf" filesize="47.60 MB" rating="5.0" quality="5.0" contenttypeparam="?content_type=book" class="ready">
-                    <img data-src="/img/cover-not-exists.png">
-                    <div slot="title">Herding Cats</div>
-                    <div slot="author">Sarah Andersen</div>
-                    <div slot="note"></div>
-                    <div slot="extend" style="position: absolute;">
-                                                                                            </div>
-                                                                                                </z-bookcard>    
-            </div>
-                    <div class="divider"></div>            <div class="book-item resItemBoxBooks exactMatch">
-                <div class="counter">28</div>
                 <z-bookcard id="21524249" isbn="" termshash="25568b38cbc0d3595f7dbd2e9cc4883c" href="/book/21524249/2e1b02/the-husky-and-his-white-cat-shizun-completed-extras.html" publisher="Recil Ann" language="english" year="0" extension="epub" filesize="2.97 MB" rating="5.0" quality="5.0" contenttypeparam="?content_type=book" class="ready">
                     <img data-src="https://s3proxy.cdn-zlib.sk/covers100/collections/userbooks/a33dd07341231c0b95c55ed1bf6f923b1e8ca213c50789f490d2ee47fd412915.jpg">
                     <div slot="title">The Husky and His White Cat Shizun [Completed + extras]</div>
@@ -1151,7 +1064,18 @@
                     <div slot="note"></div>
                     <div slot="extend" style="position: absolute;">
                                                                                             </div>
-                                                                                                </z-bookcard>    
+                                                                                                </z-bookcard>
+            </div>
+                    <div class="divider"></div>            <div class="book-item resItemBoxBooks exactMatch">
+                <div class="counter">28</div>
+                <z-bookcard id="5362498" isbn="" termshash="" href="/book/5362498/8ea71f/herding-cats.html" publisher="" language="english" year="0" extension="pdf" filesize="47.60 MB" rating="5.0" quality="5.0" contenttypeparam="?content_type=book" class="ready">
+                    <img data-src="/img/cover-not-exists.png">
+                    <div slot="title">Herding Cats</div>
+                    <div slot="author">Sarah Andersen</div>
+                    <div slot="note"></div>
+                    <div slot="extend" style="position: absolute;">
+                                                                                            </div>
+                                                                                                </z-bookcard>
             </div>
                     <div class="divider"></div>            <div class="book-item resItemBoxBooks exactMatch">
                 <div class="counter">29</div>
@@ -1162,7 +1086,7 @@
                     <div slot="note"></div>
                     <div slot="extend" style="position: absolute;">
                                                                                             </div>
-                                                                                                </z-bookcard>    
+                                                                                                </z-bookcard>
             </div>
                     <div class="divider"></div>            <div class="book-item resItemBoxBooks exactMatch">
                 <div class="counter">30</div>
@@ -1173,21 +1097,10 @@
                     <div slot="note"></div>
                     <div slot="extend" style="position: absolute;">
                                                                                             </div>
-                                                                                                </z-bookcard>    
+                                                                                                </z-bookcard>
             </div>
-        <div style="margin: 0 -1px -1px;position: relative;"><z-recommended-search query="11741056,2781053,4418556,19287394,2927348,23713734,5442917,2581101,2611692,11394068,11391705,3526349,1841249,11391528,2330254,2938751,5362498,21524249,2632288,2470901" auto="" lazy="" class="ready"></z-recommended-search></div>            <div class="divider"></div>            <div class="book-item resItemBoxBooks exactMatch">
+        <div style="margin: 0 -1px -1px;position: relative;"><z-recommended-search query="11741056,2781053,4418556,19287394,23713734,2927348,5442917,2581101,2611692,11394068,11391705,1841249,3526349,11391528,2330254,2938751,21524249,5362498,2632288,2470901" auto="" lazy="" class="ready"></z-recommended-search></div>            <div class="divider"></div>            <div class="book-item resItemBoxBooks exactMatch">
                 <div class="counter">31</div>
-                <z-bookcard id="22494457" isbn="9781957635019" termshash="7e3eae65a42b1ff1b7305f5b88d94bf4" href="/book/22494457/197cc8/hunting-adeline-cat-and-mouse-duet-book-2.html" publisher="H. D. Carlton" language="english" year="2022" extension="epub" filesize="3.25 MB" rating="5.0" quality="5.0" contenttypeparam="?content_type=book" class="ready">
-                    <img data-src="https://s3proxy.cdn-zlib.sk/covers100/collections/foreignfiction/0308e4b148eb0f7d9915a1b93d091af7d3b96d154b977f6227753aebef0e7acb.jpg">
-                    <div slot="title">Hunting Adeline (Cat and Mouse Duet Book 2)</div>
-                    <div slot="author">Carlton; H. D.</div>
-                    <div slot="note"></div>
-                    <div slot="extend" style="position: absolute;">
-                                                                                            </div>
-                                                                                                </z-bookcard>    
-            </div>
-                    <div class="divider"></div>            <div class="book-item resItemBoxBooks exactMatch">
-                <div class="counter">32</div>
                 <z-bookcard id="26283212" isbn="9781638589341" termshash="31f21bac03addd471173e05170f3284c" href="/book/26283212/7cf6a1/the-husky-and-his-white-cat-shizun-erha-he-ta-de-bai-mao-shizun-vol-3.html" publisher="Seven Seas Entertainment" language="english" year="2023" extension="epub" filesize="15.08 MB" rating="5.0" quality="5.0" contenttypeparam="?content_type=book" class="ready">
                     <img data-src="https://s3proxy.cdn-zlib.sk/covers100/collections/foreignfiction/3877e6560527bdc04ce9e4eedb86bb5685c768964097d0fa542bd0def04c60c5.jpg">
                     <div slot="title">The Husky and His White Cat Shizun: Erha He Ta De Bai Mao Shizun Vol. 3</div>
@@ -1195,7 +1108,18 @@
                     <div slot="note"></div>
                     <div slot="extend" style="position: absolute;">
                                                                                             </div>
-                                                                                                </z-bookcard>    
+                                                                                                </z-bookcard>
+            </div>
+                    <div class="divider"></div>            <div class="book-item resItemBoxBooks exactMatch">
+                <div class="counter">32</div>
+                <z-bookcard id="22494457" isbn="9781957635019" termshash="7e3eae65a42b1ff1b7305f5b88d94bf4" href="/book/22494457/197cc8/hunting-adeline-cat-and-mouse-duet-book-2.html" publisher="H. D. Carlton" language="english" year="2022" extension="epub" filesize="3.25 MB" rating="5.0" quality="5.0" contenttypeparam="?content_type=book" class="ready">
+                    <img data-src="https://s3proxy.cdn-zlib.sk/covers100/collections/foreignfiction/0308e4b148eb0f7d9915a1b93d091af7d3b96d154b977f6227753aebef0e7acb.jpg">
+                    <div slot="title">Hunting Adeline (Cat and Mouse Duet Book 2)</div>
+                    <div slot="author">Carlton; H. D.</div>
+                    <div slot="note"></div>
+                    <div slot="extend" style="position: absolute;">
+                                                                                            </div>
+                                                                                                </z-bookcard>
             </div>
                     <div class="divider"></div>            <div class="book-item resItemBoxBooks exactMatch">
                 <div class="counter">33</div>
@@ -1206,7 +1130,7 @@
                     <div slot="note"></div>
                     <div slot="extend" style="position: absolute;">
                                                                                             </div>
-                                                                                                </z-bookcard>    
+                                                                                                </z-bookcard>
             </div>
                     <div class="divider"></div>            <div class="book-item resItemBoxBooks exactMatch">
                 <div class="counter">34</div>
@@ -1217,7 +1141,7 @@
                     <div slot="note"></div>
                     <div slot="extend" style="position: absolute;">
                                                                                             </div>
-                                                                                                </z-bookcard>    
+                                                                                                </z-bookcard>
             </div>
                     <div class="divider"></div>            <div class="book-item resItemBoxBooks exactMatch">
                 <div class="counter">35</div>
@@ -1228,7 +1152,7 @@
                     <div slot="note"></div>
                     <div slot="extend" style="position: absolute;">
                                                                                             </div>
-                                                                                                </z-bookcard>    
+                                                                                                </z-bookcard>
             </div>
                     <div class="divider"></div>            <div class="book-item resItemBoxBooks exactMatch">
                 <div class="counter">36</div>
@@ -1239,7 +1163,7 @@
                     <div slot="note"></div>
                     <div slot="extend" style="position: absolute;">
                                                                                             </div>
-                                                                                                </z-bookcard>    
+                                                                                                </z-bookcard>
             </div>
                     <div class="divider"></div>            <div class="book-item resItemBoxBooks exactMatch">
                 <div class="counter">37</div>
@@ -1250,7 +1174,7 @@
                     <div slot="note"></div>
                     <div slot="extend" style="position: absolute;">
                                                                                             </div>
-                                                                                                </z-bookcard>    
+                                                                                                </z-bookcard>
             </div>
                     <div class="divider"></div>            <div class="book-item resItemBoxBooks exactMatch">
                 <div class="counter">38</div>
@@ -1261,32 +1185,10 @@
                     <div slot="note"></div>
                     <div slot="extend" style="position: absolute;">
                                                                                             </div>
-                                                                                                </z-bookcard>    
+                                                                                                </z-bookcard>
             </div>
                     <div class="divider"></div>            <div class="book-item resItemBoxBooks exactMatch">
                 <div class="counter">39</div>
-                <z-bookcard id="5443826" isbn="9789353063047" termshash="ea0cf2bcb32231de8f6979cd961fea15" href="/book/5443826/2af7d0/quantitative-aptitude-for-cat.html" publisher="Pearson Education" language="english" year="2019" extension="pdf" filesize="20.20 MB" rating="5.0" quality="5.0" contenttypeparam="?content_type=book" class="ready">
-                    <img data-src="https://s3proxy.cdn-zlib.sk/covers100/collections/genesis/e3c0bbaa77d3a1f1338caa9f054a4be599f618f527e1a85f06eb6323e1699cfa.jpg">
-                    <div slot="title">Quantitative Aptitude for CAT</div>
-                    <div slot="author">Trishna Knowledge Systems</div>
-                    <div slot="note"></div>
-                    <div slot="extend" style="position: absolute;">
-                                                                                            </div>
-                                                                                                </z-bookcard>    
-            </div>
-                    <div class="divider"></div>            <div class="book-item resItemBoxBooks exactMatch">
-                <div class="counter">40</div>
-                <z-bookcard id="16983568" isbn="" termshash="7b751e419fa72ec7e36af4e741c58bd5" href="/book/16983568/8aae46/the-husky-and-his-white-cat-shizun-2ha.html" publisher="" language="english" year="0" extension="epub" filesize="1.19 MB" rating="5.0" quality="4.5" contenttypeparam="?content_type=book" class="ready">
-                    <img data-src="https://s3proxy.cdn-zlib.sk/covers100/collections/foreignfiction/a1fd4784408a8a77f8635c47be6cc927c4416af0618e58b32a790c1da94a0d3c.jpg">
-                    <div slot="title">The Husky and His White Cat Shizun (2HA)</div>
-                    <div slot="author">Meatbun Doesn't Eat Meat</div>
-                    <div slot="note"></div>
-                    <div slot="extend" style="position: absolute;">
-                                                                                            </div>
-                                                                                                </z-bookcard>    
-            </div>
-                    <div class="divider"></div>            <div class="book-item resItemBoxBooks exactMatch">
-                <div class="counter">41</div>
                 <z-bookcard id="5013305" isbn="9780451491336" termshash="0a884d375e505a03da5f0b49646c3156" href="/book/5013305/aac29b/the-travelling-cat-chronicles-tabineko-rip%C3%B4to.html" publisher="Penguin Publishing Group" language="english" year="2018" extension="epub" filesize="4.56 MB" rating="5.0" quality="5.0" contenttypeparam="?content_type=book" class="ready">
                     <img data-src="https://s3proxy.cdn-zlib.sk/covers100/collections/foreignfiction/c13d2679a64ba7843c6ddfbb81d985318e4bac56c461d260e63824409263aca5.jpg">
                     <div slot="title">The Travelling Cat Chronicles (Tabineko Ripôto)</div>
@@ -1294,10 +1196,10 @@
                     <div slot="note"></div>
                     <div slot="extend" style="position: absolute;">
                                                                                             </div>
-                                                                                                </z-bookcard>    
+                                                                                                </z-bookcard>
             </div>
                     <div class="divider"></div>            <div class="book-item resItemBoxBooks exactMatch">
-                <div class="counter">42</div>
+                <div class="counter">40</div>
                 <z-bookcard id="17049393" isbn="" termshash="5b475739e8d698c2998b5cb36c9c80c1" href="/book/17049393/aab484/dog-man-4-dog-man-and-cat-kid.html" publisher="Scholastic" language="english" year="2016" extension="pdf" filesize="23.14 MB" rating="5.0" quality="5.0" contenttypeparam="?content_type=book" class="ready">
                     <img data-src="https://s3proxy.cdn-zlib.sk/covers100/collections/userbooks/5531cf26c6a5fb723002e03e7347a63b9e7db575a8ba2f15135da10c3f55f13d.jpg">
                     <div slot="title">Dog Man #4 Dog Man and Cat Kid</div>
@@ -1305,32 +1207,32 @@
                     <div slot="note"></div>
                     <div slot="extend" style="position: absolute;">
                                                                                             </div>
-                                                                                                </z-bookcard>    
+                                                                                                </z-bookcard>
+            </div>
+                    <div class="divider"></div>            <div class="book-item resItemBoxBooks exactMatch">
+                <div class="counter">41</div>
+                <z-bookcard id="5443826" isbn="9789353063047" termshash="ea0cf2bcb32231de8f6979cd961fea15" href="/book/5443826/2af7d0/quantitative-aptitude-for-cat.html" publisher="Pearson Education" language="english" year="2019" extension="pdf" filesize="20.20 MB" rating="5.0" quality="5.0" contenttypeparam="?content_type=book" class="ready">
+                    <img data-src="https://s3proxy.cdn-zlib.sk/covers100/collections/genesis/e3c0bbaa77d3a1f1338caa9f054a4be599f618f527e1a85f06eb6323e1699cfa.jpg">
+                    <div slot="title">Quantitative Aptitude for CAT</div>
+                    <div slot="author">Trishna Knowledge Systems</div>
+                    <div slot="note"></div>
+                    <div slot="extend" style="position: absolute;">
+                                                                                            </div>
+                                                                                                </z-bookcard>
+            </div>
+                    <div class="divider"></div>            <div class="book-item resItemBoxBooks exactMatch">
+                <div class="counter">42</div>
+                <z-bookcard id="16983568" isbn="" termshash="7b751e419fa72ec7e36af4e741c58bd5" href="/book/16983568/8aae46/the-husky-and-his-white-cat-shizun-2ha.html" publisher="" language="english" year="0" extension="epub" filesize="1.19 MB" rating="5.0" quality="4.5" contenttypeparam="?content_type=book" class="ready">
+                    <img data-src="https://s3proxy.cdn-zlib.sk/covers100/collections/foreignfiction/a1fd4784408a8a77f8635c47be6cc927c4416af0618e58b32a790c1da94a0d3c.jpg">
+                    <div slot="title">The Husky and His White Cat Shizun (2HA)</div>
+                    <div slot="author">Meatbun Doesn't Eat Meat</div>
+                    <div slot="note"></div>
+                    <div slot="extend" style="position: absolute;">
+                                                                                            </div>
+                                                                                                </z-bookcard>
             </div>
                     <div class="divider"></div>            <div class="book-item resItemBoxBooks exactMatch">
                 <div class="counter">43</div>
-                <z-bookcard id="25205923" isbn="9780063272767" termshash="115b2223b8d900223fffcf5b3c3c6fc5" href="/book/25205923/c8b5a4/we-could-be-so-good-midcentury-nyc-1.html" publisher="HarperCollins" language="english" year="2023" extension="epub" filesize="1.57 MB" rating="5.0" quality="5.0" contenttypeparam="?content_type=book" class="ready">
-                    <img data-src="https://s3proxy.cdn-zlib.sk/covers100/collections/userbooks/50955c1849c6e2fb7b1758c85e4388634f28205734174af9f7334cd554c9d15a.jpg">
-                    <div slot="title">We Could Be So Good (Midcentury NYC 1)</div>
-                    <div slot="author">Cat Sebastian</div>
-                    <div slot="note"></div>
-                    <div slot="extend" style="position: absolute;">
-                                                                                            </div>
-                                                                                                </z-bookcard>    
-            </div>
-                    <div class="divider"></div>            <div class="book-item resItemBoxBooks exactMatch">
-                <div class="counter">44</div>
-                <z-bookcard id="5288105" isbn="9780823085750" termshash="6c1d5b0841875a8cd4254fba10a94ea9" href="/book/5288105/c22500/draw-50-cats-the-stepbystep-way-to-draw-domestic-breeds-wild-cats-cuddly-kittens-and-famous-fe.html" publisher="Watson-Guptill" language="english" year="1800" extension="epub" filesize="31.01 MB" rating="3.0" quality="5.0" contenttypeparam="?content_type=book" class="ready">
-                    <img data-src="https://s3proxy.cdn-zlib.sk/covers100/collections/genesis/f56aaf7f8e37c270815382ffe07a7e315127a8f24289edebe1ae0a0b6e9df4cd.jpg">
-                    <div slot="title">Draw 50 Cats: The Step-by-Step Way to Draw Domestic Breeds, Wild Cats, Cuddly Kittens, and Famous Felines</div>
-                    <div slot="author">Lee J. Ames</div>
-                    <div slot="note"></div>
-                    <div slot="extend" style="position: absolute;">
-                                                                                            </div>
-                                                                                                </z-bookcard>    
-            </div>
-                    <div class="divider"></div>            <div class="book-item resItemBoxBooks exactMatch">
-                <div class="counter">45</div>
                 <z-bookcard id="29816436" isbn="9780593818749" termshash="4182ab360653533161407bc8bfc7c2df" href="/book/29816436/0121fa/well-prescribe-you-a-cat.html" publisher="Penguin Group" language="english" year="2024" extension="epub" filesize="2.05 MB" rating="4.5" quality="5.0" contenttypeparam="?content_type=book" class="ready">
                     <img data-src="https://s3proxy.cdn-zlib.sk/covers100/collections/userbooks/8328b230d094035451310fda04eed7be1b270a87f758a3cacdca63181942ce3a.jpg">
                     <div slot="title">We'll Prescribe You a Cat</div>
@@ -1338,7 +1240,29 @@
                     <div slot="note"></div>
                     <div slot="extend" style="position: absolute;">
                                                                                             </div>
-                                                                                                </z-bookcard>    
+                                                                                                </z-bookcard>
+            </div>
+                    <div class="divider"></div>            <div class="book-item resItemBoxBooks exactMatch">
+                <div class="counter">44</div>
+                <z-bookcard id="25205923" isbn="9780063272767" termshash="115b2223b8d900223fffcf5b3c3c6fc5" href="/book/25205923/c8b5a4/we-could-be-so-good-midcentury-nyc-1.html" publisher="HarperCollins" language="english" year="2023" extension="epub" filesize="1.57 MB" rating="5.0" quality="5.0" contenttypeparam="?content_type=book" class="ready">
+                    <img data-src="https://s3proxy.cdn-zlib.sk/covers100/collections/userbooks/50955c1849c6e2fb7b1758c85e4388634f28205734174af9f7334cd554c9d15a.jpg">
+                    <div slot="title">We Could Be So Good (Midcentury NYC 1)</div>
+                    <div slot="author">Cat Sebastian</div>
+                    <div slot="note"></div>
+                    <div slot="extend" style="position: absolute;">
+                                                                                            </div>
+                                                                                                </z-bookcard>
+            </div>
+                    <div class="divider"></div>            <div class="book-item resItemBoxBooks exactMatch">
+                <div class="counter">45</div>
+                <z-bookcard id="5288105" isbn="9780823085750" termshash="6c1d5b0841875a8cd4254fba10a94ea9" href="/book/5288105/c22500/draw-50-cats-the-stepbystep-way-to-draw-domestic-breeds-wild-cats-cuddly-kittens-and-famous-fe.html" publisher="Watson-Guptill" language="english" year="1800" extension="epub" filesize="31.01 MB" rating="3.0" quality="5.0" contenttypeparam="?content_type=book" class="ready">
+                    <img data-src="https://s3proxy.cdn-zlib.sk/covers100/collections/genesis/f56aaf7f8e37c270815382ffe07a7e315127a8f24289edebe1ae0a0b6e9df4cd.jpg">
+                    <div slot="title">Draw 50 Cats: The Step-by-Step Way to Draw Domestic Breeds, Wild Cats, Cuddly Kittens, and Famous Felines</div>
+                    <div slot="author">Lee J. Ames</div>
+                    <div slot="note"></div>
+                    <div slot="extend" style="position: absolute;">
+                                                                                            </div>
+                                                                                                </z-bookcard>
             </div>
                     <div class="divider"></div>            <div class="book-item resItemBoxBooks exactMatch">
                 <div class="counter">46</div>
@@ -1349,7 +1273,7 @@
                     <div slot="note"></div>
                     <div slot="extend" style="position: absolute;">
                                                                                             </div>
-                                                                                                </z-bookcard>    
+                                                                                                </z-bookcard>
             </div>
                     <div class="divider"></div>            <div class="book-item resItemBoxBooks exactMatch">
                 <div class="counter">47</div>
@@ -1360,21 +1284,10 @@
                     <div slot="note"></div>
                     <div slot="extend" style="position: absolute;">
                                                                                             </div>
-                                                                                                </z-bookcard>    
+                                                                                                </z-bookcard>
             </div>
                     <div class="divider"></div>            <div class="book-item resItemBoxBooks exactMatch">
                 <div class="counter">48</div>
-                <z-bookcard id="4964636" isbn="9780198466598" termshash="42f6427721ad83f6a253155d71db0cd8" href="/book/4964636/fd7148/oxford-reading-tree-songbirds-phonics-level-1-top-cat.html" publisher="Oxford University Press UK" language="english" year="2008" extension="pdf" filesize="1.06 MB" rating="5.0" quality="2.5" contenttypeparam="?content_type=book" class="ready">
-                    <img data-src="https://s3proxy.cdn-zlib.sk/covers100/collections/foreignfiction/4c769ce7cf6ed8ba3e2fd48184b99041d841800c13134cebdf9f974b9c478465.jpg">
-                    <div slot="title">Oxford Reading Tree Songbirds Phonics: Level 1+: Top Cat</div>
-                    <div slot="author">Julia Donaldson; Clare Kirtley</div>
-                    <div slot="note"></div>
-                    <div slot="extend" style="position: absolute;">
-                                                                                            </div>
-                                                                                                </z-bookcard>    
-            </div>
-                    <div class="divider"></div>            <div class="book-item resItemBoxBooks exactMatch">
-                <div class="counter">49</div>
                 <z-bookcard id="28422672" isbn="9781685795061" termshash="4d6ae93e7d0f00e4326f45e4af0a6e77" href="/book/28422672/d10c7e/the-husky-and-his-white-cat-shizun-erha-he-ta-de-bai-mao-shizun-novel-vol-5.html" publisher="Seven Seas Entertainment" language="english" year="2024" extension="epub" filesize="12.71 MB" rating="5.0" quality="5.0" contenttypeparam="?content_type=book" class="ready">
                     <img data-src="https://s3proxy.cdn-zlib.sk/covers100/collections/userbooks/16a7acf68c9500aeb15863005c45555575f40c7bfba7de3d850ffb34da4c2044.jpg">
                     <div slot="title">The Husky and His White Cat Shizun: Erha He Ta de Bai Mao Shizun (Novel) Vol. 5</div>
@@ -1382,7 +1295,18 @@
                     <div slot="note"></div>
                     <div slot="extend" style="position: absolute;">
                                                                                             </div>
-                                                                                                </z-bookcard>    
+                                                                                                </z-bookcard>
+            </div>
+                    <div class="divider"></div>            <div class="book-item resItemBoxBooks exactMatch">
+                <div class="counter">49</div>
+                <z-bookcard id="4964636" isbn="9780198466598" termshash="42f6427721ad83f6a253155d71db0cd8" href="/book/4964636/fd7148/oxford-reading-tree-songbirds-phonics-level-1-top-cat.html" publisher="Oxford University Press UK" language="english" year="2008" extension="pdf" filesize="1.06 MB" rating="5.0" quality="2.5" contenttypeparam="?content_type=book" class="ready">
+                    <img data-src="https://s3proxy.cdn-zlib.sk/covers100/collections/foreignfiction/4c769ce7cf6ed8ba3e2fd48184b99041d841800c13134cebdf9f974b9c478465.jpg">
+                    <div slot="title">Oxford Reading Tree Songbirds Phonics: Level 1+: Top Cat</div>
+                    <div slot="author">Julia Donaldson; Clare Kirtley</div>
+                    <div slot="note"></div>
+                    <div slot="extend" style="position: absolute;">
+                                                                                            </div>
+                                                                                                </z-bookcard>
             </div>
                     <div class="divider"></div>            <div class="book-item resItemBoxBooks exactMatch">
                 <div class="counter">50</div>
@@ -1393,9 +1317,9 @@
                     <div slot="note"></div>
                     <div slot="extend" style="position: absolute;">
                                                                                             </div>
-                                                                                                </z-bookcard>    
+                                                                                                </z-bookcard>
             </div>
-        <div style="margin: 0 -1px -1px;position: relative;"><z-recommended-search query="22494457,26283212,27049544,23631413,2642078,4696018,3749557,5572494,5443826,16983568,5013305,17049393,25205923,5288105,29816436,5814880,3045865,4964636,28422672,3334842" auto="" lazy="" class="ready"></z-recommended-search></div></div>
+        <div style="margin: 0 -1px -1px;position: relative;"><z-recommended-search query="26283212,22494457,27049544,23631413,2642078,4696018,3749557,5572494,5013305,17049393,5443826,16983568,29816436,25205923,5288105,5814880,3045865,28422672,4964636,3334842" auto="" lazy="" class="ready"></z-recommended-search></div></div>
     
 
 <script>
@@ -1471,7 +1395,7 @@
                                     <span class="z-modal__text">Z-Alerts可以让你在有新书时根据你的搜索要求得到通知。您可以用书名、作者、ISBN等信息作为搜索查询 <a href="/msgn/zalerts" target="_blank">阅读更多关于Z-Alerts的信息</a>.</span>
                 
                                     <input id="zalertEmail" type="text" form="zalertCreateForm" class="z-text-input" placeholder="您的 Email邮箱" name="email">
-                                    <input id="zalertQuery" type="text" form="zalertCreateForm" value="cat" class="z-text-input" placeholder="请输入搜索词"><div id="tooltip-260148" class="zlib-tooltip" style="display:none"><button class="visible-xs-block close">×</button>
+                                    <input id="zalertQuery" type="text" form="zalertCreateForm" value="cat" class="z-text-input" placeholder="请输入搜索词"><div id="tooltip-868191" class="zlib-tooltip" style="display:none"><button class="visible-xs-block close">×</button>
             <span class="zlibicon-info"></span>
             如果您需要带 ISBN 的图书，<br>我们建议创建 <a href="/requests">添加书籍请求</a></div>
 
@@ -1691,11 +1615,11 @@
         </div>
         <div class="footer__social_links">
             <ul>
-                <li><a class="tgo" data-toggle="tooltip" title="Z-Library on Telegram" href="https://t.me/zlibrary_official" target="_blank"><span class="zlibicon-telegram-fill"></span> 官方途径</a></li>
+                <li><a class="tgo" data-toggle="tooltip" title="Z-Library on Telegram" href="https://t.me/zlibrary_news" target="_blank"><span class="zlibicon-telegram-fill"></span> 官方途径</a></li>
                 <li class="break"></li>
                 <li><a class="tw" data-toggle="tooltip" title="Z-Library on Twitter" href="https://x.com/Z_Lib_official" target="_blank"><span class="zlibicon-twitter"></span></a></li>
-                <li><a class="ms" data-toggle="tooltip" title="Z-Library on Mastadon" href="https://mastodon.social/@Z_Lib_official" target="_blank"><span class="zlibicon-mastodon"></span></a></li>
-                <li><a class="tgc" data-toggle="tooltip" title="Chinese channel on Telegram" href="https://t.me/zlib_china_official" target="_blank"><span class="zlibicon-tgchn"></span></a></li>
+                <li><a class="ms" data-toggle="tooltip" title="Z-Library on Mastodon" href="https://mastodon.social/@Z_Lib_official" target="_blank"><span class="zlibicon-mastodon"></span></a></li>
+                <li><a class="tgc" data-toggle="tooltip" title="Chinese channel on Telegram" href="https://t.me/zlib_china_news" target="_blank"><span class="zlibicon-tgchn"></span></a></li>
             </ul>
         </div>
 

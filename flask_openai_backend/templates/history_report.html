@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Library Search Report</title>
+    <style>
+        .table-container { margin: 20px; }
+        table { border-collapse: collapse; width: 100%; margin-bottom: 30px; }
+        th, td { border: 1px solid #ddd; padding: 8px; text-align: left; }
+        th { background-color: #f2f2f2; }
+        h2 { color: #333; margin-bottom: 10px; }
+    </style>
+</head>
+<body>
+    <div class="table-container">
+        <!-- Search History Table -->
+        <h2>Search History</h2>
+        <table>
+            <tr>
+                <th>Date</th>
+                <th>Query</th>
+                <th>Results</th>
+            </tr>
+            {% for record in history %}
+            <tr>
+                <td>{{ record.search_date }}</td>
+                <td>{{ record.query }}</td>
+                <td>{{ record.results_count }}</td>
+            </tr>
+            {% endfor %}
+        </table>
+
+        <!-- Daily Summary Table -->
+        <h2>Daily Search Summary</h2>
+        <table>
+            <tr>
+                <th>Date</th>
+                <th>Total Searches</th>
+                <th>Unique Terms</th>
+            </tr>
+            {% for summary in summaries %}
+            <tr>
+                <td>{{ summary.summary_date }}</td>
+                <td>{{ summary.total_searches }}</td>
+                <td>{{ summary.unique_terms }}</td>
+            </tr>
+            {% endfor %}
+        </table>
+
+        <!-- Term Details Table -->
+        <h2>Search Term Details</h2>
+        <table>
+            <tr>
+                <th>Date</th>
+                <th>Hash</th>
+                <th>Original Term</th>
+                <th>Weight</th>
+            </tr>
+            {% for term in terms %}
+            <tr>
+                <td>{{ term.search_date }}</td>
+                <td>{{ term.term_hash }}</td>
+                <td>{{ term.original_term }}</td>
+                <td>{{ term.weight }}</td>
+            </tr>
+            {% endfor %}
+        </table>
+    </div>
+</body>
+</html>
