@@ -1,6 +1,14 @@
-<html lang="zh" class="" style="--vh: 4.26px;"><head>
+<html lang="zh" class="dark" style="--vh: 4.74px;"><head>
         <meta name="color-scheme" content="">
-                <script src="/components/zlibrary.js?0.774"></script>
+                <script>
+            if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
+                document.querySelector("html").className = "dark"
+            }
+            window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', e => {
+                document.querySelector('html').className = e.matches ? 'dark' : 'light';
+            });
+        </script>
+                        <script src="/components/zlibrary.js?0.777"></script>
         <script type="text/javascript">
             navigator.sayswho = (function(){
                 var ua= navigator.userAgent, tem,
@@ -88,28 +96,28 @@
         <meta name="singleLanguage" value="bool(true)
 ">
 
-            <link rel="stylesheet" href="/resources/css/theme.css?0.774">
+            <link rel="stylesheet" href="/resources/css/theme.css?0.777">
 
-                    <meta name="version" value="0.774">
-            <link rel="stylesheet" type="text/css" href="/resources/build/main.css?0.774">
-            <script type="text/javascript" src="/resources/build/main.js?0.774"></script>
-                            <link rel="stylesheet" type="text/css" href="/resources/build/global.css?0.774">
-                <link rel="stylesheet" href="/resources/build/global-d.css?0.774" as="style" onload="this.onload=null;this.rel='stylesheet'">
-                <noscript><link rel="stylesheet" href="/resources/build/global-d.css?0.774"></noscript>
-                <script type="text/javascript" src="/resources/build/global.js?0.774"></script>
-                        <script type="text/javascript" src="/resources/build/bootstrap.js?0.774"></script>
-            <script type="text/javascript" src="/resources/build/global-d.js?0.774" defer=""></script>
-                                <script type="text/javascript" src="/resources/js/search_metrics.js?0.774"></script>
+                    <meta name="version" value="0.777">
+            <link rel="stylesheet" type="text/css" href="/resources/build/main.css?0.777">
+            <script type="text/javascript" src="/resources/build/main.js?0.777"></script>
+                            <link rel="stylesheet" type="text/css" href="/resources/build/global.css?0.777">
+                <link rel="stylesheet" href="/resources/build/global-d.css?0.777" as="style" onload="this.onload=null;this.rel='stylesheet'">
+                <noscript><link rel="stylesheet" href="/resources/build/global-d.css?0.777"></noscript>
+                <script type="text/javascript" src="/resources/build/global.js?0.777"></script>
+                        <script type="text/javascript" src="/resources/build/bootstrap.js?0.777"></script>
+            <script type="text/javascript" src="/resources/build/global-d.js?0.777" defer=""></script>
+                                <script type="text/javascript" src="/resources/js/search_metrics.js?0.777"></script>
         <noscript>
-            <link rel="stylesheet" type="text/css" href="/resources/css/noscript.css?0.774" />
+            <link rel="stylesheet" type="text/css" href="/resources/css/noscript.css?0.777" />
         </noscript>
 
         <script>
             window != top ? window.stop() : null;
             
-            const Config = {"domainHost":"z-lib.gl","BRegion":"asia","Country":"sg","accessByIp":false,"supportEmail":"support@z-lib.fm","preferredDomain":"https:\/\/z-library.sk","loginURL":"\/login?redirectUrl=https:\/\/z-lib.gl","regURL":"\/registration?redirectUrl=https:\/\/z-lib.gl","generalFilesProxy":"https:\/\/dlr1.fcdn.sk\/general-files\/","isDesktopApp":false,"desktopAppVersion":null,"isTelegramBrowser":false,"isProxy":false};
+            const Config = {"domainHost":"z-lib.gl","BRegion":"highrisk","Country":"us","accessByIp":false,"supportEmail":"support@z-lib.fm","preferredDomain":"https:\/\/z-library.sk","loginURL":"\/login?redirectUrl=https:\/\/z-lib.gl","regURL":"\/registration?redirectUrl=https:\/\/z-lib.gl","generalFilesProxy":"https:\/\/dlr1.ncdn.ec\/general-files\/","isDesktopApp":false,"desktopAppVersion":null,"isTelegramBrowser":false,"isProxy":false};
             const CurrentUser = new User(null);
-            const CurrentClientIP = "103.190.179.36";
+            const CurrentClientIP = "149.112.117.51";
             const CurrentSiteMode = 'books';
             const proxiesToCheck = []; //for google verification
 
@@ -126,7 +134,7 @@
                         fallbackLng: 'en',
                         backend: {
                             // addPath: '/papi/translations/add-missing-key',
-                            loadPath: '/resources/build/translations-frontend/{{lng}}.json?v=0.774'
+                            loadPath: '/resources/build/translations-frontend/{{lng}}.json?v=0.777'
                         },
                         keySeparator: notLikelyString,
                         nsSeparator: notLikelyString,
@@ -175,8 +183,8 @@
         
         
         <script src="/components/zlibrary-startup-script.js"></script>
-        <link rel="stylesheet" href="/components/style.css?0.774">
-    <script src="/components/z-tabs.js?0.774"></script><script src="/components/z-dropdown.js?0.774"></script><script src="/components/z-bookcard.js?0.774"></script><script src="/components/z-recommended-search.js?0.774"></script><script src="/components/z-carousel.js?0.774"></script><script src="/components/z-cover.js?0.774"></script><script src="/components/z-booklists-browser.js?0.774"></script></head>
+        <link rel="stylesheet" href="/components/style.css?0.777">
+    <script src="/components/z-tabs.js?0.777"></script><script src="/components/z-dropdown.js?0.777"></script><script src="/components/z-bookcard.js?0.777"></script><script src="/components/z-recommended-search.js?0.777"></script><script src="/components/z-cover.js?0.777"></script><script src="/components/z-booklists-browser.js?0.777"></script><script src="/components/z-carousel.js?0.777"></script></head>
 
         <body style="margin:0px;padding:0px;" class="search  super-puper-main-container" data-proxy="false">
         
@@ -318,151 +326,67 @@
         </div>
     
     
-<div id="newYearBanner">
-    <i class="zlibicon-cross close-btn"></i>
-    <div class="new-year-body">
-        <div class="img"></div>
-        <a class="blogLink" href="/blog/55">Gift inside</a>
+<div id="merchantPopup" class="hidden">
+    <p>We're currently searching for a high-risk payment processing provider to handle bank cards and local payments.
+    </p><p>
+        If you know of any reliable providers, please get in touch with us via <a href="mailto:support@z-lib.fm">support@z-lib.fm</a> with the subject line <b>"High-risk merchant"</b>. Your help is greatly appreciated!
+    </p><p>Please refrain from emailing if you are not familiar with this topic.
+    </p><p>Thank you!
+    </p><div class="modal-footer">
+        <button class="btnCloseMerchantPopup">关闭</button>
     </div>
 </div>
 
-<style>
-    #newYearBanner .close-btn {
-        position: absolute;
-        right: 20px;
-        top: 15px;
-        color: #fff;
-        font-size: 11px;
-        cursor: pointer;
-        padding-left: 15px;
-        padding-bottom: 15px;
-    }
 
-    #newYearBanner .new-year-body {
-        position: absolute;
-        top: 0;
-        left: 0;
-        right: 0;
-        bottom: 24px;
-        display: flex;
-        justify-content: center;
-        align-items: flex-end;
-    }
-    @media screen and (min-width: 485px){
-        #newYearBanner {
-            width: 100%;
-            background-image: url("/img/new-year/2025/banner.png");
-            padding-top: 21.75%;
-            border-radius: 8px;
-            margin-top: 16px;
-            margin-bottom: 32px;
-            position: relative;
-            background-size: cover;
-        }
-        #newYearBanner .img{
-            width: 487px;
-            height: 183px;
-            background-image: url("/img/new-year/2025/banner-title.png");
-            margin-bottom: -24px;
-            margin-right: 32px;
-            max-width: 58%;
-            background-size: contain;
-            background-position: bottom;
-            background-repeat: no-repeat;
-        }
-    }
-    
-    @media screen and (min-width: 485px) and (min-resolution: 1.1dppx), 
-       screen and (min-width: 485px) and (-webkit-min-device-pixel-ratio: 1.1) {
-        #newYearBanner {
-            background-image: url("/img/new-year/2025/banner@2x.png");
-        }
-        #newYearBanner .img{
-            background-image: url("/img/new-year/2025/banner-title@2x.png");
-        }
-    }
-
-    @media screen and (max-width: 484px){
-        #newYearBanner {
-            width: 100%;
-            background-image: url("/img/new-year/2025/banner-mob.png");
-            padding-top: 50.26%;
-            border-radius: 8px;
-            margin-top: 16px;
-            margin-bottom: 32px;
-            position: relative;
-            background-size: cover;
-        }
-        #newYearBanner .img{
-            width: 232px;
-            height: 100px;
-            background-image: url("/img/new-year/2025/banner-title-mob.png");
-            margin-bottom: 2px;
-            max-width: 80%;
-            background-size: contain;
-            background-position: bottom;
-            background-repeat: no-repeat;
-        }
-        #newYearBanner .new-year-body {
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-            bottom: 0;
-        }
-    }   
-    @media screen and (max-width: 484px) and (min-resolution: 1.1dppx), 
-       screen and (max-width: 484px) and (-webkit-min-device-pixel-ratio: 1.1) {
-        #newYearBanner {
-            background-image: url("/img/new-year/2025/banner-mob@2x.png");
-        }
-        #newYearBanner .img{
-            background-image: url("/img/new-year/2025/banner-title-mob@2x.png");
-        }
-    }
-
-    #newYearBanner .blogLink{
-        text-decoration: none;
-        background: #DD583F;
-        border: 1px solid #FFFFFF;
-        color: #FFFFFF;
-        box-shadow: 1px 1px 0px 0px #00000040;
-        padding: 8px 24px;
-        font-size: 16px;
-        border-radius: 2px;
-    }
-    #newYearBanner .blogLink:hover{
-        background: #DD583FCC;
-    }
-
-</style>
-
-<script>
-    $(function () {
-        $(document).on('click', '#newYearBanner', function (e) {
-            const $target = $(e.target)
-            e.preventDefault()
-            if ($target.hasClass('close-btn')) {
-                return
-            }
-
-            const blogUrl = $('a.blogLink').attr('href')
-            if (!CurrentUser.id) {
-                CurrentUser.showAuthPopup('login', i18next.t('After authorization, you will be able to take a gift'), null, blogUrl)
-                return;
-            }
-
-            if (typeof blogUrl === 'string' && blogUrl.length) {
-                window.location.href = blogUrl
-            }
+<script type="text/javascript">
+    $(document).on('click', '.btnShowMerchantPopup', function() {
+        const merchantModal = new ZLibraryModal({
+            element: 'merchantPopup',
+            container: 'zlibrary-modal-styled',
         })
-        $('#newYearBanner .close-btn').on('click', function () {
-            new ZLibraryResponse('/papi/user/hide-announcement/banner25/').fetch()
-            $('#newYearBanner').slideUp(function () {
-                $(this).remove()
-            })
+        merchantModal.show()
+    })
+
+    $(document).on('click', '.btnCloseMerchantPopup', function() {
+        const merchantModal = new ZLibraryModal({
+            element: 'merchantPopup',
+            container: 'zlibrary-modal-styled',
+        })
+        merchantModal.hide()
+    })
+
+    
+    $(document).on('click', '.btnHideAnnouncement', function() {
+        let cook = getCookie('hiddenMessages');
+        let hidden = cook ? JSON.parse(cook) : [];
+        let messageHash = $(this).data('message');
+
+        if (hidden.indexOf(messageHash) === -1) {
+            hidden.push($(this).data('message'))
+        }
+
+        setCookie('hiddenMessages', JSON.stringify(hidden), 31*24*60*60*1000)
+        $('#messageBlock').hide()
+    })
+
+    $(document).on('click', '.btnHideBanner', function() {
+        const bannerName = $(this).data('name')
+        hideBanner(bannerName)
+    })
+
+    $(function () {
+        $('.feedback-modal').click(function () {
+            let modalTitle = $(this).data('title');
+            let subject = $(this).data('subject');
+            new ZLibraryModal({
+                url: '/layer/_modals/feedback?subject="' + subject + '"',
+                title: modalTitle
+            }).show()
         })
     })
 </script>
+
+
     <a name="s"></a>
 
     <form method="get" id="searchForm" action="/s/">
@@ -854,7 +778,7 @@
                     <div slot="note"></div>
                     <div slot="extend" style="position: absolute;">
                                                                                             </div>
-                                                                                                </z-bookcard>    
+                                                                                                </z-bookcard>
             </div>
                     <div class="divider"></div>            <div class="book-item resItemBoxBooks exactMatch">
                 <div class="counter">2</div>
@@ -865,7 +789,7 @@
                     <div slot="note"></div>
                     <div slot="extend" style="position: absolute;">
                                                                                             </div>
-                                                                                                </z-bookcard>    
+                                                                                                </z-bookcard>
             </div>
                     <div class="divider"></div>            <div class="book-item resItemBoxBooks exactMatch">
                 <div class="counter">3</div>
@@ -876,7 +800,7 @@
                     <div slot="note"></div>
                     <div slot="extend" style="position: absolute;">
                                                                                             </div>
-                                                                                                </z-bookcard>    
+                                                                                                </z-bookcard>
             </div>
                     <div class="divider"></div>            <div class="book-item resItemBoxBooks exactMatch">
                 <div class="counter">4</div>
@@ -887,7 +811,7 @@
                     <div slot="note"></div>
                     <div slot="extend" style="position: absolute;">
                                                                                             </div>
-                                                                                                </z-bookcard>    
+                                                                                                </z-bookcard>
             </div>
                     <div class="divider"></div>            <div class="book-item resItemBoxBooks exactMatch">
                 <div class="counter">5</div>
@@ -898,7 +822,7 @@
                     <div slot="note"></div>
                     <div slot="extend" style="position: absolute;">
                                                                                             </div>
-                                                                                                </z-bookcard>    
+                                                                                                </z-bookcard>
             </div>
                     <div class="divider"></div>            <div class="book-item resItemBoxBooks exactMatch">
                 <div class="counter">6</div>
@@ -909,7 +833,7 @@
                     <div slot="note"></div>
                     <div slot="extend" style="position: absolute;">
                                                                                             </div>
-                                                                                                </z-bookcard>    
+                                                                                                </z-bookcard>
             </div>
                     <div class="divider"></div>            <div class="book-item resItemBoxBooks exactMatch">
                 <div class="counter">7</div>
@@ -920,7 +844,7 @@
                     <div slot="note"></div>
                     <div slot="extend" style="position: absolute;">
                                                                                             </div>
-                                                                                                </z-bookcard>    
+                                                                                                </z-bookcard>
             </div>
                     <div class="divider"></div>            <div class="book-item resItemBoxBooks exactMatch">
                 <div class="counter">8</div>
@@ -931,7 +855,7 @@
                     <div slot="note"></div>
                     <div slot="extend" style="position: absolute;">
                                                                                             </div>
-                                                                                                </z-bookcard>    
+                                                                                                </z-bookcard>
             </div>
                     <div class="divider"></div>            <div class="book-item resItemBoxBooks exactMatch">
                 <div class="counter">9</div>
@@ -942,7 +866,7 @@
                     <div slot="note"></div>
                     <div slot="extend" style="position: absolute;">
                                                                                             </div>
-                                                                                                </z-bookcard>    
+                                                                                                </z-bookcard>
             </div>
                     <div class="divider"></div>            <div class="book-item resItemBoxBooks exactMatch">
                 <div class="counter">10</div>
@@ -953,7 +877,7 @@
                     <div slot="note"></div>
                     <div slot="extend" style="position: absolute;">
                                                                                             </div>
-                                                                                                </z-bookcard>    
+                                                                                                </z-bookcard>
             </div>
         <div style="margin: 0 -1px -1px;position: relative;"><z-recommended-search query="5741333,4090464,4080852,5815896,10990057,3755707,898442,4098592,4717680,1650952" auto="" lazy="" class="ready"></z-recommended-search></div>            <div class="divider"></div>            <div class="book-item resItemBoxBooks exactMatch">
                 <div class="counter">11</div>
@@ -964,7 +888,7 @@
                     <div slot="note"></div>
                     <div slot="extend" style="position: absolute;">
                                                                                             </div>
-                                                                                                </z-bookcard>    
+                                                                                                </z-bookcard>
             </div>
                     <div class="divider"></div>            <div class="book-item resItemBoxBooks exactMatch">
                 <div class="counter">12</div>
@@ -975,7 +899,7 @@
                     <div slot="note"></div>
                     <div slot="extend" style="position: absolute;">
                                                                                             </div>
-                                                                                                </z-bookcard>    
+                                                                                                </z-bookcard>
             </div>
                     <div class="divider"></div>            <div class="book-item resItemBoxBooks exactMatch">
                 <div class="counter">13</div>
@@ -986,7 +910,7 @@
                     <div slot="note"></div>
                     <div slot="extend" style="position: absolute;">
                                                                                             </div>
-                                                                                                </z-bookcard>    
+                                                                                                </z-bookcard>
             </div>
                     <div class="divider"></div>            <div class="book-item resItemBoxBooks exactMatch">
                 <div class="counter">14</div>
@@ -997,18 +921,18 @@
                     <div slot="note"></div>
                     <div slot="extend" style="position: absolute;">
                                                                                             </div>
-                                                                                                </z-bookcard>    
+                                                                                                </z-bookcard>
             </div>
                     <div class="divider"></div>            <div class="book-item resItemBoxBooks exactMatch">
                 <div class="counter">15</div>
-                <z-bookcard id="5282453" isbn="9781473692206" termshash="dbe6ec2de79ded36f76483b103275b17" href="/book/5282453/e74c0c/girls-of-paper-and-fire.html" publisher="Hodder &amp; Stoughton" language="english" year="2018" extension="epub" filesize="3.57 MB" rating="5.0" quality="5.0" contenttypeparam="?content_type=book" class="ready">
+                <z-bookcard id="5282453" isbn="9781473692206" termshash="dbe6ec2de79ded36f76483b103275b17" href="/book/5282453/e74c0c/girls-of-paper-and-fire.html" publisher="Hodder &amp; Stoughton" language="english" year="2018" extension="epub" filesize="3.57 MB" rating="3.5" quality="5.0" contenttypeparam="?content_type=book" class="ready">
                     <img data-src="https://s3proxy.cdn-zlib.sk/covers100/collections/userbooks/969a0bdeed67a8dadc1430cf469d53ba1379cbb6467b8877f5b2dd3c82535eae.jpg">
                     <div slot="title">Girls of Paper and Fire</div>
                     <div slot="author">Natasha Ngan; James Patterson (foreword)</div>
                     <div slot="note"></div>
                     <div slot="extend" style="position: absolute;">
                                                                                             </div>
-                                                                                                </z-bookcard>    
+                                                                                                </z-bookcard>
             </div>
                     <div class="divider"></div>            <div class="book-item resItemBoxBooks exactMatch">
                 <div class="counter">16</div>
@@ -1019,7 +943,7 @@
                     <div slot="note"></div>
                     <div slot="extend" style="position: absolute;">
                                                                                             </div>
-                                                                                                </z-bookcard>    
+                                                                                                </z-bookcard>
             </div>
                     <div class="divider"></div>            <div class="book-item resItemBoxBooks exactMatch">
                 <div class="counter">17</div>
@@ -1030,18 +954,18 @@
                     <div slot="note"></div>
                     <div slot="extend" style="position: absolute;">
                                                                                             </div>
-                                                                                                </z-bookcard>    
+                                                                                                </z-bookcard>
             </div>
                     <div class="divider"></div>            <div class="book-item resItemBoxBooks exactMatch">
                 <div class="counter">18</div>
-                <z-bookcard id="11329659" isbn="" termshash="39d154cbafbf20f7124cd1c9dbe81116" href="/book/11329659/bde561/harry-potter-series-book-17.html" publisher="" language="english" year="0" extension="azw3" filesize="12.90 MB" rating="5.0" quality="3.0" contenttypeparam="?content_type=book" class="ready">
+                <z-bookcard id="11329659" isbn="" termshash="39d154cbafbf20f7124cd1c9dbe81116" href="/book/11329659/bde561/harry-potter-series-book-17.html" publisher="" language="english" year="0" extension="azw3" filesize="12.90 MB" rating="5.0" quality="2.5" contenttypeparam="?content_type=book" class="ready">
                     <img data-src="https://s3proxy.cdn-zlib.sk/covers100/collections/userbooks/4d92854c77693806a0e4fcbb0204c3dca7ec29caa26a8ca43012fad7a12ec6b4.jpg">
                     <div slot="title">Harry Potter Series Book 1-7</div>
                     <div slot="author">The Philosopher s Stone &amp; The Chamber of Secrets &amp; The Prisoner of Azkaban &amp; The Goblet of Fire &amp; The Order of The Phoenix &amp; The Half Blood Prince &amp; The Deathly Hallows</div>
                     <div slot="note"></div>
                     <div slot="extend" style="position: absolute;">
                                                                                             </div>
-                                                                                                </z-bookcard>    
+                                                                                                </z-bookcard>
             </div>
                     <div class="divider"></div>            <div class="book-item resItemBoxBooks exactMatch">
                 <div class="counter">19</div>
@@ -1052,7 +976,7 @@
                     <div slot="note"></div>
                     <div slot="extend" style="position: absolute;">
                                                                                             </div>
-                                                                                                </z-bookcard>    
+                                                                                                </z-bookcard>
             </div>
                     <div class="divider"></div>            <div class="book-item resItemBoxBooks exactMatch">
                 <div class="counter">20</div>
@@ -1063,7 +987,7 @@
                     <div slot="note"></div>
                     <div slot="extend" style="position: absolute;">
                                                                                             </div>
-                                                                                                </z-bookcard>    
+                                                                                                </z-bookcard>
             </div>
                     <div class="divider"></div>            <div class="book-item resItemBoxBooks exactMatch">
                 <div class="counter">21</div>
@@ -1074,7 +998,7 @@
                     <div slot="note"></div>
                     <div slot="extend" style="position: absolute;">
                                                                                             </div>
-                                                                                                </z-bookcard>    
+                                                                                                </z-bookcard>
             </div>
                     <div class="divider"></div>            <div class="book-item resItemBoxBooks exactMatch">
                 <div class="counter">22</div>
@@ -1085,18 +1009,18 @@
                     <div slot="note"></div>
                     <div slot="extend" style="position: absolute;">
                                                                                             </div>
-                                                                                                </z-bookcard>    
+                                                                                                </z-bookcard>
             </div>
                     <div class="divider"></div>            <div class="book-item resItemBoxBooks exactMatch">
                 <div class="counter">23</div>
-                <z-bookcard id="4650284" isbn="9780349412528" termshash="55d420275e2b2a6aaebe592ece55b3b1" href="/book/4650284/1cd316/promise-of-fire.html" publisher="PIATKUS BOOKS" language="english" year="2017" extension="epub" filesize="651 KB" rating="5.0" quality="5.0" contenttypeparam="?content_type=book" class="ready">
-                    <img data-src="https://s3proxy.cdn-zlib.sk/covers100/collections/foreignfiction/81378992dcc7f32cf258affc7afc19c19181097d6e2b8ee100063fb96a30cacc.jpg">
-                    <div slot="title">Promise Of Fire</div>
-                    <div slot="author">Amanda Bouchet</div>
+                <z-bookcard id="26093862" isbn="" termshash="39d154cbafbf20f7124cd1c9dbe81116" href="/book/26093862/58416f/harry-potter-series-book-17.html" publisher="" language="english" year="0" extension="pdf" filesize="18.49 MB" rating="5.0" quality="4.0" contenttypeparam="?content_type=book" class="ready">
+                    <img data-src="https://s3proxy.cdn-zlib.sk/covers100/collections/userbooks/8ea054c6fbe349e298d8ea67f6f7885b573216949e50f56475532b082f28810a.jpg">
+                    <div slot="title">Harry Potter Series Book 1-7</div>
+                    <div slot="author">The Philosopher s Stone &amp; The Chamber of Secrets &amp; The Prisoner of Azkaban &amp; The Goblet of Fire &amp; The Order of The Phoenix &amp; The Half Blood Prince &amp; The Deathly Hallows</div>
                     <div slot="note"></div>
                     <div slot="extend" style="position: absolute;">
                                                                                             </div>
-                                                                                                </z-bookcard>    
+                                                                                                </z-bookcard>
             </div>
                     <div class="divider"></div>            <div class="book-item resItemBoxBooks exactMatch">
                 <div class="counter">24</div>
@@ -1107,18 +1031,18 @@
                     <div slot="note"></div>
                     <div slot="extend" style="position: absolute;">
                                                                                             </div>
-                                                                                                </z-bookcard>    
+                                                                                                </z-bookcard>
             </div>
                     <div class="divider"></div>            <div class="book-item resItemBoxBooks exactMatch">
                 <div class="counter">25</div>
-                <z-bookcard id="26093862" isbn="" termshash="39d154cbafbf20f7124cd1c9dbe81116" href="/book/26093862/58416f/harry-potter-series-book-17.html" publisher="" language="english" year="0" extension="pdf" filesize="18.49 MB" rating="5.0" quality="4.0" contenttypeparam="?content_type=book" class="ready">
-                    <img data-src="https://s3proxy.cdn-zlib.sk/covers100/collections/userbooks/8ea054c6fbe349e298d8ea67f6f7885b573216949e50f56475532b082f28810a.jpg">
-                    <div slot="title">Harry Potter Series Book 1-7</div>
-                    <div slot="author">The Philosopher s Stone &amp; The Chamber of Secrets &amp; The Prisoner of Azkaban &amp; The Goblet of Fire &amp; The Order of The Phoenix &amp; The Half Blood Prince &amp; The Deathly Hallows</div>
+                <z-bookcard id="4650284" isbn="9780349412528" termshash="55d420275e2b2a6aaebe592ece55b3b1" href="/book/4650284/1cd316/promise-of-fire.html" publisher="PIATKUS BOOKS" language="english" year="2017" extension="epub" filesize="651 KB" rating="5.0" quality="5.0" contenttypeparam="?content_type=book" class="ready">
+                    <img data-src="https://s3proxy.cdn-zlib.sk/covers100/collections/foreignfiction/81378992dcc7f32cf258affc7afc19c19181097d6e2b8ee100063fb96a30cacc.jpg">
+                    <div slot="title">Promise Of Fire</div>
+                    <div slot="author">Amanda Bouchet</div>
                     <div slot="note"></div>
                     <div slot="extend" style="position: absolute;">
                                                                                             </div>
-                                                                                                </z-bookcard>    
+                                                                                                </z-bookcard>
             </div>
                     <div class="divider"></div>            <div class="book-item resItemBoxBooks exactMatch">
                 <div class="counter">26</div>
@@ -1129,7 +1053,7 @@
                     <div slot="note"></div>
                     <div slot="extend" style="position: absolute;">
                                                                                             </div>
-                                                                                                </z-bookcard>    
+                                                                                                </z-bookcard>
             </div>
                     <div class="divider"></div>            <div class="book-item resItemBoxBooks exactMatch">
                 <div class="counter">27</div>
@@ -1140,7 +1064,7 @@
                     <div slot="note"></div>
                     <div slot="extend" style="position: absolute;">
                                                                                             </div>
-                                                                                                </z-bookcard>    
+                                                                                                </z-bookcard>
             </div>
                     <div class="divider"></div>            <div class="book-item resItemBoxBooks exactMatch">
                 <div class="counter">28</div>
@@ -1151,7 +1075,7 @@
                     <div slot="note"></div>
                     <div slot="extend" style="position: absolute;">
                                                                                             </div>
-                                                                                                </z-bookcard>    
+                                                                                                </z-bookcard>
             </div>
                     <div class="divider"></div>            <div class="book-item resItemBoxBooks exactMatch">
                 <div class="counter">29</div>
@@ -1162,21 +1086,10 @@
                     <div slot="note"></div>
                     <div slot="extend" style="position: absolute;">
                                                                                             </div>
-                                                                                                </z-bookcard>    
+                                                                                                </z-bookcard>
             </div>
                     <div class="divider"></div>            <div class="book-item resItemBoxBooks exactMatch">
                 <div class="counter">30</div>
-                <z-bookcard id="5555676" isbn="9781728209982" termshash="ca5c8c4ccf0ac4a4a2c728b319878a7f" href="/book/5555676/644361/the-dark-tide.html" publisher="Sourcebooks Fire" language="english" year="2020" extension="epub" filesize="301 KB" rating="5.0" quality="5.0" contenttypeparam="?content_type=book" class="ready">
-                    <img data-src="https://s3proxy.cdn-zlib.sk/covers100/collections/userbooks/845a274fbf67fc02caf909bf810167f8d52b4f21496911280d6db5090a97d8cf.jpg">
-                    <div slot="title">The Dark Tide</div>
-                    <div slot="author">Alicia Jasinska</div>
-                    <div slot="note"></div>
-                    <div slot="extend" style="position: absolute;">
-                                                                                            </div>
-                                                                                                </z-bookcard>    
-            </div>
-        <div style="margin: 0 -1px -1px;position: relative;"><z-recommended-search query="2863417,1188001,4222264,5767104,5282453,2781850,26730682,11329659,4814779,17281980,17511231,4724602,4650284,26841615,26093862,4327840,6132601,23621352,12342402,5555676" auto="" lazy="" class="ready"></z-recommended-search></div>            <div class="divider"></div>            <div class="book-item resItemBoxBooks exactMatch">
-                <div class="counter">31</div>
                 <z-bookcard id="17147828" isbn="" termshash="bc86a4ea51042795858521618738280c" href="/book/17147828/71a809/catching-fire-hunger-games-book-2.html" publisher="Scholastic " language="english" year="2010" extension="epub" filesize="455 KB" rating="5.0" quality="5.0" contenttypeparam="?content_type=book" class="ready">
                     <img data-src="https://s3proxy.cdn-zlib.sk/covers100/collections/userbooks/fd7e89042f3050b13e639b0b624f0ccfa23525b00e691286d1d617421491a470.jpg">
                     <div slot="title">Catching Fire: (Hunger Games Book 2) </div>
@@ -1184,7 +1097,18 @@
                     <div slot="note"></div>
                     <div slot="extend" style="position: absolute;">
                                                                                             </div>
-                                                                                                </z-bookcard>    
+                                                                                                </z-bookcard>
+            </div>
+        <div style="margin: 0 -1px -1px;position: relative;"><z-recommended-search query="2863417,1188001,4222264,5767104,5282453,2781850,26730682,11329659,4814779,17281980,17511231,4724602,26093862,26841615,4650284,4327840,6132601,23621352,12342402,17147828" auto="" lazy="" class="ready"></z-recommended-search></div>            <div class="divider"></div>            <div class="book-item resItemBoxBooks exactMatch">
+                <div class="counter">31</div>
+                <z-bookcard id="5555676" isbn="9781728209982" termshash="ca5c8c4ccf0ac4a4a2c728b319878a7f" href="/book/5555676/644361/the-dark-tide.html" publisher="Sourcebooks Fire" language="english" year="2020" extension="epub" filesize="301 KB" rating="5.0" quality="5.0" contenttypeparam="?content_type=book" class="ready">
+                    <img data-src="https://s3proxy.cdn-zlib.sk/covers100/collections/userbooks/845a274fbf67fc02caf909bf810167f8d52b4f21496911280d6db5090a97d8cf.jpg">
+                    <div slot="title">The Dark Tide</div>
+                    <div slot="author">Alicia Jasinska</div>
+                    <div slot="note"></div>
+                    <div slot="extend" style="position: absolute;">
+                                                                                            </div>
+                                                                                                </z-bookcard>
             </div>
                     <div class="divider"></div>            <div class="book-item resItemBoxBooks exactMatch">
                 <div class="counter">32</div>
@@ -1195,7 +1119,7 @@
                     <div slot="note"></div>
                     <div slot="extend" style="position: absolute;">
                                                                                             </div>
-                                                                                                </z-bookcard>    
+                                                                                                </z-bookcard>
             </div>
                     <div class="divider"></div>            <div class="book-item resItemBoxBooks exactMatch">
                 <div class="counter">33</div>
@@ -1206,7 +1130,7 @@
                     <div slot="note"></div>
                     <div slot="extend" style="position: absolute;">
                                                                                             </div>
-                                                                                                </z-bookcard>    
+                                                                                                </z-bookcard>
             </div>
                     <div class="divider"></div>            <div class="book-item resItemBoxBooks exactMatch">
                 <div class="counter">34</div>
@@ -1217,7 +1141,7 @@
                     <div slot="note"></div>
                     <div slot="extend" style="position: absolute;">
                                                                                             </div>
-                                                                                                </z-bookcard>    
+                                                                                                </z-bookcard>
             </div>
                     <div class="divider"></div>            <div class="book-item resItemBoxBooks exactMatch">
                 <div class="counter">35</div>
@@ -1228,21 +1152,10 @@
                     <div slot="note"></div>
                     <div slot="extend" style="position: absolute;">
                                                                                             </div>
-                                                                                                </z-bookcard>    
+                                                                                                </z-bookcard>
             </div>
                     <div class="divider"></div>            <div class="book-item resItemBoxBooks exactMatch">
                 <div class="counter">36</div>
-                <z-bookcard id="4419285" isbn="9780989133708" termshash="0f025c7d342892ac807402e25c3dab61" href="/book/4419285/2c6187/fire-and-ice-guardians-1.html" publisher="" language="english" year="2013" extension="epub" filesize="348 KB" rating="3.0" quality="4.0" contenttypeparam="?content_type=book" class="ready">
-                    <img data-src="https://s3proxy.cdn-zlib.sk/covers100/collections/foreignfiction/adfeeb0fa61dee9333eb1228b8e9a8471c234823fe1a94ad84ad21747c80c8ef.jpg">
-                    <div slot="title">Fire and Ice (Guardians 1)</div>
-                    <div slot="author">Paige Victoria</div>
-                    <div slot="note"></div>
-                    <div slot="extend" style="position: absolute;">
-                                                                                            </div>
-                                                                                                </z-bookcard>    
-            </div>
-                    <div class="divider"></div>            <div class="book-item resItemBoxBooks exactMatch">
-                <div class="counter">37</div>
                 <z-bookcard id="19141476" isbn="B09HDXDNRL" termshash="cbdcd3540fc50dd7b7ec8429e2a8e1fe" href="/book/19141476/938fc0/promised-in-fire-of-dragons-and-fae-book-1.html" publisher="Dynamo Press" language="english" year="2022" extension="epub" filesize="561 KB" rating="0.0" quality="5.0" contenttypeparam="?content_type=book" class="ready">
                     <img data-src="https://s3proxy.cdn-zlib.sk/covers100/collections/userbooks/3c80fcc21192482bd738b007f9896f2aa22649823af1aaf5341c5fdc1e0f67e5.jpg">
                     <div slot="title">Promised in Fire (Of Dragons and Fae Book 1)</div>
@@ -1250,43 +1163,21 @@
                     <div slot="note"></div>
                     <div slot="extend" style="position: absolute;">
                                                                                             </div>
-                                                                                                </z-bookcard>    
+                                                                                                </z-bookcard>
+            </div>
+                    <div class="divider"></div>            <div class="book-item resItemBoxBooks exactMatch">
+                <div class="counter">37</div>
+                <z-bookcard id="4419285" isbn="9780989133708" termshash="0f025c7d342892ac807402e25c3dab61" href="/book/4419285/2c6187/fire-and-ice-guardians-1.html" publisher="" language="english" year="2013" extension="epub" filesize="348 KB" rating="3.0" quality="4.0" contenttypeparam="?content_type=book" class="ready">
+                    <img data-src="https://s3proxy.cdn-zlib.sk/covers100/collections/foreignfiction/adfeeb0fa61dee9333eb1228b8e9a8471c234823fe1a94ad84ad21747c80c8ef.jpg">
+                    <div slot="title">Fire and Ice (Guardians 1)</div>
+                    <div slot="author">Paige Victoria</div>
+                    <div slot="note"></div>
+                    <div slot="extend" style="position: absolute;">
+                                                                                            </div>
+                                                                                                </z-bookcard>
             </div>
                     <div class="divider"></div>            <div class="book-item resItemBoxBooks exactMatch">
                 <div class="counter">38</div>
-                <z-bookcard id="17811575" isbn="9781728228877" termshash="6bab64852cc37a54b1d1559fa30641cd" href="/book/17811575/77c635/the-grimrose-girls-the-grimrose-girls-1.html" publisher="Sourcebooks Fire" language="english" year="2021" extension="epub" filesize="2.93 MB" rating="5.0" quality="5.0" contenttypeparam="?content_type=book" class="ready">
-                    <img data-src="https://s3proxy.cdn-zlib.sk/covers100/collections/userbooks/1e00d2d86631a579a15eb07cb52e0c4788b77abd54a2da5bbe2e5c6977cfa58c.jpg">
-                    <div slot="title">The Grimrose Girls (The Grimrose Girls 1)</div>
-                    <div slot="author">Laura Pohl</div>
-                    <div slot="note"></div>
-                    <div slot="extend" style="position: absolute;">
-                                                                                            </div>
-                                                                                                </z-bookcard>    
-            </div>
-                    <div class="divider"></div>            <div class="book-item resItemBoxBooks exactMatch">
-                <div class="counter">39</div>
-                <z-bookcard id="1574549" isbn="9781423140566" termshash="c0f934b0c8f487145bd5862df4d55348" href="/book/1574549/2d4210/the-throne-of-fire-the-kane-chronicles-book-2.html" publisher="Disney-Hyperion" language="english" year="2011" extension="epub" filesize="602 KB" rating="5.0" quality="5.0" contenttypeparam="?content_type=book" class="ready">
-                    <img data-src="https://s3proxy.cdn-zlib.sk/covers100/collections/foreignfiction/bc2a6033406ddba2268b09ccf3219c66e900ecf71564436d7596f55e6ec75ad0.jpg">
-                    <div slot="title">The Throne of Fire (The Kane Chronicles, Book 2)</div>
-                    <div slot="author">Riordan Rick</div>
-                    <div slot="note"></div>
-                    <div slot="extend" style="position: absolute;">
-                                                                                            </div>
-                                                                                                </z-bookcard>    
-            </div>
-                    <div class="divider"></div>            <div class="book-item resItemBoxBooks exactMatch">
-                <div class="counter">40</div>
-                <z-bookcard id="3776002" isbn="9781101611616" termshash="933e379e4c6e061c84c32b97061d2cf6" href="/book/3776002/8fade7/between-two-fires.html" publisher="Penguin" language="english" year="2012" extension="epub" filesize="522 KB" rating="5.0" quality="0.0" contenttypeparam="?content_type=book" class="ready">
-                    <img data-src="https://s3proxy.cdn-zlib.sk/covers100/collections/foreignfiction/58568d834af7a86cc0b7321ed36ac992f2fe0957c679e3aab3dcee66f20f915c.jpg">
-                    <div slot="title">Between Two Fires</div>
-                    <div slot="author">Christopher Buehlman</div>
-                    <div slot="note"></div>
-                    <div slot="extend" style="position: absolute;">
-                                                                                            </div>
-                                                                                                </z-bookcard>    
-            </div>
-                    <div class="divider"></div>            <div class="book-item resItemBoxBooks exactMatch">
-                <div class="counter">41</div>
                 <z-bookcard id="27224817" isbn="" termshash="39d154cbafbf20f7124cd1c9dbe81116" href="/book/27224817/a7a6aa/harry-potter-series-book-17.html" publisher="" language="english" year="0" extension="epub" filesize="9.61 MB" rating="5.0" quality="5.0" contenttypeparam="?content_type=book" class="ready">
                     <img data-src="/img/cover-not-exists.png">
                     <div slot="title">Harry Potter Series Book 1-7</div>
@@ -1294,7 +1185,40 @@
                     <div slot="note"></div>
                     <div slot="extend" style="position: absolute;">
                                                                                             </div>
-                                                                                                </z-bookcard>    
+                                                                                                </z-bookcard>
+            </div>
+                    <div class="divider"></div>            <div class="book-item resItemBoxBooks exactMatch">
+                <div class="counter">39</div>
+                <z-bookcard id="17811575" isbn="9781728228877" termshash="6bab64852cc37a54b1d1559fa30641cd" href="/book/17811575/77c635/the-grimrose-girls-the-grimrose-girls-1.html" publisher="Sourcebooks Fire" language="english" year="2021" extension="epub" filesize="2.93 MB" rating="5.0" quality="5.0" contenttypeparam="?content_type=book" class="ready">
+                    <img data-src="https://s3proxy.cdn-zlib.sk/covers100/collections/userbooks/1e00d2d86631a579a15eb07cb52e0c4788b77abd54a2da5bbe2e5c6977cfa58c.jpg">
+                    <div slot="title">The Grimrose Girls (The Grimrose Girls 1)</div>
+                    <div slot="author">Laura Pohl</div>
+                    <div slot="note"></div>
+                    <div slot="extend" style="position: absolute;">
+                                                                                            </div>
+                                                                                                </z-bookcard>
+            </div>
+                    <div class="divider"></div>            <div class="book-item resItemBoxBooks exactMatch">
+                <div class="counter">40</div>
+                <z-bookcard id="1574549" isbn="9781423140566" termshash="c0f934b0c8f487145bd5862df4d55348" href="/book/1574549/2d4210/the-throne-of-fire-the-kane-chronicles-book-2.html" publisher="Disney-Hyperion" language="english" year="2011" extension="epub" filesize="602 KB" rating="5.0" quality="5.0" contenttypeparam="?content_type=book" class="ready">
+                    <img data-src="https://s3proxy.cdn-zlib.sk/covers100/collections/foreignfiction/bc2a6033406ddba2268b09ccf3219c66e900ecf71564436d7596f55e6ec75ad0.jpg">
+                    <div slot="title">The Throne of Fire (The Kane Chronicles, Book 2)</div>
+                    <div slot="author">Riordan Rick</div>
+                    <div slot="note"></div>
+                    <div slot="extend" style="position: absolute;">
+                                                                                            </div>
+                                                                                                </z-bookcard>
+            </div>
+                    <div class="divider"></div>            <div class="book-item resItemBoxBooks exactMatch">
+                <div class="counter">41</div>
+                <z-bookcard id="3776002" isbn="9781101611616" termshash="933e379e4c6e061c84c32b97061d2cf6" href="/book/3776002/8fade7/between-two-fires.html" publisher="Penguin" language="english" year="2012" extension="epub" filesize="522 KB" rating="5.0" quality="0.0" contenttypeparam="?content_type=book" class="ready">
+                    <img data-src="https://s3proxy.cdn-zlib.sk/covers100/collections/foreignfiction/58568d834af7a86cc0b7321ed36ac992f2fe0957c679e3aab3dcee66f20f915c.jpg">
+                    <div slot="title">Between Two Fires</div>
+                    <div slot="author">Christopher Buehlman</div>
+                    <div slot="note"></div>
+                    <div slot="extend" style="position: absolute;">
+                                                                                            </div>
+                                                                                                </z-bookcard>
             </div>
                     <div class="divider"></div>            <div class="book-item resItemBoxBooks exactMatch">
                 <div class="counter">42</div>
@@ -1305,7 +1229,7 @@
                     <div slot="note"></div>
                     <div slot="extend" style="position: absolute;">
                                                                                             </div>
-                                                                                                </z-bookcard>    
+                                                                                                </z-bookcard>
             </div>
                     <div class="divider"></div>            <div class="book-item resItemBoxBooks exactMatch">
                 <div class="counter">43</div>
@@ -1316,7 +1240,7 @@
                     <div slot="note"></div>
                     <div slot="extend" style="position: absolute;">
                                                                                             </div>
-                                                                                                </z-bookcard>    
+                                                                                                </z-bookcard>
             </div>
                     <div class="divider"></div>            <div class="book-item resItemBoxBooks exactMatch">
                 <div class="counter">44</div>
@@ -1327,7 +1251,7 @@
                     <div slot="note"></div>
                     <div slot="extend" style="position: absolute;">
                                                                                             </div>
-                                                                                                </z-bookcard>    
+                                                                                                </z-bookcard>
             </div>
                     <div class="divider"></div>            <div class="book-item resItemBoxBooks exactMatch">
                 <div class="counter">45</div>
@@ -1338,7 +1262,7 @@
                     <div slot="note"></div>
                     <div slot="extend" style="position: absolute;">
                                                                                             </div>
-                                                                                                </z-bookcard>    
+                                                                                                </z-bookcard>
             </div>
                     <div class="divider"></div>            <div class="book-item resItemBoxBooks exactMatch">
                 <div class="counter">46</div>
@@ -1349,7 +1273,7 @@
                     <div slot="note"></div>
                     <div slot="extend" style="position: absolute;">
                                                                                             </div>
-                                                                                                </z-bookcard>    
+                                                                                                </z-bookcard>
             </div>
                     <div class="divider"></div>            <div class="book-item resItemBoxBooks exactMatch">
                 <div class="counter">47</div>
@@ -1360,7 +1284,7 @@
                     <div slot="note"></div>
                     <div slot="extend" style="position: absolute;">
                                                                                             </div>
-                                                                                                </z-bookcard>    
+                                                                                                </z-bookcard>
             </div>
                     <div class="divider"></div>            <div class="book-item resItemBoxBooks exactMatch">
                 <div class="counter">48</div>
@@ -1371,7 +1295,7 @@
                     <div slot="note"></div>
                     <div slot="extend" style="position: absolute;">
                                                                                             </div>
-                                                                                                </z-bookcard>    
+                                                                                                </z-bookcard>
             </div>
                     <div class="divider"></div>            <div class="book-item resItemBoxBooks exactMatch">
                 <div class="counter">49</div>
@@ -1382,7 +1306,7 @@
                     <div slot="note"></div>
                     <div slot="extend" style="position: absolute;">
                                                                                             </div>
-                                                                                                </z-bookcard>    
+                                                                                                </z-bookcard>
             </div>
                     <div class="divider"></div>            <div class="book-item resItemBoxBooks exactMatch">
                 <div class="counter">50</div>
@@ -1393,9 +1317,9 @@
                     <div slot="note"></div>
                     <div slot="extend" style="position: absolute;">
                                                                                             </div>
-                                                                                                </z-bookcard>    
+                                                                                                </z-bookcard>
             </div>
-        <div style="margin: 0 -1px -1px;position: relative;"><z-recommended-search query="17147828,5001412,4296099,1616716,3846218,4419285,19141476,17811575,1574549,3776002,27224817,2529227,5336017,5060124,3602209,5424978,5238367,5677252,7218317,2225668" auto="" lazy="" class="ready"></z-recommended-search></div></div>
+        <div style="margin: 0 -1px -1px;position: relative;"><z-recommended-search query="5555676,5001412,4296099,1616716,3846218,19141476,4419285,27224817,17811575,1574549,3776002,2529227,5336017,5060124,3602209,5424978,5238367,5677252,7218317,2225668" auto="" lazy="" class="ready"></z-recommended-search></div></div>
     
 
 <script>
@@ -1471,7 +1395,7 @@
                                     <span class="z-modal__text">Z-Alerts可以让你在有新书时根据你的搜索要求得到通知。您可以用书名、作者、ISBN等信息作为搜索查询 <a href="/msgn/zalerts" target="_blank">阅读更多关于Z-Alerts的信息</a>.</span>
                 
                                     <input id="zalertEmail" type="text" form="zalertCreateForm" class="z-text-input" placeholder="您的 Email邮箱" name="email">
-                                    <input id="zalertQuery" type="text" form="zalertCreateForm" value="fire" class="z-text-input" placeholder="请输入搜索词"><div id="tooltip-408900" class="zlib-tooltip" style="display:none"><button class="visible-xs-block close">×</button>
+                                    <input id="zalertQuery" type="text" form="zalertCreateForm" value="fire" class="z-text-input" placeholder="请输入搜索词"><div id="tooltip-185973" class="zlib-tooltip" style="display:none"><button class="visible-xs-block close">×</button>
             <span class="zlibicon-info"></span>
             如果您需要带 ISBN 的图书，<br>我们建议创建 <a href="/requests">添加书籍请求</a></div>
 
@@ -1691,11 +1615,11 @@
         </div>
         <div class="footer__social_links">
             <ul>
-                <li><a class="tgo" data-toggle="tooltip" title="Z-Library on Telegram" href="https://t.me/zlibrary_official" target="_blank"><span class="zlibicon-telegram-fill"></span> 官方途径</a></li>
+                <li><a class="tgo" data-toggle="tooltip" title="Z-Library on Telegram" href="https://t.me/zlibrary_news" target="_blank"><span class="zlibicon-telegram-fill"></span> 官方途径</a></li>
                 <li class="break"></li>
                 <li><a class="tw" data-toggle="tooltip" title="Z-Library on Twitter" href="https://x.com/Z_Lib_official" target="_blank"><span class="zlibicon-twitter"></span></a></li>
-                <li><a class="ms" data-toggle="tooltip" title="Z-Library on Mastadon" href="https://mastodon.social/@Z_Lib_official" target="_blank"><span class="zlibicon-mastodon"></span></a></li>
-                <li><a class="tgc" data-toggle="tooltip" title="Chinese channel on Telegram" href="https://t.me/zlib_china_official" target="_blank"><span class="zlibicon-tgchn"></span></a></li>
+                <li><a class="ms" data-toggle="tooltip" title="Z-Library on Mastodon" href="https://mastodon.social/@Z_Lib_official" target="_blank"><span class="zlibicon-mastodon"></span></a></li>
+                <li><a class="tgc" data-toggle="tooltip" title="Chinese channel on Telegram" href="https://t.me/zlib_china_news" target="_blank"><span class="zlibicon-tgchn"></span></a></li>
             </ul>
         </div>
 

@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Search History Test</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; }
+        table { border-collapse: collapse; width: 100%; }
+        th, td { border: 1px solid #ddd; padding: 8px; text-align: left; }
+        th { background-color: #f2f2f2; }
+        tr:nth-child(even) { background-color: #f9f9f9; }
+    </style>
+</head>
+<body>
+    <h1>Search History Records</h1>
+    
+    <table>
+        <thead>
+            <tr>
+                <th>Hash</th>
+                <th>Original Query</th>
+                <th>Weight</th>
+                <th>Search Date</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for record in history %}
+            <tr>
+                <td>{{ record.hash }}</td>
+                <td>{{ record.original_query }}</td>
+                <td>{{ record.weight }}</td>
+                <td>{{ record.search_date }}</td>
+            </tr>
+            {% else %}
+            <tr>
+                <td colspan="4">No records found</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</body>
+</html>

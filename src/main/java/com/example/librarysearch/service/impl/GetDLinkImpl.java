@@ -19,7 +19,7 @@ public class GetDLinkImpl {
         options.addArguments("user-data-dir=" + userProfile + "\\AppData\\Local\\Google\\Chrome\\User Data");
         
         // Remove "--headless" if you want to see browser actions
-        //options.addArguments("--headless"); 
+        options.addArguments("--headless"); 
         options.addArguments("--disable-gpu");
         options.addArguments("--no-sandbox");
         options.addArguments("--disable-dev-shm-usage");

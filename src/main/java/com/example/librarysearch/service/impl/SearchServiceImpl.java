@@ -1,5 +1,7 @@
 package com.example.librarysearch.service.impl;
 
+import com.example.librarysearch.Entry.SearchHistoryEntry;
+import com.example.librarysearch.Mapper.SearchHistoryMapper;
 import com.example.librarysearch.service.SearchService;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
@@ -10,6 +12,7 @@ import org.jsoup.select.Elements;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.chrome.ChromeDriver;
 import org.openqa.selenium.chrome.ChromeOptions;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.io.*;
@@ -30,6 +33,9 @@ public class SearchServiceImpl implements SearchService {
     private static final String CACHE_DIRECTORY = System.getProperty("user.dir") + "/src/main/resources/static/cache/";
     private static final String SEARCH_HISTORY_DIRECTORY = System.getProperty("user.dir") + "/src/main/resources/static/SearchHistory/";
     private static final String SEARCH_COUNT_FILE = System.getProperty("user.dir") + "/src/main/resources/static/SearchHistory/search_count.txt";
+    
+    @Autowired
+    private SearchHistoryMapper searchHistoryMapper;
     
     public Map<String, Object> search(String query) throws Exception {
         // Encode the search query
@@ -259,6 +265,19 @@ public class SearchServiceImpl implements SearchService {
         Map<String, Map<String, Object>> sortedHistory = new LinkedHashMap<>();
         for (Map.Entry<String, Map<String, Object>> entry : sortedEntries) {
             sortedHistory.put(entry.getKey(), entry.getValue());
+        }
+        
+        // 保存到数据库
+        for (Map.Entry<String, Map<String, Object>> entry : sortedEntries) {
+            SearchHistoryEntry dbEntry = new SearchHistoryEntry();
+            dbEntry.setHash(entry.getKey());
+            dbEntry.setOriginalQuery((String) entry.getValue().get("original"));
+            dbEntry.setWeight(((Number) entry.getValue().get("weight")).intValue());
+         // 在 sortAndSaveHistory 方法中修改：
+            dbEntry.setSearchDate(new java.sql.Date(System.currentTimeMillis()));  // 使用 SQL Date 类型
+            
+            searchHistoryMapper.insertOrUpdate(dbEntry);
+            System.out.println("uploaded into mysql.");
         }
 
         // Save the sorted history back to the file
