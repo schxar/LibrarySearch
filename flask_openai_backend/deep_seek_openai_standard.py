@@ -57,34 +57,47 @@ def get_db_connection():
 @app.route('/download', methods=['POST'])
 def handle_download():
     """处理文件下载请求"""
+    # 从请求中获取JSON数据
     data = request.get_json()
     if not data or 'user_email' not in data or 'filename' not in data:
+        # 请求数据无效时返回错误响应
         return jsonify({"error": "Invalid request data"}), 400
 
+    # 从数据中提取用户邮箱和文件名
     user_email = data['user_email']
     filename = data['filename']
+    # 生成用户邮箱和文件名的哈希值
     email_hash = generate_hash(user_email)
     filename_hash = generate_hash(filename)
 
     try:
+        # 获取数据库连接
         connection = get_db_connection()
+        # 创建数据库游标
         with connection.cursor() as cursor:
+            # 插入下载历史记录到数据库
             sql = """INSERT INTO DownloadHistory 
                     (user_email, filename, email_hash, filename_hash)
                     VALUES (%s, %s, %s, %s)"""
             cursor.execute(sql, (user_email, filename, email_hash, filename_hash))
+        # 提交数据库事务
         connection.commit()
     except Exception as e:
+        # 捕获并处理数据库异常
         app.logger.error(f"Database Error: {str(e)}")
         return jsonify({"error": "Database operation failed"}), 500
     finally:
+        # 关闭数据库连接
         connection.close()
 
     # 返回文件（示例实现）
+    # 设置文件路径
     file_path = f"/downloads/{filename}"
     if not os.path.exists(file_path):
+        # 文件不存在时返回错误响应
         return jsonify({"error": "File not found"}), 404
         
+    # 返回文件
     return send_file(file_path, as_attachment=True)
 
 from flask import render_template
@@ -122,6 +135,7 @@ def recommendation_form():
         # 获取表单数据
         user_email = request.form.get('user_email')
         if not user_email:
+            app.logger.warn("User email is empty")
             return render_template('form.html', error="邮箱不能为空")
 
         # 查询下载历史
@@ -136,6 +150,7 @@ def recommendation_form():
                 history = [row['filename'] for row in cursor.fetchall()]
                 
                 if not history:
+                    app.logger.warn("No download history found for user: %s", user_email)
                     return render_template('form.html', error="没有找到下载记录")
         except Exception as e:
             app.logger.error(f"数据库查询失败: {str(e)}")
@@ -210,6 +225,7 @@ def generate_recommendations():
     """生成搜索推荐"""
     data = request.get_json()
     if not data or 'user_email' not in data:
+        # 如果数据为空或不包含user_email参数，则返回错误
         return jsonify({"error": "Missing user_email parameter"}), 400
 
     user_email = data['user_email']
@@ -217,20 +233,26 @@ def generate_recommendations():
 
     # 查询下载历史
     try:
+        # 获取数据库连接
         connection = get_db_connection()
         with connection.cursor() as cursor:
+            # 查询下载历史SQL语句
             sql = """SELECT filename FROM DownloadHistory 
                     WHERE email_hash = %s 
                     ORDER BY download_date DESC LIMIT 50"""
             cursor.execute(sql, (email_hash,))
+            # 获取下载历史记录
             history = [row['filename'] for row in cursor.fetchall()]
             
             if not history:
+                # 如果没有下载历史记录，则返回错误
                 return jsonify({"error": "No download history found"}), 404
     except Exception as e:
+        # 异常处理，记录日志并返回错误
         app.logger.error(f"Database Query Error: {str(e)}")
         return jsonify({"error": "Failed to fetch history"}), 500
     finally:
+        # 关闭数据库连接
         connection.close()
 
     # 构造提示词
@@ -247,6 +269,7 @@ def generate_recommendations():
 
     # 调用DeepSeek API
     try:
+        # 调用DeepSeek API获取推荐结果
         response = deepseek_client.chat.completions.create(
             model="deepseek-chat",
             messages=[
@@ -264,15 +287,18 @@ def generate_recommendations():
         clean_terms = []
         for term in terms_pool:
             if re.search(r'[\u4e00-\u9fa5]', term):
+                # 中文关键词清洗
                 clean_term = re.sub(r'[^\u4e00-\u9fa5\-]', '', term)
                 if 2 <= len(clean_term) <= 10:
                     clean_terms.append(clean_term)
             else:
+                # 英文关键词清洗
                 clean_term = re.sub(r'[^a-zA-Z0-9\- ]', '', term).strip()
                 if len(clean_term.split()) >= 2:
                     clean_terms.append(clean_term)
 
         if len(clean_terms) < 3:
+            # 如果清洗后的关键词少于3个，则使用备用关键词
             fallback_terms = list(set([
                 re.sub(r'[^a-zA-Z0-9\u4e00-\u9fa5]', '', f.split('__')[0].split('(')[0].strip())
                 for f in history
@@ -282,13 +308,17 @@ def generate_recommendations():
         final_terms = clean_terms[:5]
 
     except Exception as e:
+        # 异常处理，记录日志并返回错误
         app.logger.error(f"DeepSeek API Error: {str(e)}")
         return jsonify({"error": "Failed to generate recommendations"}), 500
 
     # 存储推荐结果
     try:
+        # 获取数据库连接
         connection = get_db_connection()
+    
         with connection.cursor() as cursor:
+            # 存储推荐结果的SQL语句
             sql = """INSERT INTO SearchRecommendations 
                     (user_email, email_hash, search_terms)
                     VALUES (%s, %s, %s)"""
@@ -298,15 +328,19 @@ def generate_recommendations():
                 ','.join(clean_terms)
             ))
         connection.commit()
+        # 返回推荐结果
+        print(user_email, email_hash, clean_terms)
         return jsonify({
             "user_email": user_email,
             "recommendations": clean_terms,
             "generated_at": datetime.utcnow().isoformat()
         })
     except Exception as e:
+        # 异常处理，记录日志并返回错误
         app.logger.error(f"Recommendation Save Error: {str(e)}")
         return jsonify({"error": "Failed to save recommendations"}), 500
     finally:
+        # 关闭数据库连接
         connection.close()
 
 if __name__ == '__main__':

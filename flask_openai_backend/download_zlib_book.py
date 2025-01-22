@@ -18,7 +18,7 @@ if not os.path.exists(download_directory):
 
 # 数据库配置
 db_config = {
-    'host': 'localhost',㏂
+    'host': 'localhost',
     'user': 'root',
     'password': '13380008373',
     'database': 'library'
