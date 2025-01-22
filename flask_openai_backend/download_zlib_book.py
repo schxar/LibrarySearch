@@ -18,7 +18,7 @@ if not os.path.exists(download_directory):
 
 # 数据库配置
 db_config = {
-    'host': 'localhost',
+    'host': 'localhost',㏂
     'user': 'root',
     'password': '13380008373',
     'database': 'library'
@@ -174,16 +174,73 @@ def list_files():
 @login_required
 def serve_file(filename):
     user_email = session.get('user_email', 'Unknown')
-    print(f"User downloaded " + filename + ": email = "+ user_email)
+    
+    # 记录下载日志到数据库
+    try:
+        # 分别计算哈希值
+        email_hash = hashlib.sha256(user_email.encode('utf-8')).hexdigest()
+        filename_hash = hashlib.sha256(filename.encode('utf-8')).hexdigest()
+        
+        print(f"User downloaded " + filename + ": email = "+ user_email)
+
+        conn = get_db_connection()
+        cursor = conn.cursor()
+        cursor.execute('''
+            INSERT INTO DownloadHistory 
+            (user_email, filename, email_hash, filename_hash)
+            VALUES (%s, %s, %s, %s)
+        ''', (user_email, filename, email_hash, filename_hash))
+        conn.commit()
+        cursor.close()
+        conn.close()
+    except Exception as e:
+        print(f"Error saving download record: {str(e)}")
+
     file_path = os.path.join(download_directory, filename)
     if os.path.exists(file_path):
         return send_file(
             file_path,
-            as_attachment=True,  # 强制浏览器下载
-            download_name=filename  # 下载时的文件名
+            as_attachment=True,
+            download_name=filename
         )
     else:
         return jsonify({"error": "File not found"}), 404
+    
+@app.route('/search_downloads', methods=['GET'])
+def search_downloads():
+    search_type = request.args.get('type')  # 'email' 或 'filename'
+    search_value = request.args.get('value')
+    
+    if not search_type or not search_value:
+        return jsonify({"error": "Missing parameters"}), 400
+    
+    try:
+        # 根据类型计算哈希
+        if search_type == 'email':
+            search_hash = hashlib.sha256(search_value.encode('utf-8')).hexdigest()
+            sql_condition = "email_hash = %s"
+        elif search_type == 'filename':
+            search_hash = hashlib.sha256(search_value.encode('utf-8')).hexdigest()
+            sql_condition = "filename_hash = %s"
+        else:
+            return jsonify({"error": "Invalid search type"}), 400
+
+        conn = get_db_connection()
+        cursor = conn.cursor(dictionary=True)
+        cursor.execute(f'''
+            SELECT * FROM DownloadHistory 
+            WHERE {sql_condition}
+            ORDER BY download_date DESC
+        ''', (search_hash,))
+        
+        results = cursor.fetchall()
+        cursor.close()
+        conn.close()
+        
+        return jsonify({"results": results}), 200
+        
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
 
 @app.route('/submit_ticket', methods=['POST'])
 @login_required

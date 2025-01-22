@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>智能推荐生成器</title>
+    <style>
+        body { font-family: Arial, sans-serif; max-width: 600px; margin: 2rem auto; padding: 0 1rem; }
+        .form-box { border: 1px solid #ddd; padding: 2rem; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
+        input[type="email"] { width: 100%; padding: 0.8rem; margin: 0.5rem 0; border: 1px solid #ccc; border-radius: 4px; }
+        button { background: #007bff; color: white; border: none; padding: 0.8rem 1.5rem; border-radius: 4px; cursor: pointer; }
+        .error { color: #dc3545; margin: 0.5rem 0; }
+        .recommendation { margin: 1rem 0; padding: 1rem; background: #f8f9fa; border-radius: 4px; }
+    </style>
+</head>
+<body>
+    <div class="form-box">
+        <h1>智能搜索推荐</h1>
+        <form method="POST">
+            <label for="user_email">请输入您的邮箱：</label>
+            <input type="email" id="user_email" name="user_email" required placeholder="example@domain.com">
+            {% if error %}
+                <div class="error">{{ error }}</div>
+            {% endif %}
+            <button type="submit">生成推荐</button>
+        </form>
+    </div>
+</body>
+</html>

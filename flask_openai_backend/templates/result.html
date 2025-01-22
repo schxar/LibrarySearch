@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>推荐结果</title>
+    <style>
+        body { font-family: Arial, sans-serif; max-width: 600px; margin: 2rem auto; padding: 0 1rem; }
+        .result-box { border: 1px solid #4CAF50; padding: 2rem; border-radius: 8px; background: #f6ffed; }
+        .recommendation-list { list-style: none; padding: 0; }
+        .recommendation-item { padding: 0.8rem; margin: 0.5rem 0; background: white; border-radius: 4px; box-shadow: 0 1px 3px rgba(0,0,0,0.1); }
+        .time { color: #666; font-size: 0.9em; }
+    </style>
+</head>
+<body>
+    <div class="result-box">
+        <h2>{{ email }} 的推荐结果</h2>
+        <p class="time">生成时间：{{ generated_at }}</p>
+        
+        <ul class="recommendation-list">
+            {% for term in recommendations %}
+            <li class="recommendation-item">{{ loop.index }}. {{ term }}</li>
+            {% endfor %}
+        </ul>
+        
+        <p style="margin-top: 1.5rem;">
+            <a href="/">&laquo; 返回重新查询</a>
+        </p>
+    </div>
+</body>
+</html>
