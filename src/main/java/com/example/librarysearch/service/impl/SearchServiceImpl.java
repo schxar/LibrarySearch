@@ -43,7 +43,8 @@ public class SearchServiceImpl implements SearchService {
     
     public Map<String, Object> search(String query) throws Exception {
         // Encode the search query
-        String encodedQuery = URLEncoder.encode(query, StandardCharsets.UTF_8);
+    	// 修改后的代码
+    	String encodedQuery = URLEncoder.encode(query, StandardCharsets.UTF_8).replace("+", "%20");
         // Construct the search URL
         String searchUrl = Z_LIBRARY_SEARCH_URL + encodedQuery;
 
@@ -64,6 +65,11 @@ public class SearchServiceImpl implements SearchService {
         } else {
             // Configure ChromeDriver in headless mode
             ChromeOptions options = new ChromeOptions();
+            
+            // Specify the path to the user data directory using %USERPROFILE%
+            String userProfile = System.getenv("USERPROFILE");
+            options.addArguments("user-data-dir=" + userProfile + "\\AppData\\Local\\Google\\Chrome\\User Data");
+            
             options.addArguments("--headless");
             options.addArguments("--disable-gpu");
             options.addArguments("--no-sandbox");
