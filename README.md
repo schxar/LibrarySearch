@@ -39,7 +39,57 @@ graph TD
 ![image](https://github.com/user-attachments/assets/29ca34d1-e534-4fc4-bd26-6fa1def221ec)
 ![image](https://github.com/user-attachments/assets/f047080e-4a3e-48df-b70c-92b917103281)
 
+```mermaid
+graph LR
+    A[User] --> B(Start);
+    B --> C{User Action?};
+    C -- Search --> D[Search Input];
+    D --> E{Cache Valid?};
+    E -- Yes --> F[Load From Cache];
+    E -- No --> G[Fetch from Z-Library];
+    G --> H[Save HTML to Cache];
+    H --> I[Parse HTML];
+    F --> I;
+    I --> J{Display Results};
+    J --> K[User Selects a Book];
+    K --> L{Audio Exists?};
+     L -- Yes --> M[Play Audio];
+     L -- No --> N{Submit Ticket};
+     N --> O[Create Audio Request];
+     O --> P(End);
+    C -- Download --> Q[Select File];
+    Q --> R[Download File];
+     R --> P;
+    C -- Request Recommendations --> S[User Email Input];
+    S --> T[Fetch Download History];
+    T --> U[Generate Search Terms with DeepSeek API];
+    U --> V[Display Recommendations];
+     V --> P;
+        
+     style A fill:#f9f,stroke:#333,stroke-width:2px
+        style B fill:#ccf,stroke:#333,stroke-width:2px
+        style C fill:#ccf,stroke:#333,stroke-width:2px
+        style D fill:#ccf,stroke:#333,stroke-width:2px
+        style E fill:#ccf,stroke:#333,stroke-width:2px
+        style F fill:#ccf,stroke:#333,stroke-width:2px
+        style G fill:#ccf,stroke:#333,stroke-width:2px
+        style H fill:#ccf,stroke:#333,stroke-width:2px
+        style I fill:#ccf,stroke:#333,stroke-width:2px
+        style J fill:#ccf,stroke:#333,stroke-width:2px
+        style K fill:#ccf,stroke:#333,stroke-width:2px
+    style L fill:#ccf,stroke:#333,stroke-width:2px
+    style M fill:#ccf,stroke:#333,stroke-width:2px
+        style N fill:#ccf,stroke:#333,stroke-width:2px
+    style O fill:#ccf,stroke:#333,stroke-width:2px
+        style P fill:#fcc,stroke:#333,stroke-width:2px
+    style Q fill:#ccf,stroke:#333,stroke-width:2px
+    style R fill:#ccf,stroke:#333,stroke-width:2px
+     style S fill:#ccf,stroke:#333,stroke-width:2px
+     style T fill:#ccf,stroke:#333,stroke-width:2px
+     style U fill:#ccf,stroke:#333,stroke-width:2px
+      style V fill:#ccf,stroke:#333,stroke-width:2px
 
+```
 
 ## 主要功能
 
