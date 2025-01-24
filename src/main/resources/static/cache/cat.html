@@ -8,7 +8,7 @@
                 document.querySelector('html').className = e.matches ? 'dark' : 'light';
             });
         </script>
-                        <script src="/components/zlibrary.js?0.777"></script>
+                        <script src="/components/zlibrary.js?0.779"></script>
         <script type="text/javascript">
             navigator.sayswho = (function(){
                 var ua= navigator.userAgent, tem,
@@ -96,27 +96,30 @@
         <meta name="singleLanguage" value="bool(true)
 ">
 
-            <link rel="stylesheet" href="/resources/css/theme.css?0.777">
+            <link rel="stylesheet" href="/resources/css/theme.css?0.779">
 
-                    <meta name="version" value="0.777">
-            <link rel="stylesheet" type="text/css" href="/resources/build/main.css?0.777">
-            <script type="text/javascript" src="/resources/build/main.js?0.777"></script>
-                            <link rel="stylesheet" type="text/css" href="/resources/build/global.css?0.777">
-                <link rel="stylesheet" href="/resources/build/global-d.css?0.777" as="style" onload="this.onload=null;this.rel='stylesheet'">
-                <noscript><link rel="stylesheet" href="/resources/build/global-d.css?0.777"></noscript>
-                <script type="text/javascript" src="/resources/build/global.js?0.777"></script>
-                        <script type="text/javascript" src="/resources/build/bootstrap.js?0.777"></script>
-            <script type="text/javascript" src="/resources/build/global-d.js?0.777" defer=""></script>
-                                <script type="text/javascript" src="/resources/js/search_metrics.js?0.777"></script>
+                    <meta name="version" value="0.779">
+            <link rel="stylesheet" type="text/css" href="/resources/build/main.css?0.779">
+            <script type="text/javascript" src="/resources/build/main.js?0.779"></script>
+                            <link rel="stylesheet" type="text/css" href="/resources/build/global.css?0.779">
+                <link rel="stylesheet" href="/resources/build/global-d.css?0.779" as="style" onload="this.onload=null;this.rel='stylesheet'">
+                <noscript><link rel="stylesheet" href="/resources/build/global-d.css?0.779"></noscript>
+                <script type="text/javascript" src="/resources/build/global.js?0.779"></script>
+                        <script type="text/javascript" src="/resources/build/bootstrap.js?0.779"></script>
+            <script type="text/javascript" src="/resources/build/global-d.js?0.779" defer=""></script>
+                                <script type="text/javascript" src="/resources/ext/dexie.min.js?0.779" defer="1"></script>
+<script type="text/javascript" src="/resources/js/zlibrary-idb.js?0.779" defer="1"></script>
+<script type="text/javascript" src="/resources/js/user-bookmarks.js?0.779" defer="1"></script>
+<script type="text/javascript" src="/resources/js/search_metrics.js?0.779"></script>
         <noscript>
-            <link rel="stylesheet" type="text/css" href="/resources/css/noscript.css?0.777" />
+            <link rel="stylesheet" type="text/css" href="/resources/css/noscript.css?0.779" />
         </noscript>
 
         <script>
             window != top ? window.stop() : null;
             
-            const Config = {"domainHost":"z-lib.gl","BRegion":"highrisk","Country":"us","accessByIp":false,"supportEmail":"support@z-lib.fm","preferredDomain":"https:\/\/z-library.sk","loginURL":"\/login?redirectUrl=https:\/\/z-lib.gl","regURL":"\/registration?redirectUrl=https:\/\/z-lib.gl","generalFilesProxy":"https:\/\/dlr1.ncdn.ec\/general-files\/","isDesktopApp":false,"desktopAppVersion":null,"isTelegramBrowser":false,"isProxy":false};
-            const CurrentUser = new User(null);
+            const Config = {"domainHost":"z-lib.gl","BRegion":"highrisk","Country":"us","accessByIp":false,"supportEmail":"support-asia@z-lib.fm","preferredDomain":"https:\/\/z-library.sk","loginURL":"\/login?redirectUrl=https:\/\/z-lib.gl","regURL":"\/registration?redirectUrl=https:\/\/z-lib.gl","generalFilesProxy":"https:\/\/dlr1.ncdn.ec\/general-files\/","isDesktopApp":false,"desktopAppVersion":null,"isTelegramBrowser":false,"isProxy":false};
+            const CurrentUser = new User({"id":22467818,"email":"tschxar@gmail.com","key":"e196a81601dc3ee22c4e8774c921d959","notifications_count":"0"});
             const CurrentClientIP = "149.112.117.51";
             const CurrentSiteMode = 'books';
             const proxiesToCheck = []; //for google verification
@@ -134,7 +137,7 @@
                         fallbackLng: 'en',
                         backend: {
                             // addPath: '/papi/translations/add-missing-key',
-                            loadPath: '/resources/build/translations-frontend/{{lng}}.json?v=0.777'
+                            loadPath: '/resources/build/translations-frontend/{{lng}}.json?v=0.779'
                         },
                         keySeparator: notLikelyString,
                         nsSeparator: notLikelyString,
@@ -147,6 +150,7 @@
             $(document).ready(function() {
                 $('.tooltip-init').tooltip({html: true})
 
+                                    CurrentUser.markDownloadedBooks()
                             })
 
             $(document).on('focus', '.form-email-field', function() {
@@ -183,8 +187,8 @@
         
         
         <script src="/components/zlibrary-startup-script.js"></script>
-        <link rel="stylesheet" href="/components/style.css?0.777">
-    <script src="/components/z-tabs.js?0.777"></script><script src="/components/z-dropdown.js?0.777"></script><script src="/components/z-bookcard.js?0.777"></script><script src="/components/z-recommended-search.js?0.777"></script><script src="/components/z-carousel.js?0.777"></script><script src="/components/z-cover.js?0.777"></script><script src="/components/z-booklists-browser.js?0.777"></script></head>
+        <link rel="stylesheet" href="/components/style.css?0.779">
+    <script src="/components/z-account.js?0.779"></script><script src="/components/z-social-sharing.js?0.779"></script><script src="/components/z-tabs.js?0.779"></script><script src="/components/z-dropdown.js?0.779"></script><script src="/components/z-bookcard.js?0.779"></script><script src="/components/z-recommended-search.js?0.779"></script><script src="/components/z-cover.js?0.779"></script><script src="/components/z-booklists-browser.js?0.779"></script><script src="/components/z-carousel.js?0.779"></script></head>
 
         <body style="margin:0px;padding:0px;" class="search  super-puper-main-container" data-proxy="false">
         
@@ -205,7 +209,7 @@
             <a href="/how-to-donate" class="navigation-donate">捐款</a>        </div>
 
         
-        <section class="navigation-element navigation-search-element hidden-xs" style="order: 1">
+        <section class="navigation-element navigation-search-element hidden-xs" style="">
     <div class="navigation-icon" onclick="openSearchLine()">
         <div class="zlibicon-search-n"></div>
     </div>
@@ -221,8 +225,229 @@
                     </div>
                 </div>
             </div>
-                        <section class="navigation-element navigation-user-card-element" style="position: relative;">
-            <a href="/login?redirectUrl=https%253A%252F%252Fzh.z-lib.gl%252Fs%252Fcat" data-mode="singlelogin" data-action="login">登录</a>
+                <section class="navigation-element navigation-notifications" style="position: relative;">
+    <div class="navigation-icon">
+        <span class="zlibicon-bell">
+            <div class="badge"></div>
+        </span>
+    </div>
+    <div class="notifications-board">
+        <div class="notifications-board__title">通知</div>
+        <div class="notifications-list" data-simplebar="init"><div class="simplebar-wrapper" style="margin: 0px;"><div class="simplebar-height-auto-observer-wrapper"><div class="simplebar-height-auto-observer"></div></div><div class="simplebar-mask"><div class="simplebar-offset" style="right: 0px; bottom: 0px;"><div class="simplebar-content-wrapper" style="height: auto; overflow: hidden;"><div class="simplebar-content" style="padding: 0px;"></div></div></div></div><div class="simplebar-placeholder" style="width: 0px; height: 0px;"></div></div><div class="simplebar-track simplebar-horizontal" style="visibility: hidden;"><div class="simplebar-scrollbar" style="width: 0px; display: none;"></div></div><div class="simplebar-track simplebar-vertical" style="visibility: hidden;"><div class="simplebar-scrollbar" style="height: 0px; display: none;"></div></div></div>
+    </div>
+</section>
+
+<script>
+    (() => {
+        let clearAtModalClose = false
+        let isLoading = false
+        let isLastPage = false
+        let page = 1
+        let newNotificationsCount = CurrentUser?.notifications_count ?? 0;
+        const loadNotificationsTrigger = document.querySelector('.navigation-element.navigation-notifications')
+        const loadMoreNotificationsTrigger = loadNotificationsTrigger.querySelector('.simplebar-content-wrapper');
+        loadNotificationsTrigger.addEventListener('mouseenter', loadNotifications)
+        loadNotificationsTrigger.addEventListener('click', loadNotifications)
+        loadMoreNotificationsTrigger.addEventListener('scroll', checkScrollPosition)
+        if (newNotificationsCount > 0) document.querySelector('.navigation-notifications .badge').innerHTML = newNotificationsCount;
+        function loadNotifications() {
+            loadNotificationsTrigger.removeEventListener('mouseenter', loadNotifications)
+            loadNotificationsTrigger.removeEventListener('click', loadNotifications)
+            if(isLoading) return
+            isLoading = true
+            new ZLibraryResponse(`/papi/notification/all?page=${page}`)
+                .success(data => {
+                    isLoading = false
+                    for (let note of data.response.data) {
+                        appendNotification(note)
+                    }
+                    if(page == 1 && data.response.data.length == 0){
+                        appendEmptyNotice()
+                    }
+                    if(data.response.meta){
+                        isLastPage = data.response.meta.last_page == page
+                    }
+                    page++;
+                    if(document.querySelector('.notifications-list__loader')){
+                        document.querySelector('.notifications-list__loader').remove()
+                        ZLibrary.DOM.scroll = true
+                    }
+                })
+                .fetch();
+        }
+        function appendEmptyNotice(){ 
+            const html = `<div class="notifications-list__empty">
+                <div class="notifications-list__icons-gallery">
+                    <div class="notifications-list__icon"><span></span></div>
+                    <div class="notifications-list__icon"><span class="zlibicon-flag"></span></div>
+                    <div class="notifications-list__icon"><span class="zlibicon-blob"></span></div>
+                    <div class="notifications-list__icon"><span class="zlibicon-request"></span></div>
+                    <div class="notifications-list__icon"><span class="zlibicon-zalerts"></span></div>
+                    <div class="notifications-list__icon"><span class="zlibicon-heart"></span></div>
+                    <div class="notifications-list__icon"><span class="zlibicon-book"></span></div>
+                    <div class="notifications-list__icon"><span class="zlibicon-top"></span></div>
+                    <div class="notifications-list__icon"><span></span></div>
+                </div>
+                <div class="notifications-list__text"><b>To get notification</b> create your first <a href="/users/zalerts">Z-Alert</a>, subscribe on <a href="/requests">Book Requests</a>, comment on <a href="/booklists">Booklist</a>, <a href="/popular">Books</a> & much more</div>
+            </div>`;
+            document.querySelector('.notifications-list').innerHTML = '';
+            document.querySelector('.notifications-list').insertAdjacentHTML("beforeend", html)
+        }
+        function checkScrollPosition() {
+            if (loadMoreNotificationsTrigger.scrollTop + loadMoreNotificationsTrigger.clientHeight >= loadMoreNotificationsTrigger.scrollHeight - 1) {
+                if(!isLastPage && !isLoading){
+                    appendLoader()
+                    ZLibrary.DOM.scroll = false
+                    loadNotifications()
+                }
+            }
+        }
+        function appendLoader(){
+            const html = `<div class="notifications-list__loader"><img class="loader" src="/img/loader.svg"></div>`
+            document.querySelector('.simplebar-content').insertAdjacentHTML("beforeend", html)
+            loadMoreNotificationsTrigger.scrollTo({ top: loadMoreNotificationsTrigger.scrollHeight, behavior: 'smooth' })
+        }
+        function appendNotification(notification) {
+            const icons = {
+                comment: "zlibicon-blob",
+                requests: "zlibicon-request",
+                zalert: "zlibicon-zalerts",
+                like: "zlibicon-heart",
+                winner: "zlibicon-top", 
+                thanks: "zlibicon-gratitude-n", 
+                'donation-end': "zlibicon-dollar", 
+                'request-approved': "zlibicon-request"
+            }
+
+            const date = new Date(notification.created_at)
+            if (!notification.data.type) {
+                return
+            }
+
+            const link = notification.data.link ? `href="${notification.data.link}"` : '';
+                        
+            const html = `<div class="notifications-list__element ${!notification.read ? 'new' : ''}">
+                <a ${link}>
+                    <div class="notifications-list__icon"><span class="${icons[notification.data.type]}"></span></div>
+                    <div class="notifications-list__content">
+                        <div class="notifications-list__message">
+                            ${i18next.t(notification.message, {user: `<object><a href="${notification.data?.user?.profile}">${notification.data?.user?.name}</a></object>`, title: '<strong>' + notification.data?.title + '</strong>', activeLink: `<object><a href="${notification.data?.activeLink?.link}">${notification.data?.activeLink?.title}</a></object>`, interpolation: { escapeValue: false } })}
+                        </div>
+                        ${notification.data.quote ? `
+                            <div class="notifications-list__quote">${notification.data.quote}</div>
+                        `:``}
+                        <div class="notifications-list__time">${date.toLocaleString({}, {day: 'numeric', month: 'short',year: 'numeric'})}</div>
+                    </div>
+                </a>
+                ${link ? `<a ${link} target="_blank"><span class="zlibicon-blank-n"></span></a>` : ''}
+            </div>`
+
+            document.querySelector('.simplebar-content').insertAdjacentHTML("beforeend", html)
+        }
+
+        document.querySelector('.navigation-notifications .navigation-icon').addEventListener('click', function() {
+            document.querySelector('.notifications-board').style.display = 'block';
+
+            ZLibrary.DOM.overlay = 'dropdown';
+            if (newNotificationsCount > 0) {
+                new ZLibraryResponse(new Request('/papi/notification/mark-read-all', {
+                    method: 'PATCH'
+                }))
+                    .success(() => {
+                        newNotificationsCount = 0;
+                        clearAtModalClose = true
+                    })
+                    .fetch()
+            }
+        });
+
+        window.addEventListener('modalClose', function(e) {
+            document.querySelector('.notifications-board').classList.add("out");
+            ZLibrary.DOM.scroll = true
+            setTimeout(() => {
+                if(clearAtModalClose){
+                    document.querySelectorAll('.notifications-board .new').forEach(el => el.classList.remove('new'));
+                    document.querySelector('.navigation-notifications .badge').innerHTML = '';
+                    clearAtModalClose = false;
+                }
+                document.querySelector('.notifications-board').style.display = 'none';
+                document.querySelector('.notifications-board').classList.remove("out");
+            }, 300);
+        });
+
+    })()
+
+</script>        <section class="navigation-element navigation-user-card-element" style="position: relative;">
+            <div class="navigation-icon" onclick="openHeaderUser()">
+            <div class="profile-header__avatar">
+                <z-account class="profile-header__avatar ready" id="22467818" avatar="" premium="" avatar-only="">
+                </z-account>
+            </div>
+        </div>
+        <div class="user-card">
+            <div class="user-card__cover profile-header__poster" style="background-image: url(/img/profile/cover-0-p.png)">
+                <a href="/logout" class="logout" data-mode="singlelogin" data-action="logout">
+                    <i class="zlibicon-logout-n"></i>
+                </a>
+                <a href="/profile" class="profile-header__avatar profile-header__avatar--premium">
+                    <div class="profile-header__avatar-letter">s</div>
+                    <img class="profile-header__avatar-image" src="" alt="">
+                </a>
+                <z-account class="profile-header__avatar ready" id="22467818" avatar="" premium="" avatar-only="" size="136" href="/profile">
+                </z-account>
+            </div>
+            <div class="user-card__name">
+                <a href="/profile">schxar</a>
+            </div>
+            <div class="user-card__status">
+                <a href="/profile/22467818/e157ff/plans"><div class="profile-header__status profile-header__status--premium">高级账户</div></a><div class="profile-header__status_date">直到 Feb 07, 2025</div>            </div>
+            <div class="caret-scroll">
+                <div class="caret-scroll__reel">
+                    <div class="caret-scroll__tile">
+                        <div class="caret-scroll__title">
+                            0/15                        </div>
+                        <div class="caret-scroll__desc">
+                            <i class="zlibicon-download"></i>
+                            <span>每日限额</span>
+                                                    </div>
+                    </div>
+                    <div class="caret-scroll__tile">
+                        <div class="caret-scroll__title">
+                            0/15                        </div>
+                        <div class="caret-scroll__desc">
+                            <i class="zlibicon-download"></i>
+                            <span>每日限额</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="caret-scroll__reel">
+                    <div class="caret-scroll__tile">
+                        <div class="caret-scroll__title">
+                            $5                        </div>
+                        <div class="caret-scroll__desc">
+                            <i class="zlibicon-dollar"></i>
+                            <span>捐款</span>
+                        </div>
+                    </div>
+                    <div class="caret-scroll__tile">
+                        <div class="caret-scroll__title">
+                            $5                        </div>
+                        <div class="caret-scroll__desc">
+                            <i class="zlibicon-dollar"></i>
+                            <span>捐款</span>
+                        </div>
+                    </div>
+                </div>
+                <!-- <ul class="caret-scroll__dots">
+                    <li class="active"></li>
+                    <li></li>
+                </ul> -->
+            </div>
+            <div class="user-card__edit">
+                <a href="/profileEdit"><button theme="light"><i class="zlibicon-edit-line"></i>编辑个人资料</button></a>
+            </div>
+        </div>
     </section>
 
 <script>
@@ -274,21 +499,8 @@
         <div class="navbar-menu-flex">
             <div class="navbar-menu__bg"></div>
             <a href="/" class="logo"><img src="/img/logo.zlibrary.svg" style="width:200px;" alt="ZLibary Z-Library" title="Z-Library"></a>
-            <div class="user-data__sign-wrap">
-    <div class="user-data__sign">
-        <a href="/login?redirectUrl=https%253A%252F%252Fzh.z-lib.gl%252Fs%252Fcat" data-mode="singlelogin" data-action="login" class="user-data__sign-title">登录</a>
-        <div class="user-data__sign-note">访问更多功能</div>
-        <div class="user-data__sign-feature text-capitalize"><i class="zlibicon-arrow-right"></i>online reading</div>
-        <div class="user-data__sign-feature text-capitalize"><i class="zlibicon-arrow-right"></i>个人推荐</div>
-        <div class="user-data__sign-feature                "><i class="zlibicon-arrow-right"></i>Sending to Email &amp; eReaders</div>
-        <div class="user-data__sign-feature text-capitalize"><i class="zlibicon-arrow-right"></i>file converter</div>
-        <div class="user-data__sign-feature text-capitalize"><i class="zlibicon-arrow-right"></i>Telegram自动程序</div>
-        <div class="user-data__sign-feature text-capitalize"><i class="zlibicon-arrow-right"></i>管理书单</div>
-        <div class="user-data__sign-feature text-capitalize"><i class="zlibicon-arrow-right"></i>and much more</div>
-    </div>
-</div>
-            <div class="navbar-menu__wrap">
-                <section class="category"><input type="checkbox" id="cat0" option="个人的"><label for="cat0" class="category-title">个人的<i class="zlibicon-slider-arr-right"></i></label><div class="category-list"><a href="/requests" ""=""><i class="zlibicon-request"></i><span>书籍请求</span></a></div></section><section class="category"><input type="checkbox" id="cat1" option="探索"><label for="cat1" class="category-title">探索<i class="zlibicon-slider-arr-right"></i></label><div class="category-list"><a href="/users/zrecommended" ""=""><i class="zlibicon-recommended-feature"></i><span>Z-Recommend</span></a><a href="/booklists" ""=""><i class="zlibicon-flag"></i><span>书单</span></a><a href="/popular" ""=""><i class="zlibicon-popular"></i><span>最受欢迎</span></a><a href="/categories" ""=""><i class="zlibicon-categories"></i><span>种类</span></a></div></section><section class="category"><input type="checkbox" id="cat2" option="贡献"><label for="cat2" class="category-title">贡献<i class="zlibicon-slider-arr-right"></i></label><div class="category-list"><a href="/how-to-donate" ""=""><i class="zlibicon-dollar"></i><span>捐款</span></a><a href="/book-add" ""=""><i class="zlibicon-cloud-upload"></i><span>上载</span></a></div></section><section class="category"><input type="checkbox" id="cat3" option="Litera Library"><label for="cat3" class="category-title"><a class="link" href="https://litera-library.com" target="_blank">Litera Library</a><a href="https://litera-library.com" target="_blank" class="link zlibicon-blank-n"></a><i class="zlibicon-slider-arr-right"></i></label><div class="category-list"><a href="https://litera-library.com" target="_blank"><i class="zlibicon-offline-books color"></i><span>捐赠纸质书籍</span></a><a href="https://litera-library.com/add-my-books" target="_blank"><i class="zlibicon-open-book color"></i><span>添加纸质书籍</span></a><a href="https://litera-library.com/search-for-books" target="_blank"><i class="zlibicon-open-book-search color"></i><span>Search paper books</span></a><a href="https://litera-library.com/open-litera-point" target="_blank"><i class="zlibicon-open-book-geolabel color"></i><span>我的 LITERA Point</span></a></div></section>            </div>
+                        <div class="navbar-menu__wrap">
+                <section class="category"><input type="checkbox" id="cat0" option="个人的"><label for="cat0" class="category-title">个人的<i class="zlibicon-slider-arr-right"></i></label><div class="category-list"><a href="/users/favorites" ""=""><i class="zlibicon-heart"></i><span>收藏夹</span></a><a href="/users/downloads" ""=""><i class="zlibicon-history"></i><span>下载历史</span></a><a href="/users/zalerts" ""=""><i class="zlibicon-zalerts"></i><span>Z-Alerts</span></a><a href="/requests/my/active" ""=""><i class="zlibicon-request"></i><span>书籍请求</span></a></div></section><section class="category"><input type="checkbox" id="cat1" option="探索"><label for="cat1" class="category-title">探索<i class="zlibicon-slider-arr-right"></i></label><div class="category-list"><a href="/users/zrecommended" ""=""><i class="zlibicon-recommended-feature"></i><span>Z-Recommend</span></a><a href="/booklists" ""=""><i class="zlibicon-flag"></i><span>书单</span></a><a href="/popular" ""=""><i class="zlibicon-popular"></i><span>最受欢迎</span></a><a href="/categories" ""=""><i class="zlibicon-categories"></i><span>种类</span></a></div></section><section class="category"><input type="checkbox" id="cat2" option="贡献"><label for="cat2" class="category-title">贡献<i class="zlibicon-slider-arr-right"></i></label><div class="category-list"><a href="/how-to-donate" ""=""><i class="zlibicon-dollar"></i><span>捐款</span></a><a href="/book-add" ""=""><i class="zlibicon-cloud-upload"></i><span>上载</span></a><a href="/users/suggested-corrections" ""=""><i class="zlibicon-edit-line"></i><span>已建议的修改</span></a><a href="/users/gratitudes" ""=""><i class="zlibicon-gratitude-n"></i><span>谢谢!</span></a><a href="/top-zlibrarians" ""=""><i class="zlibicon-top"></i><span>Z-Librarians 排行榜</span></a></div></section><section class="category"><input type="checkbox" id="cat3" option="Litera Library"><label for="cat3" class="category-title"><a class="link" href="https://litera-library.com?from=z-lib" target="_blank">Litera Library</a><a href="https://litera-library.com?from=z-lib" target="_blank" class="link zlibicon-blank-n"></a><i class="zlibicon-slider-arr-right"></i></label><div class="category-list"><a href="https://litera-library.com?from=z-lib" target="_blank"><i class="zlibicon-offline-books color"></i><span>捐赠纸质书籍</span></a><a href="https://litera-library.com/add-my-books?from=z-lib" target="_blank"><i class="zlibicon-open-book color"></i><span>添加纸质书籍</span></a><a href="https://litera-library.com/search-for-books?from=z-lib" target="_blank"><i class="zlibicon-open-book-search color"></i><span>Search paper books</span></a><a href="https://litera-library.com/open-litera-point?from=z-lib" target="_blank"><i class="zlibicon-open-book-geolabel color"></i><span>我的 LITERA Point</span></a></div></section>            </div>
         </div>
     </div>
 </section>
@@ -325,11 +537,150 @@
                 您通往知识和文化的门户。 每个人都可以使用。            </div>
         </div>
     
-    
+    <div class="hidden-xs" id="scamSites2Banner" style="position: relative;">
+    <!-- <img loading="lazy" class="banner light" style="display: none;" src="/img/banners/scam-sites-3.webp" alt="Don't use scam websites">
+    <img loading="lazy" class="banner dark" style="display: none;" src="/img/banners/scam-sites-3-dark.webp" alt="Don't use scam websites"> -->
+    <div class="scsites__bg">
+        <img class="scsites__star" src="/img/banners/scam-sites-4-star.webp">
+        <picture class="scsites__hacker">
+            <source type="image/webp" srcset="/img/banners/scam-sites-4-hacker.webp 1x, /img/banners/scam-sites-4-hacker@2x.webp 1.2x, /img/banners/scam-sites-4-hacker@2x.webp 2x">
+            <source type="image/png" srcset="/img/banners/scam-sites-4-hacker.png 1x, /img/banners/scam-sites-4-hacker@2x.png 1.2x, /img/banners/scam-sites-4-hacker@2x.png 2x">
+            <img src="/img/banners/scam-sites-4-hacker.png" class="scsites__hacker" alt="hackerman">
+        </picture>
+        
+        <div class="scsites__nofollows">
+            <div class="scsites__title">Don't use scam websites</div>
+            <div class="scsites__nofollow"><span class="zlibicon-cross"></span>z-lib.io</div>
+            <div class="scsites__nofollow"><span class="zlibicon-cross"></span>z-lib.id</div>
+            <div class="scsites__nofollow"><span class="zlibicon-cross"></span>zlibrary.to</div>
+        </div>
+        <div class="scsites__desc">Be aware these fraudulent websites have no connection to Z-Library project.<br>For your own safety, don't use them!</div>
+    </div>
+    <div class="btnHideBanner" data-name="scamSites2">
+        <span class="zlibicon-cross"></span>
+    </div>
+</div>
+
+<style type="text/css">
+    #scamSites2Banner{
+        margin-top: 3.3%;
+        margin-bottom: 4%;
+    }
+    #scamSites2Banner .btnHideBanner {
+        position: absolute;
+        right: 10px;
+        top: 6%;
+        cursor: pointer;
+        opacity: 0;
+        transition: opacity var(--transition);
+    }
+    #scamSites2Banner:hover .btnHideBanner {
+        opacity: 1;
+        transition: opacity var(--transition-hover);
+    }
+
+    .scsites__star {
+        width: 5%;
+        height: 41%;
+        position: absolute;
+        top: -6%;
+        left: 16.7%;
+    }
+    .scsites__bg {
+        position: relative;
+        top: 21.3%;
+        left: 0;
+        background: radial-gradient(50% 104.22% at 50% 50%, #FFFFFF 0%, #D9D9D9 100%);
+        border: 2px solid #FFFFFF;
+        width: 100%;
+        padding-top: 12%;
+        border-radius: 8px;
+        filter: drop-shadow(0 3px 3px rgba(0,0,0,0.2));
+        user-select: none;
+    }
+    html.dark .scsites__bg {
+        background: radial-gradient(50% 104.22% at 50% 50%, #FFFFFF 0%, #3A3D42 100%);
+    }
+    .scsites__hacker{
+        position: absolute;
+        bottom: 0;
+        left: 9.8%;
+        height: 108%;
+    }
+    .scsites__title{
+        margin-right: 4.2%;
+        padding: 0 2.3%;
+        text-transform: uppercase;
+        font-weight: bold;
+        background: #000;
+        font-size: 179%;
+        text-shadow: 1px 1px 0 #fff;
+        height: 100%;
+        color: var(--primary-color);
+        white-space: nowrap;
+        display: flex;
+        align-items: center;
+    }
+    .scsites__desc{
+        font-size: 109%;
+        font-weight: 400;
+        position: absolute;
+        width: 68%;
+        top: 53%;
+        left: 29.2%;
+        line-height: 147%;
+        color: #000;
+    }
+    .scsites__nofollows{
+        display: flex;
+        position: absolute;
+        left: 29.2%;
+        top: 16%;
+        color: #000;
+        font-weight: 500;
+        height: 27%;
+    }
+    .scsites__nofollow .zlibicon-cross{
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        width: 66%;
+        height: 66%;
+        margin: auto;
+        color: #FF4D4F;
+        font-size: 140%;
+    }
+    .scsites__nofollow{
+        font-size: 126%;
+        white-space: nowrap;
+        height: 100%;
+        border-radius: 2px;
+        background-color: #fff;
+        border: 1px solid #000000;
+        text-align: center;
+        margin: 0 1.2%;
+        position: relative;
+        display: flex;
+        align-items: center;
+        padding: 0 1.5%;
+    }
+    @media (max-width: 1200px) and (min-width: 991px) {
+        #scamSites2Banner{
+            font-size: 12.3px;
+        }
+    }
+    @media (max-width: 992px) {
+        #scamSites2Banner{
+            font-size: 8.9px;
+        }
+    }
+</style>
 <div id="merchantPopup" class="hidden">
     <p>We're currently searching for a high-risk payment processing provider to handle bank cards and local payments.
     </p><p>
-        If you know of any reliable providers, please get in touch with us via <a href="mailto:support@z-lib.fm">support@z-lib.fm</a> with the subject line <b>"High-risk merchant"</b>. Your help is greatly appreciated!
+        If you know of any reliable providers, please get in touch with us via <a href="mailto:support-asia@z-lib.fm">support-asia@z-lib.fm</a> with the subject line <b>"High-risk merchant"</b>. Your help is greatly appreciated!
     </p><p>Please refrain from emailing if you are not familiar with this topic.
     </p><p>Thank you!
     </p><div class="modal-footer">
@@ -422,6 +773,7 @@
                 <div class="visible-xs visible-noJS" id="openAdvSearchBtn">
                     <span id="advSearch-control" style="border-bottom: 1px dashed; color: var(--gray-7);font-size: 14px;cursor:pointer;line-height: 1.2;">使用筛选</span>
 
+                                            <z-social-sharing class="ready">跟其他人分享</z-social-sharing>
                                     </div>
 
                 <!-- JS search filters -->
@@ -727,9 +1079,9 @@
 <div style="margin-top:40px;display: flex;align-items: center;height: 39px;">
     <z-tabs class="search-tabs ready" bordered="">
                         <a href="https://zh.z-lib.gl/s/cat?content_type=book&amp;page=1" data-type="book" index="">
-                    book&nbsp;<span>(150+)</span>                </a>
+                    book&nbsp;<span>(1000+)</span>                </a>
                             <a href="https://zh.z-lib.gl/s/cat?content_type=article&amp;page=1" data-type="article">
-                    article                 (150+)</a>
+                    article                </a>
                 </z-tabs>
 
     <div style="flex-grow: 1"></div>
@@ -771,7 +1123,7 @@
 </div>
 <div id="searchResultBox">            <div class="divider"></div>            <div class="book-item resItemBoxBooks exactMatch">
                 <div class="counter">1</div>
-                <z-bookcard id="19072481" isbn="9781957635019" termshash="7e3eae65a42b1ff1b7305f5b88d94bf4" href="/book/19072481/ec0291/hunting-adeline-cat-and-mouse-duet-2.html" publisher="" language="english" year="2022" extension="epub" filesize="3.15 MB" rating="5.0" quality="5.0" contenttypeparam="?content_type=book" class="ready">
+                <z-bookcard id="19072481" isbn="9781957635019" termshash="7e3eae65a42b1ff1b7305f5b88d94bf4" href="/book/19072481/ec0291/hunting-adeline-cat-and-mouse-duet-2.html" download="/dl/19072481/6ff627" publisher="" language="english" year="2022" extension="epub" filesize="3.15 MB" rating="5.0" quality="5.0" premium="" contenttypeparam="?content_type=book" class="ready">
                     <img data-src="https://s3proxy.cdn-zlib.sk/covers100/collections/userbooks/b59d4739b4f8db6a7518e56296ea77e90f2fc6a55dc5fc9de1e2dc5420c2d2ab.jpg">
                     <div slot="title">Hunting Adeline (Cat and Mouse Duet #2)</div>
                     <div slot="author">H. D. Carlton</div>
@@ -782,7 +1134,7 @@
             </div>
                     <div class="divider"></div>            <div class="book-item resItemBoxBooks exactMatch">
                 <div class="counter">2</div>
-                <z-bookcard id="18700080" isbn="B09CLVJJ77" termshash="f17b295b1a423b9e6e11a5686af79273" href="/book/18700080/fee86c/haunting-adeline-cat-and-mouse-duet-1.html" publisher="" language="english" year="2021" extension="epub" filesize="2.95 MB" rating="5.0" quality="5.0" contenttypeparam="?content_type=book" class="ready">
+                <z-bookcard id="18700080" isbn="B09CLVJJ77" termshash="f17b295b1a423b9e6e11a5686af79273" href="/book/18700080/fee86c/haunting-adeline-cat-and-mouse-duet-1.html" download="/dl/18700080/238520" publisher="" language="english" year="2021" extension="epub" filesize="2.95 MB" rating="5.0" quality="5.0" premium="" contenttypeparam="?content_type=book" class="ready">
                     <img data-src="https://s3proxy.cdn-zlib.sk/covers100/collections/userbooks/3d8f0c4bf030136c96ca00170d1577cb3f174eae8f6fba9e93f29032e2abd233.jpg">
                     <div slot="title">Haunting Adeline (Cat and Mouse duet #1)</div>
                     <div slot="author">H. D. Carlton</div>
@@ -793,7 +1145,7 @@
             </div>
                     <div class="divider"></div>            <div class="book-item resItemBoxBooks exactMatch">
                 <div class="counter">3</div>
-                <z-bookcard id="11808033" isbn="9780802157942" termshash="5cd25289e264e0e0a88c5e51d7841d64" href="/book/11808033/93b2dd/open-water.html" publisher="Black Cat" language="english" year="2021" extension="epub" filesize="1.67 MB" rating="5.0" quality="5.0" contenttypeparam="?content_type=book" class="ready">
+                <z-bookcard id="11808033" isbn="9780802157942" termshash="5cd25289e264e0e0a88c5e51d7841d64" href="/book/11808033/93b2dd/open-water.html" download="/dl/11808033/43c8e3" publisher="Black Cat" language="english" year="2021" extension="epub" filesize="1.67 MB" rating="5.0" quality="5.0" premium="" contenttypeparam="?content_type=book" class="ready">
                     <img data-src="https://s3proxy.cdn-zlib.sk/covers100/collections/userbooks/63024b54c531b5f8ba02e0904885482f81609be10d016780d1c766909058d271.jpg">
                     <div slot="title">Open Water</div>
                     <div slot="author">Caleb Azumah Nelson</div>
@@ -804,7 +1156,7 @@
             </div>
                     <div class="divider"></div>            <div class="book-item resItemBoxBooks exactMatch">
                 <div class="counter">4</div>
-                <z-bookcard id="19095179" isbn="B096BKV268" termshash="7e3eae65a42b1ff1b7305f5b88d94bf4" href="/book/19095179/374405/hunting-adeline-cat-and-mouse-duet-book-2.html" publisher="" language="english" year="2022" extension="pdf" filesize="6.56 MB" rating="5.0" quality="5.0" contenttypeparam="?content_type=book" class="ready">
+                <z-bookcard id="19095179" isbn="B096BKV268" termshash="7e3eae65a42b1ff1b7305f5b88d94bf4" href="/book/19095179/374405/hunting-adeline-cat-and-mouse-duet-book-2.html" download="/dl/19095179/ba6b64" publisher="" language="english" year="2022" extension="pdf" filesize="6.56 MB" rating="5.0" quality="5.0" premium="" contenttypeparam="?content_type=book" class="ready">
                     <img data-src="https://s3proxy.cdn-zlib.sk/covers100/collections/userbooks/ea00768cce1c837b0d6095ae61b6873e7dc8674a3faeb418929ec9a8f2011214.jpg">
                     <div slot="title">Hunting Adeline (Cat and Mouse Duet Book 2 )</div>
                     <div slot="author">H. D. Carlton</div>
@@ -815,7 +1167,7 @@
             </div>
                     <div class="divider"></div>            <div class="book-item resItemBoxBooks exactMatch">
                 <div class="counter">5</div>
-                <z-bookcard id="2075092" isbn="9781932907001" termshash="106241abca2cecb1b23f21e9a3777581" href="/book/2075092/348b42/save-the-cat-the-last-book-on-screenwriting-youll-ever-need.html" publisher="Michael Wiese Productions" language="english" year="2005" extension="pdf" filesize="9.64 MB" rating="5.0" quality="2.0" contenttypeparam="?content_type=book" class="ready">
+                <z-bookcard id="2075092" isbn="9781932907001" termshash="106241abca2cecb1b23f21e9a3777581" href="/book/2075092/348b42/save-the-cat-the-last-book-on-screenwriting-youll-ever-need.html" download="/dl/2075092/67ba8c" publisher="Michael Wiese Productions" language="english" year="2005" extension="pdf" filesize="9.64 MB" rating="5.0" quality="2.0" premium="" contenttypeparam="?content_type=book" class="ready">
                     <img data-src="https://s3proxy.cdn-zlib.sk/covers100/collections/genesis/d36ba563ab91095fddd4ad88ca508fcbb09e85bc8acea4267babef2d4405b9d2.jpg">
                     <div slot="title">Save The Cat! The Last Book on Screenwriting You'll Ever Need</div>
                     <div slot="author">Blake Snyder</div>
@@ -826,7 +1178,7 @@
             </div>
                     <div class="divider"></div>            <div class="book-item resItemBoxBooks exactMatch">
                 <div class="counter">6</div>
-                <z-bookcard id="2365054" isbn="9781465419590" termshash="b9585f9618c010f964167aa543d7ca3a" href="/book/2365054/3503c6/the-cat-encyclopedia-the-definitive-visual-guide.html" publisher="DK, Dorling Kindersley" language="english" year="2014" extension="pdf" filesize="78.27 MB" rating="5.0" quality="5.0" contenttypeparam="?content_type=book" class="ready">
+                <z-bookcard id="2365054" isbn="9781465419590" termshash="b9585f9618c010f964167aa543d7ca3a" href="/book/2365054/3503c6/the-cat-encyclopedia-the-definitive-visual-guide.html" download="/dl/2365054/f57386" publisher="DK, Dorling Kindersley" language="english" year="2014" extension="pdf" filesize="78.27 MB" rating="5.0" quality="5.0" premium="" contenttypeparam="?content_type=book" class="ready">
                     <img data-src="https://s3proxy.cdn-zlib.sk/covers100/collections/genesis/fb240634cfcc47b43932c0f2d336dc2a2df6293fa169b4c5164afb940436e0b8.jpg">
                     <div slot="title">The Cat Encyclopedia: The Definitive Visual Guide</div>
                     <div slot="author">DK; Miezan Van Zyl</div>
@@ -837,7 +1189,7 @@
             </div>
                     <div class="divider"></div>            <div class="book-item resItemBoxBooks exactMatch">
                 <div class="counter">7</div>
-                <z-bookcard id="1071494" isbn="1932907009" termshash="5d7820031a66c3065b5e1e500669353f" href="/book/1071494/cb0c8d/save-the-cat-the-last-book-on-screenwriting-youll-ever-need.html" publisher="Michael Wiese Productions" language="english" year="2005" extension="epub" filesize="1.03 MB" rating="5.0" quality="3.0" contenttypeparam="?content_type=book" class="ready">
+                <z-bookcard id="1071494" isbn="1932907009" termshash="5d7820031a66c3065b5e1e500669353f" href="/book/1071494/cb0c8d/save-the-cat-the-last-book-on-screenwriting-youll-ever-need.html" download="/dl/1071494/64c983" publisher="Michael Wiese Productions" language="english" year="2005" extension="epub" filesize="1.03 MB" rating="5.0" quality="3.0" premium="" contenttypeparam="?content_type=book" class="ready">
                     <img data-src="https://s3proxy.cdn-zlib.sk/covers100/collections/genesis/d36ba563ab91095fddd4ad88ca508fcbb09e85bc8acea4267babef2d4405b9d2.jpg">
                     <div slot="title">Save The Cat! The Last Book on Screenwriting You'll Ever Need</div>
                     <div slot="author">Blake Snyder</div>
@@ -848,7 +1200,7 @@
             </div>
                     <div class="divider"></div>            <div class="book-item resItemBoxBooks exactMatch">
                 <div class="counter">8</div>
-                <z-bookcard id="4823698" isbn="9780857524188" termshash="0a884d375e505a03da5f0b49646c3156" href="/book/4823698/d523b5/the-travelling-cat-chronicles-tabineko-rip%C3%B4to.html" publisher="Doubleday, Transworld Publishers, Penguin Random House UK" language="english" year="2017" extension="epub" filesize="1.67 MB" rating="5.0" quality="5.0" contenttypeparam="?content_type=book" class="ready">
+                <z-bookcard id="4823698" isbn="9780857524188" termshash="0a884d375e505a03da5f0b49646c3156" href="/book/4823698/d523b5/the-travelling-cat-chronicles-tabineko-rip%C3%B4to.html" download="/dl/4823698/7f806c" publisher="Doubleday, Transworld Publishers, Penguin Random House UK" language="english" year="2017" extension="epub" filesize="1.67 MB" rating="5.0" quality="5.0" premium="" contenttypeparam="?content_type=book" class="ready">
                     <img data-src="https://s3proxy.cdn-zlib.sk/covers100/collections/foreignfiction/c41c69d4b82763cdd40d9f7d7a703683c14f72e72f128332351189f2748a1f61.jpg">
                     <div slot="title">The Travelling Cat Chronicles (Tabineko Ripôto)</div>
                     <div slot="author">Hiro Arikawa; Philip Gabriel (translation)</div>
@@ -859,7 +1211,7 @@
             </div>
                     <div class="divider"></div>            <div class="book-item resItemBoxBooks exactMatch">
                 <div class="counter">9</div>
-                <z-bookcard id="5235772" isbn="9780399579752" termshash="d431b5f61a95739387db38e0bcff219b" href="/book/5235772/258333/save-the-cat-writes-a-novel.html" publisher="Ten Speed Press" language="english" year="2018" extension="epub" filesize="4.52 MB" rating="5.0" quality="5.0" contenttypeparam="?content_type=book" class="ready">
+                <z-bookcard id="5235772" isbn="9780399579752" termshash="d431b5f61a95739387db38e0bcff219b" href="/book/5235772/258333/save-the-cat-writes-a-novel.html" download="/dl/5235772/618d69" publisher="Ten Speed Press" language="english" year="2018" extension="epub" filesize="4.52 MB" rating="5.0" quality="5.0" premium="" contenttypeparam="?content_type=book" class="ready">
                     <img data-src="https://s3proxy.cdn-zlib.sk/covers100/collections/foreignfiction/1f99810b888d7432014ca74f2d7615fedf3a1308d115216bfe8d68b4c63a4421.jpg">
                     <div slot="title">Save the Cat! Writes a Novel</div>
                     <div slot="author">Jessica Brody</div>
@@ -870,7 +1222,7 @@
             </div>
                     <div class="divider"></div>            <div class="book-item resItemBoxBooks exactMatch">
                 <div class="counter">10</div>
-                <z-bookcard id="2579921" isbn="9781592538386" termshash="94dfba2e2d5df20e93a43f0118f5acad" href="/book/2579921/c736db/20-ways-to-draw-a-cat-and-44-other-awesome-animals.html" publisher="Quarry Books" language="english" year="2013" extension="pdf" filesize="52.61 MB" rating="5.0" quality="5.0" contenttypeparam="?content_type=book" class="ready">
+                <z-bookcard id="2579921" isbn="9781592538386" termshash="94dfba2e2d5df20e93a43f0118f5acad" href="/book/2579921/c736db/20-ways-to-draw-a-cat-and-44-other-awesome-animals.html" download="/dl/2579921/c44ef0" publisher="Quarry Books" language="english" year="2013" extension="pdf" filesize="52.61 MB" rating="5.0" quality="5.0" premium="" contenttypeparam="?content_type=book" class="ready">
                     <img data-src="https://s3proxy.cdn-zlib.sk/covers100/collections/genesis/717f5ff6cdc60fdb104d577addfe5e2259260f1a726afdc00f93c4a1365e8a97.jpg">
                     <div slot="title">20 Ways to Draw a Cat and 44 Other Awesome Animals</div>
                     <div slot="author">Julia Kuo</div>
@@ -881,7 +1233,7 @@
             </div>
         <div style="margin: 0 -1px -1px;position: relative;"><z-recommended-search query="19072481,18700080,11808033,19095179,2075092,2365054,1071494,4823698,5235772,2579921" auto="" lazy="" class="ready"></z-recommended-search></div>            <div class="divider"></div>            <div class="book-item resItemBoxBooks exactMatch">
                 <div class="counter">11</div>
-                <z-bookcard id="11741056" isbn="" termshash="cf49c1361b1c4e44f157eb2dafe60d70" href="/book/11741056/813e5d/the-husky-and-his-white-cat-shizun.html" publisher="" language="english" year="2021" extension="epub" filesize="2.18 MB" rating="5.0" quality="1.0" contenttypeparam="?content_type=book" class="ready">
+                <z-bookcard id="11741056" isbn="" termshash="cf49c1361b1c4e44f157eb2dafe60d70" href="/book/11741056/813e5d/the-husky-and-his-white-cat-shizun.html" download="/dl/11741056/cd68f2" publisher="" language="english" year="2021" extension="epub" filesize="2.18 MB" rating="5.0" quality="1.0" premium="" contenttypeparam="?content_type=book" class="ready">
                     <img data-src="https://s3proxy.cdn-zlib.sk/covers100/collections/userbooks/d305158c976e4eeefe32cd0a5bf16d761660b61309ce1140aa7e5924ec2b542e.jpg">
                     <div slot="title">The Husky and His White Cat Shizun</div>
                     <div slot="author">Meatbun Doesn't Eat Meat</div>
@@ -892,7 +1244,7 @@
             </div>
                     <div class="divider"></div>            <div class="book-item resItemBoxBooks exactMatch">
                 <div class="counter">12</div>
-                <z-bookcard id="2781053" isbn="" termshash="9b01f028021bfae246cddee840a3636e" href="/book/2781053/d681b1/pete-the-cat-i-love-my-white-shoes.html" publisher="" language="english" year="0" extension="pdf" filesize="11.51 MB" rating="1.0" quality="5.0" contenttypeparam="?content_type=book" class="ready">
+                <z-bookcard id="2781053" isbn="" termshash="9b01f028021bfae246cddee840a3636e" href="/book/2781053/d681b1/pete-the-cat-i-love-my-white-shoes.html" download="/dl/2781053/72c4e0" publisher="" language="english" year="0" extension="pdf" filesize="11.51 MB" rating="1.0" quality="5.0" premium="" contenttypeparam="?content_type=book" class="ready">
                     <img data-src="https://s3proxy.cdn-zlib.sk/covers100/collections/genesis/5fbe8219a7fdd3243436ec118e51b97ab85199876aeab73c55255a2848298c6a.png">
                     <div slot="title">Pete the Cat: I Love My White Shoes</div>
                     <div slot="author">Eric Litwin; ill. James Dean</div>
@@ -903,7 +1255,7 @@
             </div>
                     <div class="divider"></div>            <div class="book-item resItemBoxBooks exactMatch">
                 <div class="counter">13</div>
-                <z-bookcard id="4418556" isbn="9780394800028" termshash="bc021b8bdab25628690ac4f84970184a" href="/book/4418556/b1c64b/the-cat-in-the-hat-comes-back.html" publisher="Random House Books for Young Readers" language="english" year="1958" extension="pdf" filesize="11.66 MB" rating="5.0" quality="5.0" contenttypeparam="?content_type=book" class="ready">
+                <z-bookcard id="4418556" isbn="9780394800028" termshash="bc021b8bdab25628690ac4f84970184a" href="/book/4418556/b1c64b/the-cat-in-the-hat-comes-back.html" download="/dl/4418556/f81dea" publisher="Random House Books for Young Readers" language="english" year="1958" extension="pdf" filesize="11.66 MB" rating="5.0" quality="5.0" premium="" contenttypeparam="?content_type=book" class="ready">
                     <img data-src="https://s3proxy.cdn-zlib.sk/covers100/collections/foreignfiction/edb9860e0f64e101b07371b0c415954746b1e3e7ba37c162b8fdfcd6c4aa24a4.jpg">
                     <div slot="title">The Cat in the Hat Comes Back</div>
                     <div slot="author">Dr. Seuss [Theodor Seuss Geisel][Seuss]</div>
@@ -914,7 +1266,7 @@
             </div>
                     <div class="divider"></div>            <div class="book-item resItemBoxBooks exactMatch">
                 <div class="counter">14</div>
-                <z-bookcard id="19287394" isbn="baddfcdc-9cc2-4b61-9eaf-ea5d0c216ed7" termshash="7e3eae65a42b1ff1b7305f5b88d94bf4" href="/book/19287394/221327/hunting-adeline-cat-and-mouse-duet-book-2.html" publisher="" language="english" year="2022" extension="pdf" filesize="4.60 MB" rating="5.0" quality="5.0" contenttypeparam="?content_type=book" class="ready">
+                <z-bookcard id="19287394" isbn="baddfcdc-9cc2-4b61-9eaf-ea5d0c216ed7" termshash="7e3eae65a42b1ff1b7305f5b88d94bf4" href="/book/19287394/221327/hunting-adeline-cat-and-mouse-duet-book-2.html" download="/dl/19287394/c71b5d" publisher="" language="english" year="2022" extension="pdf" filesize="4.60 MB" rating="5.0" quality="5.0" premium="" contenttypeparam="?content_type=book" class="ready">
                     <img data-src="https://s3proxy.cdn-zlib.sk/covers100/collections/userbooks/0cc553d99d02aeb3c7303ec5cc7724e43e98b7616ea65a38ea1e3ef1ca9c405c.jpg">
                     <div slot="title">Hunting Adeline (Cat and Mouse Duet Book 2)</div>
                     <div slot="author">H. D. Carlton</div>
@@ -925,10 +1277,10 @@
             </div>
                     <div class="divider"></div>            <div class="book-item resItemBoxBooks exactMatch">
                 <div class="counter">15</div>
-                <z-bookcard id="23713734" isbn="" termshash="39729f59527469afcb015af40bf88adf" href="/book/23713734/860752/she-and-her-cat-stories-kanojo-to-kanojo-no-neko.html" publisher="Atria Books, Simon and Schuster" language="english" year="2022" extension="epub" filesize="2.31 MB" rating="5.0" quality="5.0" contenttypeparam="?content_type=book" class="ready">
+                <z-bookcard id="23713734" isbn="" termshash="39729f59527469afcb015af40bf88adf" href="/book/23713734/860752/she-and-her-cat-stories.html" download="/dl/23713734/fb8899" publisher="Atria Books, Simon and Schuster" language="english" year="2022" extension="epub" filesize="2.31 MB" rating="5.0" quality="5.0" premium="" contenttypeparam="?content_type=book" class="ready">
                     <img data-src="https://s3proxy.cdn-zlib.sk/covers100/collections/userbooks/ec31b2e560813b28f31b74b34409a623ff0b9b1eb6e1a10c64d50f413e86ce28.jpg">
-                    <div slot="title">She and Her Cat: Stories (Kanojo to Kanojo no Neko) </div>
-                    <div slot="author">Makoto Shinkai; Naruki Nagakawa; Ginny Tapley Takemori (translation)</div>
+                    <div slot="title">She and Her Cat: Stories</div>
+                    <div slot="author">Makoto Shinkai; Naruki Nagakawa</div>
                     <div slot="note"></div>
                     <div slot="extend" style="position: absolute;">
                                                                                             </div>
@@ -936,7 +1288,7 @@
             </div>
                     <div class="divider"></div>            <div class="book-item resItemBoxBooks exactMatch">
                 <div class="counter">16</div>
-                <z-bookcard id="2927348" isbn="" termshash="d2b2b7b8cb130f26cb718b31fe36ca21" href="/book/2927348/d5abdc/how-to-prepare-for-logical-reasoning-for-the-cat.html" publisher="" language="english" year="0" extension="pdf" filesize="9.74 MB" rating="5.0" quality="0.0" contenttypeparam="?content_type=book" class="ready">
+                <z-bookcard id="2927348" isbn="" termshash="d2b2b7b8cb130f26cb718b31fe36ca21" href="/book/2927348/d5abdc/how-to-prepare-for-logical-reasoning-for-the-cat.html" download="/dl/2927348/9ebaf0" publisher="" language="english" year="0" extension="pdf" filesize="9.74 MB" rating="5.0" quality="0.0" premium="" contenttypeparam="?content_type=book" class="ready">
                     <img data-src="https://s3proxy.cdn-zlib.sk/covers100/collections/genesis/bb7286d918fedca45e4745be54ed9d96b07ceef09822bfe1f90f85659fe6d724.jpg">
                     <div slot="title">How to prepare for Logical Reasoning for the CAT</div>
                     <div slot="author">Arun Sharma</div>
@@ -947,7 +1299,7 @@
             </div>
                     <div class="divider"></div>            <div class="book-item resItemBoxBooks exactMatch">
                 <div class="counter">17</div>
-                <z-bookcard id="5442917" isbn="9789386873514" termshash="1510ae2b5a14b1f5531a05b74287cf8c" href="/book/5442917/1a5ce7/logical-reasoning-and-data-interpretation-for-cat.html" publisher="Pearson Education" language="english" year="2019" extension="pdf" filesize="21.14 MB" rating="5.0" quality="5.0" contenttypeparam="?content_type=book" class="ready">
+                <z-bookcard id="5442917" isbn="9789386873514" termshash="1510ae2b5a14b1f5531a05b74287cf8c" href="/book/5442917/1a5ce7/logical-reasoning-and-data-interpretation-for-cat.html" download="/dl/5442917/2f0eed" publisher="Pearson Education" language="english" year="2019" extension="pdf" filesize="21.14 MB" rating="5.0" quality="5.0" premium="" contenttypeparam="?content_type=book" class="ready">
                     <img data-src="https://s3proxy.cdn-zlib.sk/covers100/collections/genesis/d7a9868ce489882edac293ab4692745aa94803b75091b2302de8424de3fd4553.jpg">
                     <div slot="title">Logical Reasoning and Data Interpretation for CAT</div>
                     <div slot="author">Nishit K. Sinha</div>
@@ -958,7 +1310,7 @@
             </div>
                     <div class="divider"></div>            <div class="book-item resItemBoxBooks exactMatch">
                 <div class="counter">18</div>
-                <z-bookcard id="2581101" isbn="" termshash="" href="/book/2581101/a7ca61/balthus-19082001-the-king-of-cats.html" publisher="Taschen" language="english" year="2003" extension="pdf" filesize="62.24 MB" rating="5.0" quality="5.0" contenttypeparam="?content_type=book" class="ready">
+                <z-bookcard id="2581101" isbn="" termshash="" href="/book/2581101/a7ca61/balthus-19082001-the-king-of-cats.html" download="/dl/2581101/0593c6" publisher="Taschen" language="english" year="2003" extension="pdf" filesize="62.24 MB" rating="5.0" quality="5.0" premium="" contenttypeparam="?content_type=book" class="ready">
                     <img data-src="https://s3proxy.cdn-zlib.sk/covers100/collections/genesis/4eac22c559097a88a2eeded43ee5d3458715528e987c125c9f05ac9e42d050c2.jpg">
                     <div slot="title">Balthus, 1908-2001: The King of Cats</div>
                     <div slot="author">Gilles Neret</div>
@@ -969,7 +1321,7 @@
             </div>
                     <div class="divider"></div>            <div class="book-item resItemBoxBooks exactMatch">
                 <div class="counter">19</div>
-                <z-bookcard id="2611692" isbn="9789339205133" termshash="67a383791dd944bb863faac0fe124eaa" href="/book/2611692/96ba83/how-to-prepare-for-verbal-ability-and-reading-comprehension-for-cat.html" publisher="Mcgraw Hill (India)" language="english" year="2014" extension="epub" filesize="4.71 MB" rating="5.0" quality="5.0" contenttypeparam="?content_type=book" class="ready">
+                <z-bookcard id="2611692" isbn="9789339205133" termshash="67a383791dd944bb863faac0fe124eaa" href="/book/2611692/96ba83/how-to-prepare-for-verbal-ability-and-reading-comprehension-for-cat.html" download="/dl/2611692/7eee59" publisher="Mcgraw Hill (India)" language="english" year="2014" extension="epub" filesize="4.71 MB" rating="5.0" quality="5.0" premium="" contenttypeparam="?content_type=book" class="ready">
                     <img data-src="https://s3proxy.cdn-zlib.sk/covers100/collections/genesis/efabfaf520b8de854fd214ad5e6b41a27990c64779e44c01bff5b18bc003bc7d.jpg">
                     <div slot="title">How To Prepare For Verbal Ability And Reading Comprehension For CAT</div>
                     <div slot="author">Arun Sharma</div>
@@ -980,7 +1332,7 @@
             </div>
                     <div class="divider"></div>            <div class="book-item resItemBoxBooks exactMatch">
                 <div class="counter">20</div>
-                <z-bookcard id="11394068" isbn="B07FH7Z8TL" termshash="6ba07d0a1ac543dde522fa6a7f88a675" href="/book/11394068/e6e664/how-to-prepare-for-verbal-ability-and-reading-comprehension-for-the-cat.html" publisher="McGraw Hill Education (India)" language="english" year="2018" extension="pdf" filesize="19.30 MB" rating="5.0" quality="4.0" contenttypeparam="?content_type=book" class="ready">
+                <z-bookcard id="11394068" isbn="B07FH7Z8TL" termshash="6ba07d0a1ac543dde522fa6a7f88a675" href="/book/11394068/e6e664/how-to-prepare-for-verbal-ability-and-reading-comprehension-for-the-cat.html" download="/dl/11394068/34be49" publisher="McGraw Hill Education (India)" language="english" year="2018" extension="pdf" filesize="19.30 MB" rating="5.0" quality="4.0" premium="" contenttypeparam="?content_type=book" class="ready">
                     <img data-src="https://s3proxy.cdn-zlib.sk/covers100/collections/userbooks/7088fdff7efc4894c42761f636f1911b3b9425428a160ffab86a78743023160f.jpg">
                     <div slot="title">How to Prepare for Verbal Ability and Reading Comprehension for the CAT</div>
                     <div slot="author">Arun Sharma &amp; Meenakshi Upadhyay [Sharma; Arun]</div>
@@ -991,7 +1343,7 @@
             </div>
                     <div class="divider"></div>            <div class="book-item resItemBoxBooks exactMatch">
                 <div class="counter">21</div>
-                <z-bookcard id="11391705" isbn="B07ZFKVGM2" termshash="97a6008fb83205b4d029bfe91c232331" href="/book/11391705/94ebfb/how-to-prepare-for-logical-reasoning-for-cat.html" publisher="McGraw Hill Education" language="english" year="2019" extension="pdf" filesize="32.22 MB" rating="4.5" quality="5.0" contenttypeparam="?content_type=book" class="ready">
+                <z-bookcard id="11391705" isbn="B07ZFKVGM2" termshash="97a6008fb83205b4d029bfe91c232331" href="/book/11391705/94ebfb/how-to-prepare-for-logical-reasoning-for-cat.html" download="/dl/11391705/96623c" publisher="McGraw Hill Education" language="english" year="2019" extension="pdf" filesize="32.22 MB" rating="4.5" quality="5.0" premium="" contenttypeparam="?content_type=book" class="ready">
                     <img data-src="https://s3proxy.cdn-zlib.sk/covers100/collections/userbooks/12cfbf022d280f4f9ca6a52c970e6d9d27b1867d6d592e6266d79329d90cf7ae.jpg">
                     <div slot="title">How to Prepare for Logical Reasoning for CAT</div>
                     <div slot="author">Arun Sharma [Sharma; Arun]</div>
@@ -1002,7 +1354,7 @@
             </div>
                     <div class="divider"></div>            <div class="book-item resItemBoxBooks exactMatch">
                 <div class="counter">22</div>
-                <z-bookcard id="1841249" isbn="9781462901753" termshash="3ba339bb49a218e413eeb6356d59c038" href="/book/1841249/51191c/i-am-a-cat.html" publisher="Tuttle Publishing" language="english" year="2011" extension="epub" filesize="1.05 MB" rating="4.5" quality="5.0" contenttypeparam="?content_type=book" class="ready">
+                <z-bookcard id="1841249" isbn="9781462901753" termshash="3ba339bb49a218e413eeb6356d59c038" href="/book/1841249/51191c/i-am-a-cat.html" download="/dl/1841249/38ddf6" publisher="Tuttle Publishing" language="english" year="2011" extension="epub" filesize="1.05 MB" rating="4.5" quality="5.0" premium="" contenttypeparam="?content_type=book" class="ready">
                     <img data-src="https://s3proxy.cdn-zlib.sk/covers100/collections/foreignfiction/ea6ae7d4c3733710d94595ce34ee37f719588320155cf9cf7ca7f8a388d9e132.jpg">
                     <div slot="title">I Am A Cat</div>
                     <div slot="author">Natsume Soseki; Aiko Ito (translation)</div>
@@ -1013,7 +1365,7 @@
             </div>
                     <div class="divider"></div>            <div class="book-item resItemBoxBooks exactMatch">
                 <div class="counter">23</div>
-                <z-bookcard id="3526349" isbn="" termshash="d8a5984525f67084d9bbdc02c31f5802" href="/book/3526349/65efde/how-to-prepare-for-quantitative-aptitude-for-the-cat.html" publisher="McGraw-Hill Education (India)" language="english" year="0" extension="pdf" filesize="19.75 MB" rating="2.5" quality="0.0" contenttypeparam="?content_type=book" class="ready">
+                <z-bookcard id="3526349" isbn="" termshash="d8a5984525f67084d9bbdc02c31f5802" href="/book/3526349/65efde/how-to-prepare-for-quantitative-aptitude-for-the-cat.html" download="/dl/3526349/1fe26d" publisher="McGraw-Hill Education (India)" language="english" year="0" extension="pdf" filesize="19.75 MB" rating="2.5" quality="0.0" premium="" contenttypeparam="?content_type=book" class="ready">
                     <img data-src="https://s3proxy.cdn-zlib.sk/covers100/collections/genesis/039e35e62f287abff9e416eff22876becb255dcfeccf33f909c2bc552ae2d187.jpg">
                     <div slot="title">How to Prepare for Quantitative Aptitude for the CAT</div>
                     <div slot="author">Arun Sharma</div>
@@ -1024,7 +1376,7 @@
             </div>
                     <div class="divider"></div>            <div class="book-item resItemBoxBooks exactMatch">
                 <div class="counter">24</div>
-                <z-bookcard id="11391528" isbn="9789353167141" termshash="8b0b725d104693938ede03c3bdb09333" href="/book/11391528/2ad522/how-to-prepare-for-data-interpretation-for-cat.html" publisher="McGraw Hill Education (India) Private Limited" language="english" year="2019" extension="pdf" filesize="29.78 MB" rating="5.0" quality="5.0" contenttypeparam="?content_type=book" class="ready">
+                <z-bookcard id="11391528" isbn="9789353167141" termshash="8b0b725d104693938ede03c3bdb09333" href="/book/11391528/2ad522/how-to-prepare-for-data-interpretation-for-cat.html" download="/dl/11391528/a41cc3" publisher="McGraw Hill Education (India) Private Limited" language="english" year="2019" extension="pdf" filesize="29.78 MB" rating="5.0" quality="5.0" premium="" contenttypeparam="?content_type=book" class="ready">
                     <img data-src="https://s3proxy.cdn-zlib.sk/covers100/collections/userbooks/5399f5d5283ba4e0c17147445a11c3d6b9219d9ff0b5bb24f898edcecbae36aa.jpg">
                     <div slot="title">How to Prepare for DATA INTERPRETATION for CAT</div>
                     <div slot="author">Arun Sharma [Sharma; Arun]</div>
@@ -1035,7 +1387,7 @@
             </div>
                     <div class="divider"></div>            <div class="book-item resItemBoxBooks exactMatch">
                 <div class="counter">25</div>
-                <z-bookcard id="2330254" isbn="9781465408518" termshash="8d752559244640762cb2c9829df6f3d8" href="/book/2330254/acd660/the-complete-cat-breed-book.html" publisher="DK, Dorling Kindersley" language="english" year="2013" extension="pdf" filesize="48.73 MB" rating="5.0" quality="5.0" contenttypeparam="?content_type=book" class="ready">
+                <z-bookcard id="2330254" isbn="9781465408518" termshash="8d752559244640762cb2c9829df6f3d8" href="/book/2330254/acd660/the-complete-cat-breed-book.html" download="/dl/2330254/a8a9ac" publisher="DK, Dorling Kindersley" language="english" year="2013" extension="pdf" filesize="48.73 MB" rating="5.0" quality="5.0" premium="" contenttypeparam="?content_type=book" class="ready">
                     <img data-src="https://s3proxy.cdn-zlib.sk/covers100/collections/genesis/a97e0181041be97e7972e719b53f1820d472c89776ab1b2592fb46cc48aeaf27.jpg">
                     <div slot="title">The Complete Cat Breed Book</div>
                     <div slot="author">DK Publishing</div>
@@ -1046,7 +1398,7 @@
             </div>
                     <div class="divider"></div>            <div class="book-item resItemBoxBooks exactMatch">
                 <div class="counter">26</div>
-                <z-bookcard id="2938751" isbn="9781440350719" termshash="f13bd4b1ab51dde1352260ae273634ce" href="/book/2938751/781daf/big-book-of-drawing-animals-90-dogs-cats-horses-and-wild-animals.html" publisher="North Light Books" language="english" year="2017" extension="pdf" filesize="22.35 MB" rating="5.0" quality="5.0" contenttypeparam="?content_type=book" class="ready">
+                <z-bookcard id="2938751" isbn="9781440350719" termshash="f13bd4b1ab51dde1352260ae273634ce" href="/book/2938751/781daf/big-book-of-drawing-animals-90-dogs-cats-horses-and-wild-animals.html" download="/dl/2938751/d8dc4c" publisher="North Light Books" language="english" year="2017" extension="pdf" filesize="22.35 MB" rating="5.0" quality="5.0" premium="" contenttypeparam="?content_type=book" class="ready">
                     <img data-src="https://s3proxy.cdn-zlib.sk/covers100/collections/genesis/8c7479ee953c7223d9f719441c8e32ab39ca65554fb09ee8a34784f7c72de947.jpg">
                     <div slot="title">Big Book of Drawing Animals. 90+ Dogs, Cats, Horses and Wild Animals</div>
                     <div slot="author">T. Beaudenon; P. Rodriguez</div>
@@ -1057,7 +1409,7 @@
             </div>
                     <div class="divider"></div>            <div class="book-item resItemBoxBooks exactMatch">
                 <div class="counter">27</div>
-                <z-bookcard id="21524249" isbn="" termshash="25568b38cbc0d3595f7dbd2e9cc4883c" href="/book/21524249/2e1b02/the-husky-and-his-white-cat-shizun-completed-extras.html" publisher="Recil Ann" language="english" year="0" extension="epub" filesize="2.97 MB" rating="5.0" quality="5.0" contenttypeparam="?content_type=book" class="ready">
+                <z-bookcard id="21524249" isbn="" termshash="25568b38cbc0d3595f7dbd2e9cc4883c" href="/book/21524249/2e1b02/the-husky-and-his-white-cat-shizun-completed-extras.html" download="/dl/21524249/a849f3" publisher="Recil Ann" language="english" year="0" extension="epub" filesize="2.97 MB" rating="5.0" quality="5.0" premium="" contenttypeparam="?content_type=book" class="ready">
                     <img data-src="https://s3proxy.cdn-zlib.sk/covers100/collections/userbooks/a33dd07341231c0b95c55ed1bf6f923b1e8ca213c50789f490d2ee47fd412915.jpg">
                     <div slot="title">The Husky and His White Cat Shizun [Completed + extras]</div>
                     <div slot="author">Meatbun doesn't eat meat</div>
@@ -1068,7 +1420,7 @@
             </div>
                     <div class="divider"></div>            <div class="book-item resItemBoxBooks exactMatch">
                 <div class="counter">28</div>
-                <z-bookcard id="5362498" isbn="" termshash="" href="/book/5362498/8ea71f/herding-cats.html" publisher="" language="english" year="0" extension="pdf" filesize="47.60 MB" rating="5.0" quality="5.0" contenttypeparam="?content_type=book" class="ready">
+                <z-bookcard id="5362498" isbn="" termshash="" href="/book/5362498/8ea71f/herding-cats.html" download="/dl/5362498/c4ee5a" publisher="" language="english" year="0" extension="pdf" filesize="47.60 MB" rating="5.0" quality="5.0" premium="" contenttypeparam="?content_type=book" class="ready">
                     <img data-src="/img/cover-not-exists.png">
                     <div slot="title">Herding Cats</div>
                     <div slot="author">Sarah Andersen</div>
@@ -1079,7 +1431,7 @@
             </div>
                     <div class="divider"></div>            <div class="book-item resItemBoxBooks exactMatch">
                 <div class="counter">29</div>
-                <z-bookcard id="2632288" isbn="9781465416049" termshash="44a0401cfc8bfc45abe29447b94b90be" href="/book/2632288/dc23f8/complete-cat-care-how-to-keep-your-cat-healthy-and-happy.html" publisher="Dk Pub" language="english" year="2014" extension="pdf" filesize="12.79 MB" rating="5.0" quality="5.0" contenttypeparam="?content_type=book" class="ready">
+                <z-bookcard id="2632288" isbn="9781465416049" termshash="44a0401cfc8bfc45abe29447b94b90be" href="/book/2632288/dc23f8/complete-cat-care-how-to-keep-your-cat-healthy-and-happy.html" download="/dl/2632288/078a71" publisher="Dk Pub" language="english" year="2014" extension="pdf" filesize="12.79 MB" rating="5.0" quality="5.0" premium="" contenttypeparam="?content_type=book" class="ready">
                     <img data-src="https://s3proxy.cdn-zlib.sk/covers100/collections/genesis/a693d53142dc2b6369b5722dbe12b8b96e19e48377ec77fef33230cd37b2a490.jpg">
                     <div slot="title">Complete Cat Care: How To Keep Your Cat Healthy and Happy</div>
                     <div slot="author">Dorling Kindersley</div>
@@ -1090,7 +1442,7 @@
             </div>
                     <div class="divider"></div>            <div class="book-item resItemBoxBooks exactMatch">
                 <div class="counter">30</div>
-                <z-bookcard id="2470901" isbn="9781937163082" termshash="edaf63b3f1fb6f36f4b30771a4308cc0" href="/book/2470901/80c0eb/cyberpunk-stories-of-hardware-software-wetware-evolution-and-revolution.html" publisher="Underland Press" language="english" year="2013" extension="pdf" filesize="1.70 MB" rating="5.0" quality="0.0" contenttypeparam="?content_type=book" class="ready">
+                <z-bookcard id="2470901" isbn="9781937163082" termshash="edaf63b3f1fb6f36f4b30771a4308cc0" href="/book/2470901/80c0eb/cyberpunk-stories-of-hardware-software-wetware-evolution-and-revolution.html" download="/dl/2470901/852a99" publisher="Underland Press" language="english" year="2013" extension="pdf" filesize="1.70 MB" rating="5.0" quality="0.0" premium="" contenttypeparam="?content_type=book" class="ready">
                     <img data-src="https://s3proxy.cdn-zlib.sk/covers100/collections/genesis/fbe55e2101fea68f445a9e5f19f8a2173751dcaad380c7d54817b5adf2a922de.jpg">
                     <div slot="title">Cyberpunk: Stories of Hardware, Software, Wetware, Evolution, and Revolution</div>
                     <div slot="author">Pat Cadigan; Benjamin Parzybok; William Gibson; Jonathan Lethem; Greg Bear; Mark Teppo; Cory Doctorow; Cat Rambo; Kim Stanley Robinson; Bruce Sterling; Victoria Blake</div>
@@ -1101,7 +1453,7 @@
             </div>
         <div style="margin: 0 -1px -1px;position: relative;"><z-recommended-search query="11741056,2781053,4418556,19287394,23713734,2927348,5442917,2581101,2611692,11394068,11391705,1841249,3526349,11391528,2330254,2938751,21524249,5362498,2632288,2470901" auto="" lazy="" class="ready"></z-recommended-search></div>            <div class="divider"></div>            <div class="book-item resItemBoxBooks exactMatch">
                 <div class="counter">31</div>
-                <z-bookcard id="26283212" isbn="9781638589341" termshash="31f21bac03addd471173e05170f3284c" href="/book/26283212/7cf6a1/the-husky-and-his-white-cat-shizun-erha-he-ta-de-bai-mao-shizun-vol-3.html" publisher="Seven Seas Entertainment" language="english" year="2023" extension="epub" filesize="15.08 MB" rating="5.0" quality="5.0" contenttypeparam="?content_type=book" class="ready">
+                <z-bookcard id="26283212" isbn="9781638589341" termshash="31f21bac03addd471173e05170f3284c" href="/book/26283212/7cf6a1/the-husky-and-his-white-cat-shizun-erha-he-ta-de-bai-mao-shizun-vol-3.html" download="/dl/26283212/7154a9" publisher="Seven Seas Entertainment" language="english" year="2023" extension="epub" filesize="15.08 MB" rating="5.0" quality="5.0" premium="" contenttypeparam="?content_type=book" class="ready">
                     <img data-src="https://s3proxy.cdn-zlib.sk/covers100/collections/foreignfiction/3877e6560527bdc04ce9e4eedb86bb5685c768964097d0fa542bd0def04c60c5.jpg">
                     <div slot="title">The Husky and His White Cat Shizun: Erha He Ta De Bai Mao Shizun Vol. 3</div>
                     <div slot="author">Rou Bao Bu Chi Rou; Meatbun Doesn't Eat Meat</div>
@@ -1112,7 +1464,7 @@
             </div>
                     <div class="divider"></div>            <div class="book-item resItemBoxBooks exactMatch">
                 <div class="counter">32</div>
-                <z-bookcard id="22494457" isbn="9781957635019" termshash="7e3eae65a42b1ff1b7305f5b88d94bf4" href="/book/22494457/197cc8/hunting-adeline-cat-and-mouse-duet-book-2.html" publisher="H. D. Carlton" language="english" year="2022" extension="epub" filesize="3.25 MB" rating="5.0" quality="5.0" contenttypeparam="?content_type=book" class="ready">
+                <z-bookcard id="22494457" isbn="9781957635019" termshash="7e3eae65a42b1ff1b7305f5b88d94bf4" href="/book/22494457/197cc8/hunting-adeline-cat-and-mouse-duet-book-2.html" download="/dl/22494457/309d93" publisher="H. D. Carlton" language="english" year="2022" extension="epub" filesize="3.25 MB" rating="5.0" quality="5.0" premium="" contenttypeparam="?content_type=book" class="ready">
                     <img data-src="https://s3proxy.cdn-zlib.sk/covers100/collections/foreignfiction/0308e4b148eb0f7d9915a1b93d091af7d3b96d154b977f6227753aebef0e7acb.jpg">
                     <div slot="title">Hunting Adeline (Cat and Mouse Duet Book 2)</div>
                     <div slot="author">Carlton; H. D.</div>
@@ -1123,7 +1475,7 @@
             </div>
                     <div class="divider"></div>            <div class="book-item resItemBoxBooks exactMatch">
                 <div class="counter">33</div>
-                <z-bookcard id="27049544" isbn="B0CLXXB2PD" termshash="22265fe9fbb7fcd52f18c57f91e0c0f6" href="/book/27049544/c8e583/the-husky-and-his-white-cat-shizun-erha-he-ta-de-bai-mao-shizun-novel-vol-4.html" publisher="Seven Seas Entertainment" language="english" year="2023" extension="epub" filesize="13.31 MB" rating="5.0" quality="5.0" contenttypeparam="?content_type=book" class="ready">
+                <z-bookcard id="27049544" isbn="B0CLXXB2PD" termshash="22265fe9fbb7fcd52f18c57f91e0c0f6" href="/book/27049544/c8e583/the-husky-and-his-white-cat-shizun-erha-he-ta-de-bai-mao-shizun-novel-vol-4.html" download="/dl/27049544/455ef5" publisher="Seven Seas Entertainment" language="english" year="2023" extension="epub" filesize="13.31 MB" rating="5.0" quality="5.0" premium="" contenttypeparam="?content_type=book" class="ready">
                     <img data-src="https://s3proxy.cdn-zlib.sk/covers100/collections/userbooks/b2e0874ee954abf077fdab85503d29dc0b0541c590b38c92409575eba18cc66e.jpg">
                     <div slot="title">The Husky and His White Cat Shizun: Erha He Ta De Bai Mao Shizun (Novel) Vol. 4</div>
                     <div slot="author">Rou Bao Bu Chi Rou</div>
@@ -1134,7 +1486,7 @@
             </div>
                     <div class="divider"></div>            <div class="book-item resItemBoxBooks exactMatch">
                 <div class="counter">34</div>
-                <z-bookcard id="23631413" isbn="9781685799656" termshash="5b8f920e76dda3dedabb362aa5866f3b" href="/book/23631413/3504e1/the-husky-and-his-white-cat-shizun-erha-he-ta-de-bai-mao-shizun-vol-1.html" publisher="Seven Seas Entertainment" language="english" year="2022" extension="epub" filesize="14.27 MB" rating="5.0" quality="5.0" contenttypeparam="?content_type=book" class="ready">
+                <z-bookcard id="23631413" isbn="9781685799656" termshash="5b8f920e76dda3dedabb362aa5866f3b" href="/book/23631413/3504e1/the-husky-and-his-white-cat-shizun-erha-he-ta-de-bai-mao-shizun-vol-1.html" download="/dl/23631413/030017" publisher="Seven Seas Entertainment" language="english" year="2022" extension="epub" filesize="14.27 MB" rating="5.0" quality="5.0" premium="" contenttypeparam="?content_type=book" class="ready">
                     <img data-src="https://s3proxy.cdn-zlib.sk/covers100/collections/foreignfiction/8ecd8eff591e8986665446ba63ad3ccf50ae4461b27bd161e835956390e03f4e.jpg">
                     <div slot="title">The Husky and His White Cat Shizun: Erha He Ta De Bai Mao Shizun Vol. 1</div>
                     <div slot="author">Rou Bao Bu Chi Rou; Meatbun Doesn't Eat Meat</div>
@@ -1145,7 +1497,7 @@
             </div>
                     <div class="divider"></div>            <div class="book-item resItemBoxBooks exactMatch">
                 <div class="counter">35</div>
-                <z-bookcard id="2642078" isbn="9780811221504" termshash="7a3acea1e1af69d762ed4bfd751c4447" href="/book/2642078/2c349c/the-guest-cat.html" publisher="New Directions Publishing" language="english" year="2014" extension="epub" filesize="361 KB" rating="5.0" quality="5.0" contenttypeparam="?content_type=book" class="ready">
+                <z-bookcard id="2642078" isbn="9780811221504" termshash="7a3acea1e1af69d762ed4bfd751c4447" href="/book/2642078/2c349c/the-guest-cat.html" download="/dl/2642078/f24c2b" publisher="New Directions Publishing" language="english" year="2014" extension="epub" filesize="361 KB" rating="5.0" quality="5.0" premium="" contenttypeparam="?content_type=book" class="ready">
                     <img data-src="https://s3proxy.cdn-zlib.sk/covers100/collections/genesis/9e074893b9d6b7d947ef1d3948fc58d49b6ab502daa06bcd182cf24fa290830b.jpg">
                     <div slot="title">The Guest Cat</div>
                     <div slot="author">Takashi Hiraide; Eric Selland (translation)</div>
@@ -1156,7 +1508,7 @@
             </div>
                     <div class="divider"></div>            <div class="book-item resItemBoxBooks exactMatch">
                 <div class="counter">36</div>
-                <z-bookcard id="4696018" isbn="9780802124821" termshash="21a7a7ea6e8f386ee55c42bee534013d" href="/book/4696018/d62d39/born-on-a-tuesday.html" publisher="Black Cat" language="english" year="2016" extension="epub" filesize="1.32 MB" rating="5.0" quality="5.0" contenttypeparam="?content_type=book" class="ready">
+                <z-bookcard id="4696018" isbn="9780802124821" termshash="21a7a7ea6e8f386ee55c42bee534013d" href="/book/4696018/d62d39/born-on-a-tuesday.html" download="/dl/4696018/67ddc1" publisher="Black Cat" language="english" year="2016" extension="epub" filesize="1.32 MB" rating="5.0" quality="5.0" premium="" contenttypeparam="?content_type=book" class="ready">
                     <img data-src="https://s3proxy.cdn-zlib.sk/covers100/collections/foreignfiction/8b4dc7538cdf277cf11eeaea72aa6546d536154024c1097e1696e50767705700.jpg">
                     <div slot="title">Born on a Tuesday</div>
                     <div slot="author">Elnathan John</div>
@@ -1167,7 +1519,7 @@
             </div>
                     <div class="divider"></div>            <div class="book-item resItemBoxBooks exactMatch">
                 <div class="counter">37</div>
-                <z-bookcard id="3749557" isbn="9781932907353" termshash="c31f429e448a99ea81efecac2a4c6ee1" href="/book/3749557/a015b1/save-the-cat-goes-to-the-movies.html" publisher="Michael Wiese Productions" language="english" year="2007" extension="epub" filesize="2.38 MB" rating="0.0" quality="5.0" contenttypeparam="?content_type=book" class="ready">
+                <z-bookcard id="3749557" isbn="9781932907353" termshash="c31f429e448a99ea81efecac2a4c6ee1" href="/book/3749557/a015b1/save-the-cat-goes-to-the-movies.html" download="/dl/3749557/405336" publisher="Michael Wiese Productions" language="english" year="2007" extension="epub" filesize="2.38 MB" rating="0.0" quality="5.0" premium="" contenttypeparam="?content_type=book" class="ready">
                     <img data-src="https://s3proxy.cdn-zlib.sk/covers100/collections/foreignfiction/e1263bc992848ba4527d5d81732a114144635c817c8c619b299aa730df075921.jpg">
                     <div slot="title">Save the Cat! Goes to the Movies</div>
                     <div slot="author">Blake Snyder</div>
@@ -1178,7 +1530,7 @@
             </div>
                     <div class="divider"></div>            <div class="book-item resItemBoxBooks exactMatch">
                 <div class="counter">38</div>
-                <z-bookcard id="5572494" isbn="" termshash="8fd65f70e785a25edcf8490243712603" href="/book/5572494/d8b2ef/pete-the-cat-and-the-bad-banana.html" publisher="" language="english" year="0" extension="pdf" filesize="1.34 MB" rating="5.0" quality="2.0" contenttypeparam="?content_type=book" class="ready">
+                <z-bookcard id="5572494" isbn="" termshash="8fd65f70e785a25edcf8490243712603" href="/book/5572494/d8b2ef/pete-the-cat-and-the-bad-banana.html" download="/dl/5572494/ac4635" publisher="" language="english" year="0" extension="pdf" filesize="1.34 MB" rating="5.0" quality="2.0" premium="" contenttypeparam="?content_type=book" class="ready">
                     <img data-src="https://s3proxy.cdn-zlib.sk/covers100/collections/userbooks/6b0366798d67a44f9fb7a63bcbf90355067742fb6aa510fba5e1b3dd6d7d98cf.png">
                     <div slot="title">Pete the Cat and the Bad Banana</div>
                     <div slot="author">James Dean</div>
@@ -1189,7 +1541,7 @@
             </div>
                     <div class="divider"></div>            <div class="book-item resItemBoxBooks exactMatch">
                 <div class="counter">39</div>
-                <z-bookcard id="5013305" isbn="9780451491336" termshash="0a884d375e505a03da5f0b49646c3156" href="/book/5013305/aac29b/the-travelling-cat-chronicles-tabineko-rip%C3%B4to.html" publisher="Penguin Publishing Group" language="english" year="2018" extension="epub" filesize="4.56 MB" rating="5.0" quality="5.0" contenttypeparam="?content_type=book" class="ready">
+                <z-bookcard id="5013305" isbn="9780451491336" termshash="0a884d375e505a03da5f0b49646c3156" href="/book/5013305/aac29b/the-travelling-cat-chronicles-tabineko-rip%C3%B4to.html" download="/dl/5013305/89ce6d" publisher="Berkley, Penguin Random House" language="english" year="2018" extension="epub" filesize="4.56 MB" rating="5.0" quality="5.0" premium="" contenttypeparam="?content_type=book" class="ready">
                     <img data-src="https://s3proxy.cdn-zlib.sk/covers100/collections/foreignfiction/c13d2679a64ba7843c6ddfbb81d985318e4bac56c461d260e63824409263aca5.jpg">
                     <div slot="title">The Travelling Cat Chronicles (Tabineko Ripôto)</div>
                     <div slot="author">Hiro Arikawa; Philip Gabriel (translation)</div>
@@ -1200,7 +1552,7 @@
             </div>
                     <div class="divider"></div>            <div class="book-item resItemBoxBooks exactMatch">
                 <div class="counter">40</div>
-                <z-bookcard id="17049393" isbn="" termshash="5b475739e8d698c2998b5cb36c9c80c1" href="/book/17049393/aab484/dog-man-4-dog-man-and-cat-kid.html" publisher="Scholastic" language="english" year="2016" extension="pdf" filesize="23.14 MB" rating="5.0" quality="5.0" contenttypeparam="?content_type=book" class="ready">
+                <z-bookcard id="17049393" isbn="" termshash="5b475739e8d698c2998b5cb36c9c80c1" href="/book/17049393/aab484/dog-man-4-dog-man-and-cat-kid.html" download="/dl/17049393/98f5c5" publisher="Scholastic" language="english" year="2016" extension="pdf" filesize="23.14 MB" rating="5.0" quality="5.0" premium="" contenttypeparam="?content_type=book" class="ready">
                     <img data-src="https://s3proxy.cdn-zlib.sk/covers100/collections/userbooks/5531cf26c6a5fb723002e03e7347a63b9e7db575a8ba2f15135da10c3f55f13d.jpg">
                     <div slot="title">Dog Man #4 Dog Man and Cat Kid</div>
                     <div slot="author">Dav Pilkey</div>
@@ -1211,7 +1563,7 @@
             </div>
                     <div class="divider"></div>            <div class="book-item resItemBoxBooks exactMatch">
                 <div class="counter">41</div>
-                <z-bookcard id="5443826" isbn="9789353063047" termshash="ea0cf2bcb32231de8f6979cd961fea15" href="/book/5443826/2af7d0/quantitative-aptitude-for-cat.html" publisher="Pearson Education" language="english" year="2019" extension="pdf" filesize="20.20 MB" rating="5.0" quality="5.0" contenttypeparam="?content_type=book" class="ready">
+                <z-bookcard id="5443826" isbn="9789353063047" termshash="ea0cf2bcb32231de8f6979cd961fea15" href="/book/5443826/2af7d0/quantitative-aptitude-for-cat.html" download="/dl/5443826/3c31fd" publisher="Pearson Education" language="english" year="2019" extension="pdf" filesize="20.20 MB" rating="5.0" quality="5.0" premium="" contenttypeparam="?content_type=book" class="ready">
                     <img data-src="https://s3proxy.cdn-zlib.sk/covers100/collections/genesis/e3c0bbaa77d3a1f1338caa9f054a4be599f618f527e1a85f06eb6323e1699cfa.jpg">
                     <div slot="title">Quantitative Aptitude for CAT</div>
                     <div slot="author">Trishna Knowledge Systems</div>
@@ -1222,7 +1574,7 @@
             </div>
                     <div class="divider"></div>            <div class="book-item resItemBoxBooks exactMatch">
                 <div class="counter">42</div>
-                <z-bookcard id="16983568" isbn="" termshash="7b751e419fa72ec7e36af4e741c58bd5" href="/book/16983568/8aae46/the-husky-and-his-white-cat-shizun-2ha.html" publisher="" language="english" year="0" extension="epub" filesize="1.19 MB" rating="5.0" quality="4.5" contenttypeparam="?content_type=book" class="ready">
+                <z-bookcard id="16983568" isbn="" termshash="7b751e419fa72ec7e36af4e741c58bd5" href="/book/16983568/8aae46/the-husky-and-his-white-cat-shizun-2ha.html" download="/dl/16983568/d2ce9f" publisher="" language="english" year="0" extension="epub" filesize="1.19 MB" rating="5.0" quality="4.5" premium="" contenttypeparam="?content_type=book" class="ready">
                     <img data-src="https://s3proxy.cdn-zlib.sk/covers100/collections/foreignfiction/a1fd4784408a8a77f8635c47be6cc927c4416af0618e58b32a790c1da94a0d3c.jpg">
                     <div slot="title">The Husky and His White Cat Shizun (2HA)</div>
                     <div slot="author">Meatbun Doesn't Eat Meat</div>
@@ -1233,7 +1585,7 @@
             </div>
                     <div class="divider"></div>            <div class="book-item resItemBoxBooks exactMatch">
                 <div class="counter">43</div>
-                <z-bookcard id="29816436" isbn="9780593818749" termshash="4182ab360653533161407bc8bfc7c2df" href="/book/29816436/0121fa/well-prescribe-you-a-cat.html" publisher="Penguin Group" language="english" year="2024" extension="epub" filesize="2.05 MB" rating="4.5" quality="5.0" contenttypeparam="?content_type=book" class="ready">
+                <z-bookcard id="29816436" isbn="9780593818749" termshash="4182ab360653533161407bc8bfc7c2df" href="/book/29816436/0121fa/well-prescribe-you-a-cat.html" download="/dl/29816436/ac9af5" publisher="Penguin Group" language="english" year="2024" extension="epub" filesize="2.05 MB" rating="4.5" quality="5.0" premium="" contenttypeparam="?content_type=book" class="ready">
                     <img data-src="https://s3proxy.cdn-zlib.sk/covers100/collections/userbooks/8328b230d094035451310fda04eed7be1b270a87f758a3cacdca63181942ce3a.jpg">
                     <div slot="title">We'll Prescribe You a Cat</div>
                     <div slot="author">Syou Ishida</div>
@@ -1244,7 +1596,7 @@
             </div>
                     <div class="divider"></div>            <div class="book-item resItemBoxBooks exactMatch">
                 <div class="counter">44</div>
-                <z-bookcard id="25205923" isbn="9780063272767" termshash="115b2223b8d900223fffcf5b3c3c6fc5" href="/book/25205923/c8b5a4/we-could-be-so-good-midcentury-nyc-1.html" publisher="HarperCollins" language="english" year="2023" extension="epub" filesize="1.57 MB" rating="5.0" quality="5.0" contenttypeparam="?content_type=book" class="ready">
+                <z-bookcard id="25205923" isbn="9780063272767" termshash="115b2223b8d900223fffcf5b3c3c6fc5" href="/book/25205923/c8b5a4/we-could-be-so-good-midcentury-nyc-1.html" download="/dl/25205923/5b6f87" publisher="HarperCollins" language="english" year="2023" extension="epub" filesize="1.57 MB" rating="5.0" quality="5.0" premium="" contenttypeparam="?content_type=book" class="ready">
                     <img data-src="https://s3proxy.cdn-zlib.sk/covers100/collections/userbooks/50955c1849c6e2fb7b1758c85e4388634f28205734174af9f7334cd554c9d15a.jpg">
                     <div slot="title">We Could Be So Good (Midcentury NYC 1)</div>
                     <div slot="author">Cat Sebastian</div>
@@ -1255,7 +1607,7 @@
             </div>
                     <div class="divider"></div>            <div class="book-item resItemBoxBooks exactMatch">
                 <div class="counter">45</div>
-                <z-bookcard id="5288105" isbn="9780823085750" termshash="6c1d5b0841875a8cd4254fba10a94ea9" href="/book/5288105/c22500/draw-50-cats-the-stepbystep-way-to-draw-domestic-breeds-wild-cats-cuddly-kittens-and-famous-fe.html" publisher="Watson-Guptill" language="english" year="1800" extension="epub" filesize="31.01 MB" rating="3.0" quality="5.0" contenttypeparam="?content_type=book" class="ready">
+                <z-bookcard id="5288105" isbn="9780823085750" termshash="6c1d5b0841875a8cd4254fba10a94ea9" href="/book/5288105/c22500/draw-50-cats-the-stepbystep-way-to-draw-domestic-breeds-wild-cats-cuddly-kittens-and-famous-fe.html" download="/dl/5288105/93853b" publisher="Watson-Guptill" language="english" year="1800" extension="epub" filesize="31.01 MB" rating="3.0" quality="5.0" premium="" contenttypeparam="?content_type=book" class="ready">
                     <img data-src="https://s3proxy.cdn-zlib.sk/covers100/collections/genesis/f56aaf7f8e37c270815382ffe07a7e315127a8f24289edebe1ae0a0b6e9df4cd.jpg">
                     <div slot="title">Draw 50 Cats: The Step-by-Step Way to Draw Domestic Breeds, Wild Cats, Cuddly Kittens, and Famous Felines</div>
                     <div slot="author">Lee J. Ames</div>
@@ -1266,7 +1618,7 @@
             </div>
                     <div class="divider"></div>            <div class="book-item resItemBoxBooks exactMatch">
                 <div class="counter">46</div>
-                <z-bookcard id="5814880" isbn="9780062675217" termshash="" href="/book/5814880/773a71/pete-the-cat-and-the-cool-caterpillar.html" publisher="HarperCollins" language="english" year="2018" extension="pdf" filesize="3.36 MB" rating="5.0" quality="5.0" contenttypeparam="?content_type=book" class="ready">
+                <z-bookcard id="5814880" isbn="9780062675217" termshash="" href="/book/5814880/773a71/pete-the-cat-and-the-cool-caterpillar.html" download="/dl/5814880/8385ee" publisher="HarperCollins" language="english" year="2018" extension="pdf" filesize="3.36 MB" rating="5.0" quality="5.0" premium="" contenttypeparam="?content_type=book" class="ready">
                     <img data-src="https://s3proxy.cdn-zlib.sk/covers100/collections/foreignfiction/b6e22cf57e3eb6a47021e2226d96440e5d347c02d22d3224f72603940b774545.jpg">
                     <div slot="title">Pete the Cat and the Cool Caterpillar</div>
                     <div slot="author">James Dean; Kimberly Dean</div>
@@ -1277,7 +1629,7 @@
             </div>
                     <div class="divider"></div>            <div class="book-item resItemBoxBooks exactMatch">
                 <div class="counter">47</div>
-                <z-bookcard id="3045865" isbn="9780198484998" termshash="382b9631cd4e2a17cff2b5759b842b13" href="/book/3045865/9498e0/oxford-reading-tree-stage-1-more-floppys-phonics-cats.html" publisher="Oxford University Press" language="english" year="0" extension="pdf" filesize="13.36 MB" rating="5.0" quality="3.0" contenttypeparam="?content_type=book" class="ready">
+                <z-bookcard id="3045865" isbn="9780198484998" termshash="382b9631cd4e2a17cff2b5759b842b13" href="/book/3045865/9498e0/oxford-reading-tree-stage-1-more-floppys-phonics-cats.html" download="/dl/3045865/9c1841" publisher="Oxford University Press" language="english" year="0" extension="pdf" filesize="13.36 MB" rating="5.0" quality="3.0" premium="" contenttypeparam="?content_type=book" class="ready">
                     <img data-src="https://s3proxy.cdn-zlib.sk/covers100/collections/genesis/9c819570ae94bf591c0b1678dcb210d76f77e2cddd99a918e10a93c9274d011f.jpg">
                     <div slot="title">Oxford Reading Tree: Stage 1+: More Floppy's Phonics: Cats</div>
                     <div slot="author">Hunt R.; Brychta A.</div>
@@ -1288,7 +1640,7 @@
             </div>
                     <div class="divider"></div>            <div class="book-item resItemBoxBooks exactMatch">
                 <div class="counter">48</div>
-                <z-bookcard id="28422672" isbn="9781685795061" termshash="4d6ae93e7d0f00e4326f45e4af0a6e77" href="/book/28422672/d10c7e/the-husky-and-his-white-cat-shizun-erha-he-ta-de-bai-mao-shizun-novel-vol-5.html" publisher="Seven Seas Entertainment" language="english" year="2024" extension="epub" filesize="12.71 MB" rating="5.0" quality="5.0" contenttypeparam="?content_type=book" class="ready">
+                <z-bookcard id="28422672" isbn="9781685795061" termshash="4d6ae93e7d0f00e4326f45e4af0a6e77" href="/book/28422672/d10c7e/the-husky-and-his-white-cat-shizun-erha-he-ta-de-bai-mao-shizun-novel-vol-5.html" download="/dl/28422672/cf7616" publisher="Seven Seas Entertainment" language="english" year="2024" extension="epub" filesize="12.71 MB" rating="5.0" quality="5.0" premium="" contenttypeparam="?content_type=book" class="ready">
                     <img data-src="https://s3proxy.cdn-zlib.sk/covers100/collections/userbooks/16a7acf68c9500aeb15863005c45555575f40c7bfba7de3d850ffb34da4c2044.jpg">
                     <div slot="title">The Husky and His White Cat Shizun: Erha He Ta de Bai Mao Shizun (Novel) Vol. 5</div>
                     <div slot="author">Rou Bao Bu Chi Rou; Meatbun Doesn’t Eat Meat</div>
@@ -1299,7 +1651,7 @@
             </div>
                     <div class="divider"></div>            <div class="book-item resItemBoxBooks exactMatch">
                 <div class="counter">49</div>
-                <z-bookcard id="4964636" isbn="9780198466598" termshash="42f6427721ad83f6a253155d71db0cd8" href="/book/4964636/fd7148/oxford-reading-tree-songbirds-phonics-level-1-top-cat.html" publisher="Oxford University Press UK" language="english" year="2008" extension="pdf" filesize="1.06 MB" rating="5.0" quality="2.5" contenttypeparam="?content_type=book" class="ready">
+                <z-bookcard id="4964636" isbn="9780198466598" termshash="42f6427721ad83f6a253155d71db0cd8" href="/book/4964636/fd7148/oxford-reading-tree-songbirds-phonics-level-1-top-cat.html" download="/dl/4964636/cb2bd7" publisher="Oxford University Press UK" language="english" year="2008" extension="pdf" filesize="1.06 MB" rating="5.0" quality="2.5" premium="" contenttypeparam="?content_type=book" class="ready">
                     <img data-src="https://s3proxy.cdn-zlib.sk/covers100/collections/foreignfiction/4c769ce7cf6ed8ba3e2fd48184b99041d841800c13134cebdf9f974b9c478465.jpg">
                     <div slot="title">Oxford Reading Tree Songbirds Phonics: Level 1+: Top Cat</div>
                     <div slot="author">Julia Donaldson; Clare Kirtley</div>
@@ -1310,7 +1662,7 @@
             </div>
                     <div class="divider"></div>            <div class="book-item resItemBoxBooks exactMatch">
                 <div class="counter">50</div>
-                <z-bookcard id="3334842" isbn="9780823014248" termshash="024de0c6f798f0ab2c809e6a278ff000" href="/book/3334842/7f65fd/the-artists-guide-to-drawing-animals-how-to-draw-cats-dogs-and-other-favorite-pets.html" publisher="Watson-Guptill" language="english" year="2012" extension="pdf" filesize="42.10 MB" rating="4.0" quality="5.0" contenttypeparam="?content_type=book" class="ready">
+                <z-bookcard id="3334842" isbn="9780823014248" termshash="024de0c6f798f0ab2c809e6a278ff000" href="/book/3334842/7f65fd/the-artists-guide-to-drawing-animals-how-to-draw-cats-dogs-and-other-favorite-pets.html" download="/dl/3334842/d59277" publisher="Watson-Guptill" language="english" year="2012" extension="pdf" filesize="42.10 MB" rating="4.0" quality="5.0" premium="" contenttypeparam="?content_type=book" class="ready">
                     <img data-src="https://s3proxy.cdn-zlib.sk/covers100/collections/genesis/3b7389c6e10dd933fe24a5f19520a83b6ce7b185bc323756fcca76683b7a7d78.jpg">
                     <div slot="title">The Artist's Guide to Drawing Animals How to Draw Cats, Dogs, and Other Favorite Pets</div>
                     <div slot="author">J.C. Amberlyn</div>
@@ -1369,10 +1721,10 @@
 
 </script>
 
-    <div class="paginator "><table width="100%"><tbody><tr><td class="left top"><a href="/s/cat?page=1" rel="1">← Prior</a></td><td class="spaser"></td><td rowspan="2" align="center"><table><tbody><tr><td width="20%"><span><strong>1</strong></span></td><td width="20%"><span><a href="/s/cat?page=2">2</a></span></td><td width="20%"><span><a href="/s/cat?page=3">3</a></span></td></tr><tr><td colspan="3"><div class="scroll_bar"><div class="scroll_trough"></div><div class="scroll_thumb" style="width: 100%; left: 0px;"><div class="scroll_knob"></div></div><div class="current_page_mark" style="width: 33.3333%; left: 0px;"></div></div></td></tr></tbody></table></td><td class="spaser"></td><td class="right top"><a href="/s/cat?page=2" rel="2">Next →</a></td></tr><tr><td class="left bottom"><a href="/s/cat?page=1" rel="1">First</a></td><td class="spaser"></td><td class="spaser"></td><td class="right bottom"><a href="/s/cat?page=3" rel="3">Last</a></td></tr></tbody></table></div>
+    <div class="paginator "><table width="100%"><tbody><tr><td class="left top"><a href="/s/cat?page=1" rel="1">← Prior</a></td><td class="spaser"></td><td rowspan="2" align="center"><table><tbody><tr><td width="9%"><span><strong>1</strong></span></td><td width="9%"><span><a href="/s/cat?page=2">2</a></span></td><td width="9%"><span><a href="/s/cat?page=3">3</a></span></td><td width="9%"><span><a href="/s/cat?page=4">4</a></span></td><td width="9%"><span><a href="/s/cat?page=5">5</a></span></td><td width="9%"><span><a href="/s/cat?page=6">6</a></span></td><td width="9%"><span><a href="/s/cat?page=7">7</a></span></td><td width="9%"><span><a href="/s/cat?page=8">8</a></span></td><td width="9%"><span><a href="/s/cat?page=9">9</a></span></td><td width="9%"><span><a href="/s/cat?page=10">10</a></span></td></tr><tr><td colspan="10"><div class="scroll_bar"><div class="scroll_trough"></div><div class="scroll_thumb" style="width: 50%; left: 0px;"><div class="scroll_knob"></div></div><div class="current_page_mark" style="width: 5%; left: 0px;"></div></div></td></tr></tbody></table></td><td class="spaser"></td><td class="right top"><a href="/s/cat?page=2" rel="2">Next →</a></td></tr><tr><td class="left bottom"><a href="/s/cat?page=1" rel="1">First</a></td><td class="spaser"></td><td class="spaser"></td><td class="right bottom"><a href="/s/cat?page=20" rel="20">Last</a></td></tr></tbody></table></div>
     <script>
         var pagerOptions = {
-            pagesTotal: 3,
+            pagesTotal: 20,
             pagesSpan: 10,
             pageCurrent: 1,
             baseUrl: '/s/cat?page=%number%'
@@ -1394,12 +1746,10 @@
             <div class="z-modal-content__main">
                                     <span class="z-modal__text">Z-Alerts可以让你在有新书时根据你的搜索要求得到通知。您可以用书名、作者、ISBN等信息作为搜索查询 <a href="/msgn/zalerts" target="_blank">阅读更多关于Z-Alerts的信息</a>.</span>
                 
-                                    <input id="zalertEmail" type="text" form="zalertCreateForm" class="z-text-input" placeholder="您的 Email邮箱" name="email">
-                                    <input id="zalertQuery" type="text" form="zalertCreateForm" value="cat" class="z-text-input" placeholder="请输入搜索词"><div id="tooltip-868191" class="zlib-tooltip" style="display:none"><button class="visible-xs-block close">×</button>
+                                    <input id="zalertQuery" type="text" form="zalertCreateForm" value="cat" class="z-text-input" placeholder="请输入搜索词"><div id="tooltip-734499" class="zlib-tooltip" style="display:none"><button class="visible-xs-block close">×</button>
             <span class="zlibicon-info"></span>
             如果您需要带 ISBN 的图书，<br>我们建议创建 <a href="/requests">添加书籍请求</a></div>
 
-                                    <span class="z-modal__text z-modal__alert">Only <b>10 Z-Alerts</b> are available for Basic account. You can delete old request or <a target="_blank" style="color: var(--yellow-8);" href="/how-to-donate" data-target-desktop="new-tab">Make a donation</a> to become a <a target="_blank" style="color: var(--yellow-8);" href="/upgrade" data-target-desktop="new-tab">Premium account</a></span>
                 
             </div>
             <div class="z-modal-content__footer">
@@ -1507,16 +1857,20 @@
      *  2. Set focus on the input field after modal window show
      */
     $('#zalertDialog').on('shown.bs.modal', function () {
-                $('.z-modal-content').removeClass('has-limit');
-        if ($('z-toggle-button[checked]').length >= 10) {
-            $('.z-modal-content').addClass('has-limit');
-        }
         
         validateQuery();
         $('#zalertQuery').focus();
     })
 </script>
 
+    <script>
+        $(function() {
+            const userBookmarksInstance = new UserBookmarks(CurrentUser.id);
+            userBookmarksInstance.init({
+                page: 'search'
+            })
+        });
+    </script>
 
 
 <script>
@@ -1656,7 +2010,7 @@
                 <img src="/img/footer/Y.png" srcset="/img/footer/Y.png 1x, /img/footer/Y@2x.png 1.2x, /img/footer/Y@2x.png 2x" alt="Z-Library">
             </span>
             <span><a href="https://z-library.sk" title="Z-Library project main page" target="blank" style="text-decoration:none;">Z-Library</a> Since 2009</span>
-            <span><a href="mailto: support@z-lib.fm">support@z-lib.fm</a></span>
+            <span><a href="mailto: support-asia@z-lib.fm">support-asia@z-lib.fm</a></span>
         </div>
         <z-dropdown icon="zlibicon-language" arrow="" class="ready">
             <a onclick="redirectToLink('en')" href="https://z-lib.gl/s/cat">English</a><a onclick="redirectToLink('ru')" href="https://ru.z-lib.gl/s/cat">Русский</a><a onclick="redirectToLink('es')" href="https://es.z-lib.gl/s/cat">Español</a><a onclick="redirectToLink('it')" href="https://it.z-lib.gl/s/cat">Italiano</a><a onclick="redirectToLink('el')" href="https://el.z-lib.gl/s/cat">ελληνικά</a><a onclick="redirectToLink('ar')" href="https://ar.z-lib.gl/s/cat">اللغة العربية</a><a onclick="redirectToLink('id')" href="https://id.z-lib.gl/s/cat">Bahasa Indonesia</a><a onclick="redirectToLink('ms')" href="https://ms.z-lib.gl/s/cat">Bahasa Malaysia</a><a onclick="redirectToLink('hi')" href="https://hi.z-lib.gl/s/cat">हिन्दी</a><a onclick="redirectToLink('de')" href="https://de.z-lib.gl/s/cat">Deutsch</a><a onclick="redirectToLink('fr')" href="https://fr.z-lib.gl/s/cat">Français</a><a onclick="redirectToLink('pt')" href="https://pt.z-lib.gl/s/cat">Português</a><a onclick="redirectToLink('uk')" href="https://uk.z-lib.gl/s/cat">Українська</a><a onclick="redirectToLink('pl')" href="https://pl.z-lib.gl/s/cat">Polski</a><a onclick="redirectToLink('zh')" href="https://zh.z-lib.gl/s/cat" checked="">中文</a><a onclick="redirectToLink('tw')" href="https://tw.z-lib.gl/s/cat">繁體中文</a><a onclick="redirectToLink('ja')" href="https://ja.z-lib.gl/s/cat">日本語</a><a onclick="redirectToLink('vi')" href="https://vi.z-lib.gl/s/cat">Tiếng Việt</a><a onclick="redirectToLink('az')" href="https://az.z-lib.gl/s/cat">Azərbaycan Dili</a><a onclick="redirectToLink('hy')" href="https://hy.z-lib.gl/s/cat">Հայոց լեզու</a><a onclick="redirectToLink('th')" href="https://th.z-lib.gl/s/cat">ภาษาไทย</a><a onclick="redirectToLink('tr')" href="https://tr.z-lib.gl/s/cat">Türk Dili</a><a onclick="redirectToLink('ka')" href="https://ka.z-lib.gl/s/cat">ქართველი</a><a onclick="redirectToLink('bn')" href="https://bn.z-lib.gl/s/cat">বাংলা</a><a onclick="redirectToLink('ps')" href="https://ps.z-lib.gl/s/cat">پښتو</a><a onclick="redirectToLink('te')" href="https://te.z-lib.gl/s/cat">తెలుగు</a><a onclick="redirectToLink('ur')" href="https://ur.z-lib.gl/s/cat">اردو</a><a onclick="redirectToLink('ko')" href="https://ko.z-lib.gl/s/cat">한국어</a><a onclick="redirectToLink('sr')" href="https://sr.z-lib.gl/s/cat">Srpski</a><a onclick="redirectToLink('bg')" href="https://bg.z-lib.gl/s/cat">Български</a>            <style>

@@ -38,10 +38,11 @@ public class SearchServiceImpl implements SearchService {
     @Autowired
     private SearchHistoryMapper searchHistoryMapper;
     
-    @Autowired
-    private SearchCountMapper searchCountMapper; // Autowire the new mapper
+
     
     public Map<String, Object> search(String query) throws Exception {
+    	 long startTime = System.currentTimeMillis();
+    	
         // Encode the search query
     	// 修改后的代码
     	String encodedQuery = URLEncoder.encode(query, StandardCharsets.UTF_8).replace("+", "%20");
@@ -144,6 +145,10 @@ public class SearchServiceImpl implements SearchService {
             System.out.println("Search results box not found.");
         }
 
+        // 在返回响应前添加耗时统计
+        long totalTime = System.currentTimeMillis() - startTime;
+        System.out.printf("[Search Timing] Query: '%s' | Duration: %d ms%n", query, totalTime);
+        
         return responseMap;
     }
 
