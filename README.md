@@ -33,6 +33,8 @@ graph TD
     classDef box fill:#f9f9f9,stroke:#333,stroke-width:1px;
     class A,B,C,D,E,F,G,H,I,J,K,L,M,N,O box;
 
+```
+
 ## 主要功能
 
 ### 🔍 智能搜索系统
