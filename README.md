@@ -7,13 +7,19 @@
 本项目实现了一个多模块的电子书库搜索系统，主要功能包括智能搜索、安全下载、用户行为分析和个性化推荐。系统采用前后端分离架构，结合Python与Java技术栈，通过MySQL实现数据持久化，并集成第三方API增强功能。
 
 ```mermaid
+%%{init: {'themeVariables': { 
+    'textColor': '#333',
+    'primaryColor': '#d9e8f5',
+    'lineColor': '#666',
+    'fontFamily': 'Microsoft YaHei'
+}}}%%
 graph TD
     A[用户界面] --> B[Clerk认证模块]
     B -->|JWT令牌| C[Spring Boot微服务]
     
     subgraph SpringBoot微服务层
-        C --> D[SearchController]
-        C --> E[GetDLinkController]
+        C --> D[搜索控制器]
+        C --> E[下载链接控制器]
         D -->|处理请求| F[Jsoup解析器]
         D -->|缓存管理| G[HTML缓存系统]
         E -->|浏览器自动化| H[Selenium驱动器]
@@ -27,69 +33,61 @@ graph TD
     K -->|推荐结果| I
     K -->|清洗数据| M[正则处理器]
     
-    I -->|分区策略| N[Range/Hash分区]
+    I -->|分区策略| N[范围/哈希分区]
     J -->|文件存储| O[哈希命名目录]
-    
-    classDef box fill:#f9f9f9,stroke:#333,stroke-width:1px;
+
+    classDef box fill:#e8f5e9,stroke:#2e7d32,stroke-width:1.5px,color:#1b5e20;
     class A,B,C,D,E,F,G,H,I,J,K,L,M,N,O box;
+
+```
+
+
+
+```mermaid
+%%{init: {'theme':'base', 'themeVariables': {
+    'primaryColor': '#fff3e0',
+    'textColor': '#37474f',
+    'fontFamily': 'Microsoft YaHei'
+}}}%%
+graph LR
+    A[用户] --> B(开始);
+    B --> C{用户操作类型?};
+    C -- 搜索 --> D[搜索输入];
+    D --> E{缓存有效?};
+    E -- 是 --> F[从缓存加载];
+    E -- 否 --> G[从Z-Library获取];
+    G --> H[保存HTML到缓存];
+    H --> I[解析HTML];
+    F --> I;
+    I --> J{显示结果};
+    J --> K[用户选择书籍];
+    K --> L{音频存在?};
+     L -- 是 --> M[播放音频];
+     L -- 否 --> N{提交工单};
+     N --> O[创建音频请求];
+     O --> P(结束);
+    C -- 下载 --> Q[选择文件];
+    Q --> R[下载文件];
+     R --> P;
+    C -- 请求推荐 --> S[用户邮箱输入];
+    S --> T[获取下载历史];
+    T --> U[通过DeepSeek生成搜索词];
+    U --> V[显示推荐结果];
+     V --> P;
+
+    classDef process fill:#e3f2fd,stroke:#1565c0,color:#0d47a1;
+    classDef decision fill:#fff8e1,stroke:#f9a825,color:#ef6c00;
+    classDef endpoint fill:#f8bbd0,stroke:#c2185b,color:#880e4f;
+    
+    class A,B,D,E,F,G,H,I,J,K,Q,R,S,T,U,V process;
+    class C,L,N decision;
+    class P,O endpoint;
 
 ```
 
 ![image](https://github.com/user-attachments/assets/3767157b-f197-4d65-99c0-a8344922949b)
 ![image](https://github.com/user-attachments/assets/29ca34d1-e534-4fc4-bd26-6fa1def221ec)
 ![image](https://github.com/user-attachments/assets/f047080e-4a3e-48df-b70c-92b917103281)
-
-```mermaid
-graph LR
-    A[User] --> B(Start);
-    B --> C{User Action?};
-    C -- Search --> D[Search Input];
-    D --> E{Cache Valid?};
-    E -- Yes --> F[Load From Cache];
-    E -- No --> G[Fetch from Z-Library];
-    G --> H[Save HTML to Cache];
-    H --> I[Parse HTML];
-    F --> I;
-    I --> J{Display Results};
-    J --> K[User Selects a Book];
-    K --> L{Audio Exists?};
-     L -- Yes --> M[Play Audio];
-     L -- No --> N{Submit Ticket};
-     N --> O[Create Audio Request];
-     O --> P(End);
-    C -- Download --> Q[Select File];
-    Q --> R[Download File];
-     R --> P;
-    C -- Request Recommendations --> S[User Email Input];
-    S --> T[Fetch Download History];
-    T --> U[Generate Search Terms with DeepSeek API];
-    U --> V[Display Recommendations];
-     V --> P;
-        
-     style A fill:#f9f,stroke:#333,stroke-width:2px
-        style B fill:#ccf,stroke:#333,stroke-width:2px
-        style C fill:#ccf,stroke:#333,stroke-width:2px
-        style D fill:#ccf,stroke:#333,stroke-width:2px
-        style E fill:#ccf,stroke:#333,stroke-width:2px
-        style F fill:#ccf,stroke:#333,stroke-width:2px
-        style G fill:#ccf,stroke:#333,stroke-width:2px
-        style H fill:#ccf,stroke:#333,stroke-width:2px
-        style I fill:#ccf,stroke:#333,stroke-width:2px
-        style J fill:#ccf,stroke:#333,stroke-width:2px
-        style K fill:#ccf,stroke:#333,stroke-width:2px
-    style L fill:#ccf,stroke:#333,stroke-width:2px
-    style M fill:#ccf,stroke:#333,stroke-width:2px
-        style N fill:#ccf,stroke:#333,stroke-width:2px
-    style O fill:#ccf,stroke:#333,stroke-width:2px
-        style P fill:#fcc,stroke:#333,stroke-width:2px
-    style Q fill:#ccf,stroke:#333,stroke-width:2px
-    style R fill:#ccf,stroke:#333,stroke-width:2px
-     style S fill:#ccf,stroke:#333,stroke-width:2px
-     style T fill:#ccf,stroke:#333,stroke-width:2px
-     style U fill:#ccf,stroke:#333,stroke-width:2px
-      style V fill:#ccf,stroke:#333,stroke-width:2px
-
-```
 
 ## 主要功能
 
