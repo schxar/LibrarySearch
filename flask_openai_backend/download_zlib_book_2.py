@@ -6,6 +6,7 @@ import mysql.connector
 import hashlib
 from datetime import datetime
 
+
 app = Flask(__name__)
 
 # 设置SECRET_KEY用于session
@@ -23,6 +24,15 @@ db_config = {
     'password': '13380008373',
     'database': 'library'
 }
+
+import atexit
+def check_pid(pid):
+    try:
+        os.kill(pid, 0)
+    except OSError:
+        return False
+    else:
+        return True
 
 import re
 from collections import defaultdict
@@ -507,7 +517,29 @@ def update_status(ticket_id, status):
     conn.close()
     return redirect(url_for('tickets'))
 
+from flask import redirect
+
+@app.route('/recommend', methods=['GET'])
+def recommend_proxy():
+    """
+    将推荐服务路由代理到10811端口
+    """
+    return redirect('http://localhost:10811' + request.full_path)
+
+import subprocess
+
 if __name__ == '__main__':
     create_table()
-    remove_duplicate_files(download_directory)  # 启动时自动清理
-    app.run(host='0.0.0.0', port=10805)
+    remove_duplicate_files(download_directory)
+    
+    # 启动推荐服务
+    recommendation_process = subprocess.Popen(
+        ['python', 'flask_openai_backend\\recommendation_service.py'],
+        cwd=os.getcwd()  # 确保工作目录正确
+    )
+    
+    try:
+        app.run(host='0.0.0.0', port=10805)
+    finally:
+        # 确保主应用退出时终止子进程
+        recommendation_process.terminate()

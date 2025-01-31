@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>推荐记录查看</title>
+    <style>
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+        th, td {
+            border: 1px solid #ddd;
+            padding: 12px;
+            text-align: left;
+        }
+        th {
+            background-color: #f2f2f2;
+        }
+        tr:nth-child(even) {
+            background-color: #f9f9f9;
+        }
+    </style>
+</head>
+<body>
+    <h1>搜索推荐记录</h1>
+    {% if recommendations %}
+        <table>
+            <thead>
+                <tr>
+                    <th>用户邮箱</th>
+                    <th>哈希值</th>
+                    <th>搜索词</th>
+                    <th>生成时间</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for rec in recommendations %}
+                <tr>
+                    <td>{{ rec.user_email }}</td>
+                    <td class="hash">{{ rec.email_hash|truncate(10) }}</td>
+                    <td>{{ rec.search_terms }}</td>
+                    <td>{{ rec.created_at.strftime('%Y-%m-%d %H:%M') }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    {% else %}
+        <p>暂无推荐记录</p>
+    {% endif %}
+</body>
+</html>

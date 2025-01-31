@@ -240,4 +240,4 @@ if __name__ == '__main__':
     finally:
         conn.close()
 
-    app.run(host='0.0.0.0', port=10811, debug=True)
+    app.run(host='0.0.0.0', port=10811, debug=False)  # 关闭debug模式
