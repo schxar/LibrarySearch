@@ -167,6 +167,7 @@ CREATE TABLE `download_history` (
   `download_date` DATETIME,
   PRIMARY KEY (`id`)
 ) PARTITION BY HASH(id) PARTITIONS 4;
+```
 安装指南
 环境要求
 Python 3.9+
@@ -247,3 +248,192 @@ json
 
 许可协议
 本项目采用 MIT License。
+
+项目运行指南
+1. 项目结构概述
+Flask后端：处理API请求、用户认证、数据库交互 (Python实现)
+
+Spring Boot后端：实现网页爬虫和搜索功能 (Java实现)
+
+MySQL数据库：存储用户数据、搜索记录和下载历史
+
+2. 环境准备
+Python环境
+bash
+复制
+# 安装Python 3.6+
+sudo apt-get install python3.8  # Ubuntu示例
+# 安装pip
+sudo apt-get install python3-pip
+# 创建虚拟环境（推荐）
+python3 -m venv venv
+source venv/bin/activate
+Java环境
+bash
+复制
+# 安装JDK 8+
+sudo apt-get install openjdk-11-jdk  # Ubuntu示例
+# 安装Maven
+sudo apt-get install maven
+3. 数据库配置
+安装MySQL数据库
+
+bash
+复制
+sudo apt-get install mysql-server
+创建数据库
+
+sql
+复制
+CREATE DATABASE library;
+USE library;
+# 导入表结构（需执行项目中的schema.sql文件）
+SOURCE /path/to/resources/sql/schema.sql;
+修改数据库配置
+
+properties
+复制
+# Flask配置 (app.py)
+app.config['MYSQL_HOST'] = 'localhost'
+app.config['MYSQL_USER'] = 'root'
+app.config['MYSQL_PASSWORD'] = 'yourpassword'
+app.config['MYSQL_DB'] = 'library'
+
+# Spring Boot配置 (application.properties)
+spring.datasource.url=jdbc:mysql://localhost:3306/library
+spring.datasource.username=root
+spring.datasource.password=yourpassword
+4. 运行Flask后端
+bash
+复制
+cd flask_openai_backend
+
+# 安装依赖
+pip install -r requirements.txt
+
+# 配置API密钥
+echo "your_deepseek_api_key" > deepseek.txt
+
+# 设置环境变量
+echo "FLASK_DEBUG=True" > .env
+export FLASK_APP=app.py
+
+# 启动服务
+flask run --host=0.0.0.0 --port=10811
+5. 运行Spring Boot后端
+bash
+复制
+cd LibrarySearch
+
+# 构建项目
+mvn clean install
+
+# 启动应用
+mvn spring-boot:run
+6. 关键配置项
+文件下载路径 (修改app.py)
+
+python
+复制
+download_directory = "/path/to/your/books/folder"  # 确保目录存在
+ChromeDriver配置 (适用于网页爬虫)
+
+java
+复制
+// 在Java代码中配置
+System.setProperty("webdriver.chrome.driver", "/path/to/chromedriver");
+ChromeOptions options = new ChromeOptions();
+options.addArguments("--headless");  // 无头模式
+认证配置 (Clerk集成)
+
+html
+复制
+<!-- 在HTML模板中替换 -->
+<script>
+  Clerk.configure({
+    publishableKey: 'your_clerk_publishable_key'
+  });
+</script>
+运行 HTML
+7. 功能验证
+访问Flask前端
+
+复制
+http://localhost:10811
+测试用户注册/登录
+
+尝试文件下载功能
+
+提交音频转换请求
+
+测试Spring Boot接口
+
+复制
+http://localhost:8080/search?keyword=python
+8. 常见问题排查
+数据库连接失败
+
+检查3306端口是否开放
+
+验证用户权限 GRANT ALL PRIVILEGES ON library.* TO 'root'@'localhost';
+
+依赖安装问题
+
+bash
+复制
+# 清除Maven缓存
+mvn dependency:purge-local-repository
+
+# 更新Python依赖
+pip install --upgrade -r requirements.txt
+ChromeDriver问题
+
+下载对应Chrome版本的驱动：https://chromedriver.chromium.org/
+
+验证环境变量配置
+
+跨域问题
+
+在Spring Boot中添加配置
+
+java
+复制
+@Bean
+public WebMvcConfigurer corsConfigurer() {
+    return new WebMvcConfigurer() {
+        @Override
+        public void addCorsMappings(CorsRegistry registry) {
+            registry.addMapping("/**").allowedOrigins("*");
+        }
+    };
+}
+9. 系统架构示意图
+复制
+用户浏览器
+    │
+    ├──▶ Flask前端 (10811端口)
+    │     ├── 用户认证
+    │     ├── 文件下载
+    │     └── 请求管理
+    │
+    └──▶ Spring Boot后端 (8080端口)
+          ├── 网页爬虫
+          ├── 搜索服务
+          └── 数据存储
+                │
+                └── MySQL数据库
+10. 联系方式
+如遇问题，请提交issue或联系：
+
+邮箱：tschxar@gmail.com
+
+
+✅ 提示：运行前请确保：
+
+MySQL服务已启动
+
+10811和8080端口未被占用
+
+所有API密钥已正确配置
+
+ChromeDriver路径设置正确
