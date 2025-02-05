@@ -519,7 +519,7 @@ def update_status(ticket_id, status):
 
 from flask import redirect
 
-@app.route('/recommend', methods=['GET'])
+@app.route('/recommendation', methods=['GET'])
 def recommend_proxy():
     """
     将推荐服务路由代理到10811端口

@@ -179,7 +179,7 @@ def view_recommendations():
     finally:
         connection.close()
 
-@app.route('/download', methods=['POST'])
+@app.route('/downloadrc', methods=['POST'])
 def handle_download():
     """处理下载请求"""
     data = request.get_json()
