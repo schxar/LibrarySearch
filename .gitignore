@@ -42,3 +42,4 @@ flask_openai_backend/Gemini.txt
 /src/main/resources/static/SearchHistory
 /src/main/resources/static/SearchHistory
 flask_openai_backend/deepseek.txt
+src/main/resources/static/SearchHistory/search_count.txt

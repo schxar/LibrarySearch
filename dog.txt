@@ -1,0 +1,22 @@
+LibrarySearch 项目使用说明
+
+1. 项目结构：
+- 前端：基于Vite+React的TypeScript应用 (library-search-ts-vite)
+- 后端：Java Spring Boot应用 (src/main/java)
+- 辅助后端：Python Flask应用 (flask_*_backend)
+
+2. 主要功能模块：
+- 图书搜索服务 (SearchController)
+- 聊天服务 (ChatController)
+- 下载服务 (LibraryDownloadController)
+- 搜索历史记录 (SearchHistoryService)
+
+3. 运行方式：
+- 前端：进入library-search-ts-vite目录执行`npm install && npm run dev`
+- Java后端：使用`mvn spring-boot:run`启动
+- Python后端：执行对应flask应用中的app.py
+
+4. 数据存储：
+- MySQL数据库配置见src/main/resources/sql/schema.sql
+- 静态资源存储在static/目录下
+
