@@ -17,6 +17,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.io.*;
+import java.util.Arrays;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.text.SimpleDateFormat;
@@ -26,14 +27,18 @@ import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 
+import org.springframework.scheduling.annotation.EnableScheduling;
+
 @Service
+@EnableScheduling
 public class SearchServiceImpl implements SearchService {
 
-    private static final String Z_LIBRARY_SEARCH_URL = "https://zh.z-lib.gl/s/";
-    private static final String AUDIO_DIRECTORY = System.getProperty("user.dir") + "/src/main/resources/static/audio/";
-    private static final String CACHE_DIRECTORY = System.getProperty("user.dir") + "/src/main/resources/static/cache/";
-    private static final String SEARCH_HISTORY_DIRECTORY = System.getProperty("user.dir") + "/src/main/resources/static/SearchHistory/";
-    private static final String SEARCH_COUNT_FILE = System.getProperty("user.dir") + "/src/main/resources/static/SearchHistory/search_count.txt";
+    public static final String Z_LIBRARY_SEARCH_URL = "https://zh.z-lib.gl/s/";
+    public static final String AUDIO_DIRECTORY = System.getProperty("user.dir") + "/src/main/resources/static/audio/";
+    public static final String CACHE_DIRECTORY = System.getProperty("user.dir") + "/src/main/resources/static/cache/";
+    public static final int MAX_CACHE_AGE_DAYS = 7;
+    public static final String SEARCH_HISTORY_DIRECTORY = System.getProperty("user.dir") + "/src/main/resources/static/SearchHistory/";
+    public static final String SEARCH_COUNT_FILE = System.getProperty("user.dir") + "/src/main/resources/static/SearchHistory/search_count.txt";
     
     @Autowired
     private SearchHistoryMapper searchHistoryMapper;
@@ -352,7 +357,7 @@ public class SearchServiceImpl implements SearchService {
         }
     }
 
-    private void saveHtmlToCache(String query, String htmlContent) {
+    public void saveHtmlToCache(String query, String htmlContent) {
         try {
             // Ensure the cache directory exists
             File cacheDir = new File(CACHE_DIRECTORY);
