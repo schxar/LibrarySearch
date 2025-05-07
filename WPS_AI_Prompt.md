@@ -35,17 +35,30 @@ public String chatWithAI(@RequestParam String query) {
 ```
 
 2. 性能优化方案：
-- 本地文件缓存系统（自动过期机制）
+- 智能缓存预加载系统
 ```java
-// 文件缓存实现示例
-private boolean isCacheValid(File cachedFile) {
-    return cachedFile.exists() 
-        && cachedFile.isFile()
-        && (System.currentTimeMillis() - cachedFile.lastModified()) < CACHE_EXPIRE_TIME;
+// 定时预加载热门搜索
+@Scheduled(fixedRate = 60 * 60 * 1000)
+public void preloadPopularSearches() {
+    // 预加载逻辑...
 }
 ```
+- 双文件缓存机制（原始+完整DOM）
+- 自动清理过期缓存（7天保留期）
 - 异步日志处理
 - 数据库连接池配置
+
+3. 系统调度方案：
+- 定时任务管理
+```mermaid
+gantt
+    title 缓存系统调度计划
+    dateFormat  HH:mm
+    section 预加载
+    热门搜索预加载      :active,  des1, 00:00, 60m
+    section 清理
+    过期缓存清理       :crit,    des2, 03:00, 15m
+```
 
 3. 安全措施：
 - JWT认证流程

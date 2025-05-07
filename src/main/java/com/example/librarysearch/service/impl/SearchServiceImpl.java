@@ -29,15 +29,30 @@ import java.security.NoSuchAlgorithmException;
 
 import org.springframework.scheduling.annotation.EnableScheduling;
 
+/**
+ * 搜索服务实现类
+ * 提供图书搜索、搜索历史记录和缓存管理等功能
+ */
 @Service
 @EnableScheduling
 public class SearchServiceImpl implements SearchService {
 
+    /** Z-Library搜索URL */
     public static final String Z_LIBRARY_SEARCH_URL = "https://zh.z-lib.gl/s/";
+    
+    /** 音频文件存储目录 */
     public static final String AUDIO_DIRECTORY = System.getProperty("user.dir") + "/src/main/resources/static/audio/";
+    
+    /** 缓存文件存储目录 */
     public static final String CACHE_DIRECTORY = System.getProperty("user.dir") + "/src/main/resources/static/cache/";
+    
+    /** 缓存最大有效期(天) */
     public static final int MAX_CACHE_AGE_DAYS = 7;
+    
+    /** 搜索历史记录存储目录 */
     public static final String SEARCH_HISTORY_DIRECTORY = System.getProperty("user.dir") + "/src/main/resources/static/SearchHistory/";
+    
+    /** 搜索计数文件路径 */
     public static final String SEARCH_COUNT_FILE = System.getProperty("user.dir") + "/src/main/resources/static/SearchHistory/search_count.txt";
     
     @Autowired
@@ -45,6 +60,12 @@ public class SearchServiceImpl implements SearchService {
     
 
     
+    /**
+     * 执行图书搜索
+     * @param query 搜索关键词
+     * @return 包含搜索结果和其他信息的Map
+     * @throws Exception 搜索过程中可能发生的异常
+     */
     public Map<String, Object> search(String query) throws Exception {
     	 long startTime = System.currentTimeMillis();
     	
@@ -157,6 +178,11 @@ public class SearchServiceImpl implements SearchService {
         return responseMap;
     }
 
+    /**
+     * 获取热门搜索词
+     * @param topN 返回的热门搜索词数量
+     * @return 包含热门搜索词信息的列表
+     */
     public List<Map<String, Object>> getTopSearches(int topN) {
         try {
             // Get today's date for the file name
@@ -197,6 +223,10 @@ public class SearchServiceImpl implements SearchService {
     }
 
 
+    /**
+     * 记录搜索查询
+     * @param query 搜索关键词
+     */
     private void recordSearchQuery(String query) {
         try {
             // Ensure the search history directory exists
@@ -247,6 +277,11 @@ public class SearchServiceImpl implements SearchService {
         }
     }
 
+    /**
+     * 增加搜索计数
+     * @return 增加后的搜索计数
+     * @throws IOException 文件读写异常
+     */
     private int incrementSearchCount() throws IOException {
         File countFile = new File(SEARCH_COUNT_FILE);
         int count = 0;
@@ -271,6 +306,12 @@ public class SearchServiceImpl implements SearchService {
         return count;
     }
 
+    /**
+     * 排序并保存搜索历史
+     * @param searchHistory 搜索历史数据
+     * @param historyFile 历史文件
+     * @throws IOException 文件读写异常
+     */
     private void sortAndSaveHistory(Map<String, Map<String, Object>> searchHistory, File historyFile) throws IOException {
         // Sort search history by weight in descending order
         List<Map.Entry<String, Map<String, Object>>> sortedEntries = new ArrayList<>(searchHistory.entrySet());
@@ -323,6 +364,11 @@ public class SearchServiceImpl implements SearchService {
 
 
 
+    /**
+     * 对搜索词进行哈希处理
+     * @param query 搜索关键词
+     * @return 哈希后的字符串
+     */
     private String hashQuery(String query) {
         try {
             MessageDigest digest = MessageDigest.getInstance("SHA-256");
@@ -342,6 +388,11 @@ public class SearchServiceImpl implements SearchService {
     }
 
 
+    /**
+     * 从缓存加载HTML内容
+     * @param cachedFile 缓存文件
+     * @return HTML内容字符串
+     */
     private String loadHtmlFromCache(File cachedFile) {
         try (FileReader reader = new FileReader(cachedFile)) {
             StringBuilder sb = new StringBuilder();
@@ -357,6 +408,11 @@ public class SearchServiceImpl implements SearchService {
         }
     }
 
+    /**
+     * 保存HTML内容到缓存
+     * @param query 搜索关键词
+     * @param htmlContent HTML内容
+     */
     public void saveHtmlToCache(String query, String htmlContent) {
         try {
             // Ensure the cache directory exists
@@ -375,6 +431,11 @@ public class SearchServiceImpl implements SearchService {
         }
     }
 
+    /**
+     * 检查缓存是否有效
+     * @param cachedFile 缓存文件
+     * @return 缓存是否有效
+     */
     private boolean isCacheValid(File cachedFile) {
         if (cachedFile.exists() && cachedFile.isFile()) {
             long lastModified = cachedFile.lastModified();
