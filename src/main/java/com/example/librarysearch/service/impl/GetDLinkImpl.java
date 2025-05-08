@@ -69,67 +69,147 @@ public class GetDLinkImpl {
             // 定位下载按钮元素
             WebElement downloadButton = driver.findElement(By.cssSelector("a.btn.btn-default.addDownloadedBook"));
 
-            // Extract the href attribute of the download button
-            downloadUrl = downloadButton.getAttribute("href");
+            // 获取文件类型信息
+            String extension = "";
+            try {
+                WebElement fileInfo = driver.findElement(By.cssSelector("div.bookProperty.property__file div.property_value"));
+                String fileText = fileInfo.getText();
+                if (fileText != null && !fileText.isEmpty()) {
+                    extension = fileText.split(",")[0].trim().toLowerCase();
+                } else {
+                    extension = getFileExtension(bookUrl);
+                }
+            } catch (Exception e) {
+                extension = getFileExtension(bookUrl);
+            }
+            
+            // 检查目标文件夹是否已存在同名文件（不检查扩展名）
+            String downloadDir = "C:\\Users\\PC\\eclipse-workspace\\LibrarySearch\\src\\main\\resources\\static\\books";
+            File dir = new File(downloadDir);
+            File[] files = dir.listFiles();
+            if (files != null) {
+                for (File file : files) {
+                    // 检测完整书名或前20个字符匹配的文件
+                    String shortTitle = bookTitle.length() > 20 ? bookTitle.substring(0, 20) : bookTitle;
+                    if (file.getName().startsWith(bookTitle) || file.getName().startsWith(shortTitle)) {
+                        long fileSize = file.length();
+                        String sizeFormatted = fileSize < 1024 ? fileSize + " B" : 
+                            fileSize < 1024 * 1024 ? (fileSize / 1024) + " KB" : 
+                            (fileSize / (1024 * 1024)) + " MB";
+                        System.out.println("文件已存在，跳过下载: " + file.getAbsolutePath());
+                        System.out.println("本地文件信息:");
+                        System.out.println("  大小: " + sizeFormatted);
+                        System.out.println("  格式: " + getFileExtension(file.getName()));
+                        try {
+                            WebElement remoteFileInfo = driver.findElement(By.cssSelector("div.bookProperty.property__file div.property_value"));
+                            String remoteInfo = remoteFileInfo.getText();
+                            System.out.println("远程文件信息:");
+                            System.out.println("  " + remoteInfo);
+                        } catch (Exception e) {
+                            System.out.println("无法获取远程文件信息: " + e.getMessage());
+                        }
+                        // 构建与下载URL相同格式的公网URL
+                        String[] titleWords = bookTitle.split("\\s+");
+                        String searchQuery = titleWords.length > 1 ? 
+                            titleWords[0] + " " + titleWords[1] : 
+                            titleWords[0];
+                        // 限制searchQuery最多20个字符
+                        if (searchQuery.length() > 20) {
+                            searchQuery = searchQuery.substring(0, 20);
+                        }
+                        return "https://schxar.picp.vip/search?book_name=" + 
+                            java.net.URLEncoder.encode(searchQuery, "UTF-8");
+                    }
+                }
+            }
+
+            // 构建搜索URL使用书名前两个词
+            String[] titleWords = bookTitle.split("\\s+");
+            String searchQuery = titleWords.length > 1 ? 
+                titleWords[0] + " " + titleWords[1] : 
+                titleWords[0];
+            // 限制searchQuery最多20个字符
+            if (searchQuery.length() > 20) {
+                searchQuery = searchQuery.substring(0, 20);
+            }
+            downloadUrl = "https://schxar.picp.vip/search?book_name=" + 
+                java.net.URLEncoder.encode(searchQuery, "UTF-8");
 
             // 点击下载按钮触发下载
             Thread.sleep(4000); // 等待4秒确保页面加载完成
             System.out.println("已完成4000ms页面加载等待");
             downloadButton.click();
             
+            // 打印文件信息
+            try {
+                WebElement fileInfo = driver.findElement(By.cssSelector("div.bookProperty.property__file div.property_value"));
+                String fileText = fileInfo.getText();
+                System.out.println("File Info: " + fileText);
+            } catch (Exception e) {
+                System.out.println("无法获取文件信息: " + e.getMessage());
+            }
+            
             // 初始等待，确保.crdownload文件创建
             System.out.println("等待10秒确保下载启动...");
             Thread.sleep(10000);
             
-            // 提取书名前两个单词作为匹配模式
-            String[] words = bookTitle.split(" ");
-            String firstWord = words[0].replaceAll("[^a-zA-Z0-9]", "_");
-            String secondWord = words.length > 1 ? words[1].replaceAll("[^a-zA-Z0-9]", "_") : "";
-            String fileNamePattern = firstWord + (secondWord.isEmpty() ? "" : "_" + secondWord);
-            System.out.println("正在查找匹配文件: " + fileNamePattern);
-            
-            // 检查下载目录中的文件
-            fileNamePattern += "*." + getFileExtension(bookUrl);
-            String downloadDir = "C:\\Users\\PC\\eclipse-workspace\\LibrarySearch\\src\\main\\resources\\static\\books";
-            File dir = new File(downloadDir);
+            // 优化下载检测逻辑
             long startTime = System.currentTimeMillis();
             long timeout = 120000; // 2分钟超时
             boolean downloadStarted = false;
             
             while (System.currentTimeMillis() - startTime < timeout) {
-                boolean fileFound = false;
-                File[] files = dir.listFiles();
-                if (files != null) {
-                    for (File file : files) {
-                        // 检查.crdownload文件或匹配文件名模式
-                        if (file.getName().endsWith(".crdownload") || 
-                            file.getName().toLowerCase().matches(fileNamePattern.toLowerCase().replace("*", ".*"))) {
-                            fileFound = true;
+                File[] downloadingFiles = dir.listFiles();
+                if (downloadingFiles != null) {
+                    boolean shouldBreak = false;
+                    for (File file : downloadingFiles) {
+                        // 检测.crdownload文件
+                        if (file.getName().endsWith(".crdownload")) {
+                            downloadStarted = true;
+                            System.out.println("检测到下载中文件...");
+                            // 不立即返回，继续等待下载完成
+                            continue;
+                        }
+                        // 检测完整书名文件
+                        if (file.getName().startsWith(bookTitle)) {
+                            System.out.println("检测到完整书名文件已存在");
+                            shouldBreak = true;
+                            break;
+                        }
+                        // 检测书名前两个词文件
+                        
+                        if (titleWords.length > 1 && file.getName().startsWith(titleWords[0] + " " + titleWords[1])) {
+                            System.out.println("检测到书名关键词文件已存在");
+                            shouldBreak = true;
+                            break;
+                        }
+                        // 新增书名前20个字符模糊搜索
+                        String shortTitle = bookTitle.length() > 20 ? bookTitle.substring(0, 20) : bookTitle;
+                        if (file.getName().startsWith(shortTitle)) {
+                            System.out.println("检测到书名前20个字符匹配文件已存在");
+                            shouldBreak = true;
                             break;
                         }
                     }
+                    if (shouldBreak) break;
                 }
                 
-                if (fileFound) {
-                    downloadStarted = true;
-                    System.out.println("检测到相关文件，下载仍在进行中...");
-                } else if (downloadStarted) {
-                    System.out.println("下载已完成：相关文件已存在");
-                    break;
-                } else {
-                    System.out.println("未检测到相关文件，等待5秒后重试...");
+                if (!downloadStarted) {
+                    System.out.println("等待下载开始...");
                 }
                 
-                Thread.sleep(5000); // 每5秒检查一次
+                Thread.sleep(2000); // 每2秒检查一次
             }
             
-            System.out.println("下载等待完成，总耗时: " + (System.currentTimeMillis() - startTime) + "ms");
+            System.out.println("下载检测完成，总耗时: " + (System.currentTimeMillis() - startTime) + "ms");
         } catch (Exception e) {
             System.err.println("Error retrieving or clicking download URL for book: " + bookUrl + " - " + e.getMessage());
         } finally {
-            // 关闭WebDriver释放资源
-            System.out.println("Shutting Down Webdriver.");
-            driver.quit();
+            if (driver != null) {
+                // 关闭WebDriver释放资源
+                System.out.println("Shutting Down Webdriver.");
+                driver.quit();
+            }
         }
 
         return downloadUrl;

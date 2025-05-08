@@ -47,7 +47,7 @@ public class SearchServiceImpl implements SearchService {
     public static final String CACHE_DIRECTORY = System.getProperty("user.dir") + "/src/main/resources/static/cache/";
     
     /** 缓存最大有效期(天) */
-    public static final int MAX_CACHE_AGE_DAYS = 7;
+    public static final int MAX_CACHE_AGE_DAYS = 1; // 缓存保留1天
     
     /** 搜索历史记录存储目录 */
     public static final String SEARCH_HISTORY_DIRECTORY = System.getProperty("user.dir") + "/src/main/resources/static/SearchHistory/";

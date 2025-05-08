@@ -21,11 +21,17 @@ public class CachePreloaderTask {
     @Autowired
     private SearchServiceImpl searchService;
 
-    // 每小时执行一次预加载
-    // 每小时预加载一次热门搜索
-    @Scheduled(fixedRate = 60 * 60 * 1000)
+    // 每6小时执行一次预加载
+    @Scheduled(fixedRate = 6 * 60 * 60 * 1000)
     public void preloadPopularSearches() {
-        cleanOldCache(); // 先清理旧缓存
+        // 不再每次清理缓存，由定时任务单独处理
+        if (new File(SearchServiceImpl.CACHE_DIRECTORY).exists()) {
+            // 如果缓存目录已存在且有文件，则跳过预加载
+            if (new File(SearchServiceImpl.CACHE_DIRECTORY).list().length > 0) {
+                System.out.println("缓存已存在，跳过预加载");
+                return;
+            }
+        }
         // 获取热门搜索词（前10个）
         List<String> popularQueries = getPopularQueries(10);
         

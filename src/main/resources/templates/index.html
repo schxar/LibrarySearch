@@ -4,6 +4,48 @@
     <meta charset="UTF-8">
     <title>OpenDelta Z Library Search</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        body {
+            background-color: #121212; /* 深色背景 */
+            color: #e0e0e0; /* 浅灰色文字 */
+        }
+        .list-group-item {
+            background-color: #1e1e1e; /* 深灰色背景 */
+            border-color: #333;
+            color: #e0e0e0;
+        }
+        .card {
+            background-color: #1e1e1e;
+            color: #e0e0e0;
+        }
+        .navbar {
+            background-color: #1a1a1a;
+        }
+        .btn-primary {
+            background-color: #1976d2;
+            border-color: #1976d2;
+        }
+        .btn-success {
+            background-color: #388e3c;
+            border-color: #388e3c;
+        }
+        .btn-warning {
+            background-color: #ffa000;
+            border-color: #ffa000;
+        }
+        .alert {
+            background-color: #1e1e1e;
+            border-color: #333;
+        }
+        .form-control {
+            background-color: #1e1e1e;
+            border-color: #333;
+            color: #e0e0e0;
+        }
+        .form-control:disabled {
+            background-color: #2d2d2d;
+        }
+    </style>
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     
     <!-- Clerk SDK -->
@@ -158,9 +200,16 @@
                                         <button class="btn btn-primary download-button" data-book-url="${item.book_url}" ${Clerk.user ? "" : "disabled"}>Download To Flask File Server</button>
                                         <div class="download-info" style="display:none;"></div>
 
-                                        <!-- Add PDF and EPUB download buttons with dynamic search URL -->
-                                        <a href="${searchUrl}" target="_blank" class="btn btn-success mt-2" ${Clerk.user ? "" : "disabled"}>Download PDF From File Server</a>
-                                        <a href="${searchUrl}" target="_blank" class="btn btn-info mt-2" ${Clerk.user ? "" : "disabled"}>Download EPUB From File Server</a>
+                                        <!-- Single download button with improved styling -->
+                                        <div class="mt-2">
+                                            <a href="${searchUrl}" target="_blank" class="btn btn-primary position-relative" ${Clerk.user ? "" : "disabled"} style="min-width: 200px;">
+                                                <i class="bi bi-download me-2"></i>Download From File Server
+                                                <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-success">
+                                                    PDF/EPUB
+                                                    <span class="visually-hidden">available formats</span>
+                                                </span>
+                                            </a>
+                                        </div>
 
                                         <!-- Add audio playback button and container -->
                                         ${item.audioExists === "true" ? `
