@@ -110,9 +110,50 @@ def generate_hash(input_string):
     """生成SHA-256哈希值"""
     return hashlib.sha256(input_string.encode('utf-8')).hexdigest()
 
+def check_tables(conn):
+    """检查所有需要的表是否存在，不存在则创建"""
+    with conn.cursor() as cursor:
+        # 检查并创建DownloadHistory表
+        cursor.execute('''
+            CREATE TABLE IF NOT EXISTS DownloadHistory (
+                id INT AUTO_INCREMENT PRIMARY KEY,
+                user_email VARCHAR(255) NOT NULL,
+                filename VARCHAR(255) NOT NULL,
+                email_hash VARCHAR(64) NOT NULL,
+                filename_hash VARCHAR(64) NOT NULL,
+                download_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+            ) CHARSET=utf8mb4;
+        ''')
+        
+        # 检查并创建SearchRecommendations表
+        cursor.execute('''
+            CREATE TABLE IF NOT EXISTS SearchRecommendations (
+                id INT AUTO_INCREMENT PRIMARY KEY,
+                user_email VARCHAR(255) NOT NULL,
+                email_hash VARCHAR(64) NOT NULL,
+                search_terms TEXT NOT NULL,
+                created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+            ) CHARSET=utf8mb4;
+        ''')
+        
+        # 检查并创建NotebookLMAudioRequests表
+        cursor.execute('''
+            CREATE TABLE IF NOT EXISTS NotebookLMAudioRequests (
+                id INT AUTO_INCREMENT PRIMARY KEY,
+                book_title VARCHAR(255) NOT NULL,
+                book_hash VARCHAR(64) NOT NULL,
+                request_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                clerk_user_email VARCHAR(255) NOT NULL,
+                status ENUM('pending', 'processing', 'completed') DEFAULT 'pending'
+            ) CHARSET=utf8mb4;
+        ''')
+        conn.commit()
+
 def get_db_connection():
-    """获取数据库连接"""
-    return pymysql.connect(**DB_CONFIG)
+    """获取数据库连接并确保表存在"""
+    conn = pymysql.connect(**DB_CONFIG)
+    check_tables(conn)
+    return conn
 
 def clean_recommendations(raw_text):
     """智能清洗推荐结果"""
@@ -224,6 +265,16 @@ HTML_LOGIN = """
         data: { email: Clerk.user.emailAddresses[0].emailAddress },
         success: function(response) {
             console.log('Session set:', response);
+            
+            // 检查是否从搜索页面返回
+            if(document.referrer.indexOf('/search') > -1) {
+                // 显示已登录提示和返回按钮
+                $("#app").append(`
+                    <div class="alert alert-success mt-3">
+                        您已成功登录，请<a href="${document.referrer}" class="alert-link">返回搜索页面</a>重试下载
+                    </div>
+                `);
+            }
         },
         error: function(error) {
             console.error('Failed to set session:', error);
@@ -391,7 +442,7 @@ def search_books():
         decoded_book_name,  # 原始搜索词
         ' '.join(decoded_book_name.split()[:2]) if len(decoded_book_name.split()) > 2 else None,  # 前两个词
         decoded_book_name.split()[0] if len(decoded_book_name.split()) >= 1 else None,  # 第一个词
-        decoded_book_name[:4] if len(decoded_book_name) >= 4 else None  # 前四个字母
+        decoded_book_name[:4] if len(decoded_book_name) >= 4 else None,  # 前四个字母
         decoded_book_name[:2] if len(decoded_book_name) >= 2 else None,  # 前两个字母
         decoded_book_name.split(' ')[0] if ' ' in decoded_book_name else None,  # 第一个词方法2
     ]

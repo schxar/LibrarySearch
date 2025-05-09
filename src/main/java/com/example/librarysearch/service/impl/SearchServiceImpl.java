@@ -17,7 +17,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.io.*;
-import java.util.Arrays;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.text.SimpleDateFormat;
@@ -94,11 +93,17 @@ public class SearchServiceImpl implements SearchService {
             ChromeOptions options = new ChromeOptions();
             
             // Specify the path to the user data directory using %USERPROFILE%
-            String userProfile = System.getenv("USERPROFILE");
-            options.addArguments("user-data-dir=" + userProfile + "\\AppData\\Local\\Google\\Chrome\\User Data");
-            
-            options.addArguments("--headless");
+            //String userProfile = System.getenv("USERPROFILE");
+            //options.addArguments("user-data-dir=" + userProfile + "\\AppData\\Local\\Google\\Chrome\\User Data");
+            // 替代方案：使用临时profile目录
+            //String tempProfileDir = System.getProperty("java.io.tmpdir") + "chrome-profile";
+            //options.addArguments("user-data-dir=" + tempProfileDir);
+            // 使用项目内的持久化profile目录
+            String profileDir = new File("chrome-profiles/GetDLinkImpl").getAbsolutePath();
+            options.addArguments("user-data-dir=" + profileDir);
+            //options.addArguments("--headless");
             options.addArguments("--disable-gpu");
+            options.addArguments("--remote-debugging-port=9222");
             options.addArguments("--no-sandbox");
             options.addArguments("--disable-dev-shm-usage");
 
@@ -224,11 +229,34 @@ public class SearchServiceImpl implements SearchService {
 
 
     /**
+     * 检查并创建所有需要的表
+     */
+    private void checkTables() {
+        try {
+            // 确保目录存在
+            new File(SEARCH_HISTORY_DIRECTORY).mkdirs();
+            new File(CACHE_DIRECTORY).mkdirs();
+            
+            // 检查并创建搜索历史表
+            searchHistoryMapper.createSearchHistoryTableIfNotExists();
+            
+            // 其他表检查逻辑可以在这里添加
+            System.out.println("所有表结构验证完成");
+        } catch (Exception e) {
+            System.err.println("表结构验证失败: " + e.getMessage());
+            throw new RuntimeException("数据库表初始化失败", e);
+        }
+    }
+
+    /**
      * 记录搜索查询
      * @param query 搜索关键词
      */
     private void recordSearchQuery(String query) {
         try {
+            // 确保表存在
+            checkTables();
+            
             // Ensure the search history directory exists
             File historyDir = new File(SEARCH_HISTORY_DIRECTORY);
             if (!historyDir.exists()) {
@@ -283,6 +311,8 @@ public class SearchServiceImpl implements SearchService {
      * @throws IOException 文件读写异常
      */
     private int incrementSearchCount() throws IOException {
+        // 确保表存在
+        checkTables();
         File countFile = new File(SEARCH_COUNT_FILE);
         int count = 0;
 
@@ -415,6 +445,9 @@ public class SearchServiceImpl implements SearchService {
      */
     public void saveHtmlToCache(String query, String htmlContent) {
         try {
+            // 确保表存在
+            checkTables();
+            
             // Ensure the cache directory exists
             File cacheDir = new File(CACHE_DIRECTORY);
             if (!cacheDir.exists()) {

@@ -7,7 +7,6 @@ import org.openqa.selenium.chrome.ChromeDriver;
 import org.openqa.selenium.chrome.ChromeOptions;
 import org.springframework.stereotype.Service;
 import java.io.File;
-import java.util.Arrays;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -28,11 +27,13 @@ public class GetDLinkImpl {
         ChromeOptions options = new ChromeOptions();
 
         // Specify the path to the user data directory using %USERPROFILE%
-        String userProfile = System.getenv("USERPROFILE");
-        options.addArguments("user-data-dir=" + userProfile + "\\AppData\\Local\\Google\\Chrome\\User Data");
-        
+        //String userProfile = System.getenv("USERPROFILE");
+        //options.addArguments("user-data-dir=" + userProfile + "\\AppData\\Local\\Google\\Chrome\\User Data");
+        // 使用项目内的持久化profile目录
+        String profileDir = new File("chrome-profiles/GetDLinkImpl").getAbsolutePath();
+        options.addArguments("user-data-dir=" + profileDir);
         // Remove "--headless" if you want to see browser actions
-        options.addArguments("--headless"); 
+        //options.addArguments("--headless"); 
         options.addArguments("--disable-gpu");
         options.addArguments("--no-sandbox");
         options.addArguments("--disable-dev-shm-usage");
@@ -44,7 +45,7 @@ public class GetDLinkImpl {
         try {
             // 首先访问下载页面获取限额
             driver.get("https://zh.z-lib.gl/users/downloads");
-            Thread.sleep(2000); // 等待2秒确保页面加载
+            Thread.sleep(2000);
             
             // 获取下载限额和刷新时间信息
             try {
@@ -90,9 +91,8 @@ public class GetDLinkImpl {
                 System.out.println("无法获取下载信息: " + e.getMessage());
             }
             
-            // 然后导航到目标书籍页面
+            // 导航到目标书籍页面
             driver.get(bookUrl);
-            Thread.sleep(2000); // 等待2秒确保页面加载
 
             // 检查是否需要登录
             try {
@@ -100,12 +100,13 @@ public class GetDLinkImpl {
                 if (loginElement != null) {
                     // Open the login window
                     loginElement.click();
-
+                    Thread.sleep(600000);
 
 
                     // Wait for the page to load after login
                     Thread.sleep(2000); // Adjust this sleep time as needed
                     System.out.println("请打开Chrome进行登录操作，然后关闭窗口重启Java后端  并再次点击下载到flask文件服务器。");
+                    Thread.sleep(600000);
                 }
             } catch (Exception e) {
                 System.out.println("No login required, proceeding to fetch download link.");
@@ -203,11 +204,12 @@ public class GetDLinkImpl {
             System.out.println("等待10秒确保下载启动...");
             Thread.sleep(10000);
             
-            // 优化下载检测逻辑
+            // 增强版下载检测逻辑
             long startTime = System.currentTimeMillis();
-            long timeout = 180000; // 3分钟超时
+            long timeout = 300000; // 5分钟超时(大文件需要更长时间)
             boolean downloadStarted = false;
-            long minExpectedSize = 100 * 1024; // 最小期望文件大小100KB
+            long lastFileSize = 0;
+            int noProgressCount = 0;
             
             while (System.currentTimeMillis() - startTime < timeout) {
                 File[] downloadingFiles = dir.listFiles();
@@ -217,62 +219,63 @@ public class GetDLinkImpl {
                         // 检测.crdownload文件
                         if (file.getName().endsWith(".crdownload")) {
                             downloadStarted = true;
-                            System.out.println("检测到下载中文件: " + file.getName() + " (" + file.length() + " bytes)");
-                            continue;
-                        }
-                        
-                        // 检查文件大小是否达到最小期望值
-                        if (file.length() < minExpectedSize) {
-                            System.out.println("文件过小，跳过: " + file.getName() + " (" + file.length() + " bytes)");
-                            continue;
-                        }
-                        
-                        // 增强文件名匹配逻辑
-                        String normalizedBookTitle = bookTitle.replaceAll("[^a-zA-Z0-9\\s\\p{L}]", "").toLowerCase();
-                        String normalizedFileName = file.getName().replaceAll("[^a-zA-Z0-9\\s\\p{L}]", "").toLowerCase();
-                        
-                        // 1. 检测完整书名匹配（相似度>90%）
-                        if (calculateSimilarity(normalizedFileName, normalizedBookTitle) > 0.9) {
-                            System.out.println("检测到完整书名匹配文件: " + file.getName());
-                            shouldBreak = true;
-                            break;
-                        }
-                        
-                        // 2. 检测关键特征词匹配
-                        String[] keywords = extractKeywords(normalizedBookTitle);
-                        boolean allKeywordsMatch = true;
-                        for (String keyword : keywords) {
-                            if (!normalizedFileName.contains(keyword)) {
-                                allKeywordsMatch = false;
-                                break;
+                            long currentSize = file.length();
+                            if (currentSize > lastFileSize) {
+                                System.out.println(String.format("下载中... 当前大小: %.2fMB", currentSize/1024.0/1024.0));
+                                lastFileSize = currentSize;
+                                noProgressCount = 0;
+                            } else {
+                                noProgressCount++;
+                                if (noProgressCount > 3) {
+                                    System.out.println("警告: 下载进度已停滞超过6秒");
+                                }
                             }
+                            continue;
                         }
-                        if (allKeywordsMatch && keywords.length > 0) {
-                            System.out.println("检测到关键特征词匹配文件: " + file.getName());
+                        
+                        // 检测完整书名文件
+                        if (file.getName().startsWith(bookTitle)) {
+                            System.out.println("检测到完整书名文件已存在");
                             shouldBreak = true;
                             break;
                         }
                         
-                        // 3. 检测书名前30个字符匹配（提高阈值）
-                        String shortTitle = normalizedBookTitle.length() > 30 ? 
-                            normalizedBookTitle.substring(0, 30) : normalizedBookTitle;
-                        if (normalizedFileName.contains(shortTitle) && shortTitle.length() >= 10) {
-                            System.out.println("检测到书名前30字符匹配文件: " + file.getName());
+                        // 检测书名前两个词文件
+                        if (titleWords.length > 1 && file.getName().startsWith(titleWords[0] + " " + titleWords[1])) {
+                            System.out.println("检测到书名关键词文件已存在");
+                            shouldBreak = true;
+                            break;
+                        }
+                        
+                        // 检测书名前20个字符模糊搜索
+                        String shortTitle = bookTitle.length() > 20 ? bookTitle.substring(0, 20) : bookTitle;
+                        if (file.getName().startsWith(shortTitle)) {
+                            System.out.println("检测到书名前20个字符匹配文件已存在");
                             shouldBreak = true;
                             break;
                         }
                     }
                     if (shouldBreak) break;
+                    
+                    // 检查是否长时间无进展
+                    if (noProgressCount > 10) { // 20秒无进展
+                        System.out.println("下载停滞超过20秒，可能已失败");
+                        break;
+                    }
                 }
                 
                 if (!downloadStarted) {
-                    System.out.println("等待下载开始...剩余时间: " + (timeout - (System.currentTimeMillis() - startTime)) + "ms");
+                    System.out.println("等待下载开始...");
                 }
                 
-                Thread.sleep(3000); // 每3秒检查一次
+                Thread.sleep(2000); // 每2秒检查一次
             }
             
-            System.out.println("下载检测完成，总耗时: " + (System.currentTimeMillis() - startTime) + "ms");
+            if (System.currentTimeMillis() - startTime >= timeout) {
+                System.out.println("下载超时，请检查网络连接或尝试重新下载");
+            } else {
+                System.out.println("下载检测完成，总耗时: " + (System.currentTimeMillis() - startTime) + "ms");
+            }
         } catch (Exception e) {
             System.err.println("Error retrieving or clicking download URL for book: " + bookUrl + " - " + e.getMessage());
         } finally {
@@ -299,58 +302,5 @@ public class GetDLinkImpl {
             return matcher.group(1);
         }
         return "pdf"; // 默认扩展名
-    }
-    
-    /**
-     * 计算两个字符串的相似度（Levenshtein距离）
-     */
-    private double calculateSimilarity(String s1, String s2) {
-        int maxLength = Math.max(s1.length(), s2.length());
-        if (maxLength == 0) return 1.0;
-        return (maxLength - calculateLevenshteinDistance(s1, s2)) / (double) maxLength;
-    }
-    
-    /**
-     * 计算Levenshtein距离
-     */
-    private int calculateLevenshteinDistance(String s1, String s2) {
-        int[][] dp = new int[s1.length() + 1][s2.length() + 1];
-        
-        for (int i = 0; i <= s1.length(); i++) {
-            dp[i][0] = i;
-        }
-        
-        for (int j = 0; j <= s2.length(); j++) {
-            dp[0][j] = j;
-        }
-        
-        for (int i = 1; i <= s1.length(); i++) {
-            for (int j = 1; j <= s2.length(); j++) {
-                int cost = (s1.charAt(i - 1) == s2.charAt(j - 1)) ? 0 : 1;
-                dp[i][j] = Math.min(
-                    Math.min(dp[i - 1][j] + 1, dp[i][j - 1] + 1),
-                    dp[i - 1][j - 1] + cost
-                );
-            }
-        }
-        
-        return dp[s1.length()][s2.length()];
-    }
-    
-    /**
-     * 从书名中提取关键特征词
-     */
-    private String[] extractKeywords(String title) {
-        // 过滤掉常见无意义词
-        String[] stopWords = {"the", "and", "of", "in", "a", "to", "for", "with", "on", "at"};
-        String filtered = title;
-        for (String word : stopWords) {
-            filtered = filtered.replaceAll("\\b" + word + "\\b", "");
-        }
-        
-        // 提取长度大于3的词作为关键词
-        return Arrays.stream(filtered.split("\\s+"))
-            .filter(word -> word.length() > 3)
-            .toArray(String[]::new);
     }
 }
