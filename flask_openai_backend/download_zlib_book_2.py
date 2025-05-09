@@ -5,12 +5,31 @@ from math import ceil
 import mysql.connector
 import hashlib
 from datetime import datetime
+from openai import OpenAI
+import pymysql
+import re
+import traceback
+from dotenv import load_dotenv
 
+
+# 加载环境变量
+load_dotenv()
 
 app = Flask(__name__)
+app.config['SECRET_KEY'] = os.getenv('FLASK_SECRET_KEY', 'your_secret_key')
 
-# 设置SECRET_KEY用于session
-app.config['SECRET_KEY'] = 'your_secret_key'
+# DeepSeek客户端配置
+try:
+    with open("flask_openai_backend/deepseek.txt", "r") as f:
+        DeepSeek_API_KEY = f.read().strip()
+    
+    deepseek_client = OpenAI(
+        api_key=DeepSeek_API_KEY,
+        base_url="https://api.deepseek.com"
+    )
+except Exception as e:
+    print(f"DeepSeek初始化失败: {str(e)}")
+    deepseek_client = None
 
 # 自定义下载目录
 download_directory = os.path.join(os.getcwd(), "C:\\Users\\PC\\eclipse-workspace\\LibrarySearch\\src\\main\\resources\\static\\books")
@@ -18,11 +37,13 @@ if not os.path.exists(download_directory):
     os.makedirs(download_directory)
 
 # 数据库配置
-db_config = {
+DB_CONFIG = {
     'host': 'localhost',
     'user': 'root',
     'password': '13380008373',
-    'database': 'library'
+    'database': 'library',
+    'charset': 'utf8mb4',
+    'cursorclass': pymysql.cursors.DictCursor
 }
 
 import atexit
@@ -84,10 +105,31 @@ def remove_duplicate_files(directory):
                 os.remove(os.path.join(directory, f))
                 print(f"已删除旧文件: {f}")
 
-# 连接数据库
+# 工具函数
+def generate_hash(input_string):
+    """生成SHA-256哈希值"""
+    return hashlib.sha256(input_string.encode('utf-8')).hexdigest()
+
 def get_db_connection():
-    conn = mysql.connector.connect(**db_config)
-    return conn
+    """获取数据库连接"""
+    return pymysql.connect(**DB_CONFIG)
+
+def clean_recommendations(raw_text):
+    """智能清洗推荐结果"""
+    try:
+        cleaned = re.sub(r'[^\u4e00-\u9fa5a-zA-Z0-9\-\s，,;；、]', '', raw_text)
+        
+        if "：" in cleaned:
+            cleaned = cleaned.split("：")[-1]
+        elif ":" in cleaned:
+            cleaned = cleaned.split(":")[-1]
+            
+        cleaned = re.sub(r'[,\s;；、]+', '，', cleaned)
+        terms = [term.strip() for term in cleaned.split('，') if term.strip()]
+        return terms[:10]
+    except Exception as e:
+        app.logger.error(f"清洗异常: {str(e)}")
+        return []
 
 # 创建工单表
 def create_table():
@@ -149,6 +191,12 @@ HTML_LOGIN = """
         <button class="btn btn-primary" onclick="window.location.href='/filemainpage'">Go to File Main Page</button>
     </div>
 
+    <!-- Recommendation Buttons (Hidden by default, shown after login) -->
+    <div id="recommendationButtons" class="mt-4" style="display: none;">
+        <button class="btn btn-info me-2" onclick="window.location.href='/recommend'">Get Recommendations</button>
+        <button class="btn btn-secondary" onclick="window.location.href='/view_recommendations'">View Recommendation History</button>
+    </div>
+
     <!-- New Button for NotebookLM -->
     <div class="mt-4 text-center">
         <a href="https://notebooklm.google.com/" target="_blank" class="btn btn-success">Go to NotebookLM</a>
@@ -165,8 +213,9 @@ HTML_LOGIN = """
                 document.getElementById('app').innerHTML = '<div id="user-button"></div>';
                 Clerk.mountUserButton(document.getElementById('user-button'));
 
-                // Show the file main page button for logged-in users
+                // Show the buttons for logged-in users
                 $("#fileMainButton").show();
+                $("#recommendationButtons").show();
 
     // Set session user_email
     $.ajax({
@@ -327,12 +376,37 @@ def submit_ticket():
 # 搜索文件夹中的关键词
 @app.route('/search', methods=['GET'])
 def search_books():
+    from urllib.parse import unquote
+    
     book_name = request.args.get('book_name')
     if not book_name:
         return jsonify({"error": "book_name is required"}), 400
+        
+    # 解码URL编码的特殊字符
+    decoded_book_name = unquote(book_name)
+    print(f"原始搜索词: {book_name}, 解码后: {decoded_book_name}")
 
-    # 使用 glob 模糊匹配文件名
-    pattern = os.path.join(download_directory, f"*{book_name}*")
+    # 多级回退搜索策略
+    search_terms = [
+        decoded_book_name,  # 原始搜索词
+        ' '.join(decoded_book_name.split()[:2]) if len(decoded_book_name.split()) > 2 else None,  # 前两个词
+        decoded_book_name.split()[0] if len(decoded_book_name.split()) >= 1 else None,  # 第一个词
+        decoded_book_name[:4] if len(decoded_book_name) >= 4 else None  # 前四个字母
+        decoded_book_name[:2] if len(decoded_book_name) >= 2 else None,  # 前两个字母
+        decoded_book_name.split(' ')[0] if ' ' in decoded_book_name else None,  # 第一个词方法2
+    ]
+    
+    # 移除None值
+    search_terms = [term for term in search_terms if term is not None]
+    
+    matching_files = []
+    for term in search_terms:
+        pattern = os.path.join(download_directory, f"*{term}*")
+        current_matches = glob.glob(pattern)
+        if current_matches:
+            matching_files.extend(current_matches)
+            print(f"使用搜索词 '{term}' 找到 {len(current_matches)} 个匹配文件")
+            break  # 找到匹配就停止
     matching_files = glob.glob(pattern)
 
     if matching_files:
@@ -517,29 +591,177 @@ def update_status(ticket_id, status):
     conn.close()
     return redirect(url_for('tickets'))
 
-from flask import redirect
-
-@app.route('/recommendation', methods=['GET'])
-def recommend_proxy():
-    """
-    将推荐服务路由代理到10811端口
-    """
-    return redirect('http://localhost:10811' + request.full_path)
-
 import subprocess
 
+# 添加推荐服务路由
+@app.route('/recommend', methods=['GET', 'POST'])
+def recommendation_form():
+    """推荐查询表单页面"""
+    if request.method == 'POST':
+        user_email = request.form.get('user_email')
+        if not user_email:
+            return render_template('form.html', error="邮箱不能为空")
+
+        email_hash = generate_hash(user_email)
+        try:
+            connection = get_db_connection()
+            with connection.cursor() as cursor:
+                sql = """SELECT filename FROM DownloadHistory 
+                        WHERE email_hash = %s 
+                        ORDER BY download_date DESC LIMIT 50"""
+                cursor.execute(sql, (email_hash,))
+                history = [row['filename'] for row in cursor.fetchall()]
+                
+                if not history:
+                    return render_template('form.html', error="没有找到下载记录")
+        except Exception as e:
+            app.logger.error(f"数据库查询失败: {str(e)}")
+            return render_template('form.html', error="查询历史记录失败")
+        finally:
+            connection.close()
+
+        prompt = f"""根据以下文件下载记录（按时间倒序），分析用户兴趣并生成5个搜索关键词：
+        {', '.join(history)}
+        推荐关键词："""
+
+        try:
+            if not deepseek_client:
+                raise Exception("DeepSeek客户端未初始化")
+                
+            response = deepseek_client.chat.completions.create(
+                model="deepseek-chat",
+                messages=[
+                    {"role": "system", "content": "你是一个专业的用户行为分析师"},
+                    {"role": "user", "content": prompt}
+                ],
+                temperature=0.7
+            )
+            raw_recommendations = response.choices[0].message.content.strip()
+            
+            terms_pool = clean_recommendations(raw_recommendations)
+            clean_terms = []
+            for term in terms_pool:
+                if re.search(r'[\u4e00-\u9fa5]', term):
+                    clean_term = re.sub(r'[^\u4e00-\u9fa5\-]', '', term)
+                    if 2 <= len(clean_term) <= 10:
+                        clean_terms.append(clean_term)
+                else:
+                    clean_term = re.sub(r'[^a-zA-Z0-9\- ]', '', term).strip()
+                    if len(clean_term.split()) >= 2:
+                        clean_terms.append(clean_term)
+
+            # 空值处理机制
+            if not clean_terms:
+                app.logger.warning("清洗后关键词为空，使用备选方案")
+                clean_terms = ["学术论文", "研究报告", "技术文档"]
+            elif len(clean_terms) < 3:
+                fallback_terms = list(set([
+                    re.sub(r'[^a-zA-Z0-9\u4e00-\u9fa5]', '', f.split('__')[0].split('(')[0].strip())
+                    for f in history
+                ]))[:5]
+                clean_terms += fallback_terms[:3-len(clean_terms)]
+
+            final_terms = clean_terms[:5]
+
+            # 写入数据库
+            try:
+                conn = get_db_connection()
+                with conn.cursor() as cursor:
+                    sql = """INSERT INTO SearchRecommendations 
+                            (user_email, email_hash, search_terms)
+                            VALUES (%s, %s, %s)"""
+                    app.logger.debug(f"插入数据: {user_email}, {email_hash}, {final_terms}")
+                    cursor.execute(sql, (
+                        user_email, 
+                        email_hash, 
+                        ','.join(final_terms)
+                    ))
+                conn.commit()
+                app.logger.info(f"成功存储推荐: {user_email}")
+            except Exception as e:
+                app.logger.error(f"数据库写入失败: {str(e)}")
+                app.logger.error(traceback.format_exc())
+            finally:
+                conn.close()
+
+            return render_template('result.html',
+                                 email=user_email,
+                                 recommendations=final_terms,
+                                 generated_at=datetime.now().strftime('%Y-%m-%d %H:%M:%S'))
+        except Exception as e:
+            app.logger.error(f"API调用失败: {str(e)}")
+            return render_template('form.html', error="推荐生成失败，请稍后重试")
+
+    return render_template('form.html')
+
+@app.route('/view_recommendations')
+def view_recommendations():
+    """查看推荐记录"""
+    try:
+        connection = get_db_connection()
+        with connection.cursor() as cursor:
+            sql = """SELECT * FROM SearchRecommendations 
+                    ORDER BY created_at DESC LIMIT 100"""
+            cursor.execute(sql)
+            records = cursor.fetchall()
+            
+        return render_template('view_recommendations.html',
+                             recommendations=records)
+    except Exception as e:
+        app.logger.error(f"记录查询失败: {str(e)}")
+        return render_template('error.html', error="无法获取推荐记录")
+    finally:
+        connection.close()
+
 if __name__ == '__main__':
-    create_table()
+    # 创建所有需要的表
+    try:
+        conn = get_db_connection()
+        with conn.cursor() as cursor:
+            # 创建下载历史表
+            cursor.execute('''
+                CREATE TABLE IF NOT EXISTS DownloadHistory (
+                    id INT AUTO_INCREMENT PRIMARY KEY,
+                    user_email VARCHAR(255) NOT NULL,
+                    filename VARCHAR(255) NOT NULL,
+                    email_hash VARCHAR(64) NOT NULL,
+                    filename_hash VARCHAR(64) NOT NULL,
+                    download_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+                ) CHARSET=utf8mb4;
+            ''')
+            
+            # 创建推荐记录表
+            cursor.execute('''
+                CREATE TABLE IF NOT EXISTS SearchRecommendations (
+                    id INT AUTO_INCREMENT PRIMARY KEY,
+                    user_email VARCHAR(255) NOT NULL,
+                    email_hash VARCHAR(64) NOT NULL,
+                    search_terms TEXT NOT NULL,
+                    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+                ) CHARSET=utf8mb4;
+            ''')
+            
+            # 创建NotebookLM请求表
+            cursor.execute('''
+                CREATE TABLE IF NOT EXISTS NotebookLMAudioRequests (
+                    id INT AUTO_INCREMENT PRIMARY KEY,
+                    book_title VARCHAR(255) NOT NULL,
+                    book_hash VARCHAR(64) NOT NULL,
+                    request_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                    clerk_user_email VARCHAR(255) NOT NULL,
+                    status ENUM('pending', 'processing', 'completed') DEFAULT 'pending'
+                ) CHARSET=utf8mb4;
+            ''')
+        conn.commit()
+        print("所有表结构验证完成")
+    except Exception as e:
+        print(f"表结构验证失败: {str(e)}")
+        exit(1)
+    finally:
+        conn.close()
+    
+    # 清理重复文件
     remove_duplicate_files(download_directory)
     
-    # 启动推荐服务
-    recommendation_process = subprocess.Popen(
-        ['python', 'flask_openai_backend\\recommendation_service.py'],
-        cwd=os.getcwd()  # 确保工作目录正确
-    )
-    
-    try:
-        app.run(host='0.0.0.0', port=10805)
-    finally:
-        # 确保主应用退出时终止子进程
-        recommendation_process.terminate()
+    # 启动主应用
+    app.run(host='0.0.0.0', port=10805, debug=False)

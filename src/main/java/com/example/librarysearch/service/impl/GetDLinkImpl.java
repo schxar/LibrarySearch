@@ -7,6 +7,7 @@ import org.openqa.selenium.chrome.ChromeDriver;
 import org.openqa.selenium.chrome.ChromeOptions;
 import org.springframework.stereotype.Service;
 import java.io.File;
+import java.util.Arrays;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -41,8 +42,57 @@ public class GetDLinkImpl {
         String downloadUrl = null;
 
         try {
-            // 导航到目标书籍页面
+            // 首先访问下载页面获取限额
+            driver.get("https://zh.z-lib.gl/users/downloads");
+            Thread.sleep(2000); // 等待2秒确保页面加载
+            
+            // 获取下载限额和刷新时间信息
+            try {
+                // 获取下载限额
+                WebElement downloadLimitElement = driver.findElement(By.cssSelector("div.m-v-auto.d-count"));
+                String downloadLimitText = downloadLimitElement.getText().trim();
+                
+                // 获取刷新时间
+                WebElement resetTimeElement = driver.findElement(By.cssSelector("div.m-v-auto.d-reset"));
+                String resetTime = resetTimeElement.getText().trim();
+                
+                System.out.println("下载限额信息: " + downloadLimitText);
+                System.out.println("下载量刷新时间: " + resetTime);
+                
+                // 解析下载限额格式(如"4/10"或"999/999")
+                String[] limitParts = downloadLimitText.split("/");
+                if (limitParts.length == 2) {
+                    try {
+                        int remaining = Integer.parseInt(limitParts[0].trim());
+                        int total = Integer.parseInt(limitParts[1].trim());
+                        
+                        // 检查下载限额状态
+                        if (total == 10 && remaining <= 0) {
+                            System.out.println("Shutting Down Webdriver.");
+                            driver.quit();
+                            return "NO_QUOTA_REMAINING|COOLING";
+                        } else if (total == 999 && remaining <= 0) {
+                            System.out.println("Shutting Down Webdriver.");
+                            driver.quit();
+                            return "NO_QUOTA_REMAINING|UNLOCKED";
+                        }
+                    } catch (NumberFormatException e) {
+                        System.out.println("无法解析下载限额: " + downloadLimitText);
+                    }
+                }
+                
+                // 获取进度条信息
+                WebElement progressBar = driver.findElement(By.cssSelector("div.progress-bar"));
+                String progress = progressBar.getAttribute("style");
+                System.out.println("下载额度消耗进度: " + progress);
+                
+            } catch (Exception e) {
+                System.out.println("无法获取下载信息: " + e.getMessage());
+            }
+            
+            // 然后导航到目标书籍页面
             driver.get(bookUrl);
+            Thread.sleep(2000); // 等待2秒确保页面加载
 
             // 检查是否需要登录
             try {
@@ -155,8 +205,9 @@ public class GetDLinkImpl {
             
             // 优化下载检测逻辑
             long startTime = System.currentTimeMillis();
-            long timeout = 120000; // 2分钟超时
+            long timeout = 180000; // 3分钟超时
             boolean downloadStarted = false;
+            long minExpectedSize = 100 * 1024; // 最小期望文件大小100KB
             
             while (System.currentTimeMillis() - startTime < timeout) {
                 File[] downloadingFiles = dir.listFiles();
@@ -166,27 +217,47 @@ public class GetDLinkImpl {
                         // 检测.crdownload文件
                         if (file.getName().endsWith(".crdownload")) {
                             downloadStarted = true;
-                            System.out.println("检测到下载中文件...");
-                            // 不立即返回，继续等待下载完成
+                            System.out.println("检测到下载中文件: " + file.getName() + " (" + file.length() + " bytes)");
                             continue;
                         }
-                        // 检测完整书名文件
-                        if (file.getName().startsWith(bookTitle)) {
-                            System.out.println("检测到完整书名文件已存在");
-                            shouldBreak = true;
-                            break;
-                        }
-                        // 检测书名前两个词文件
                         
-                        if (titleWords.length > 1 && file.getName().startsWith(titleWords[0] + " " + titleWords[1])) {
-                            System.out.println("检测到书名关键词文件已存在");
+                        // 检查文件大小是否达到最小期望值
+                        if (file.length() < minExpectedSize) {
+                            System.out.println("文件过小，跳过: " + file.getName() + " (" + file.length() + " bytes)");
+                            continue;
+                        }
+                        
+                        // 增强文件名匹配逻辑
+                        String normalizedBookTitle = bookTitle.replaceAll("[^a-zA-Z0-9\\s\\p{L}]", "").toLowerCase();
+                        String normalizedFileName = file.getName().replaceAll("[^a-zA-Z0-9\\s\\p{L}]", "").toLowerCase();
+                        
+                        // 1. 检测完整书名匹配（相似度>90%）
+                        if (calculateSimilarity(normalizedFileName, normalizedBookTitle) > 0.9) {
+                            System.out.println("检测到完整书名匹配文件: " + file.getName());
                             shouldBreak = true;
                             break;
                         }
-                        // 新增书名前20个字符模糊搜索
-                        String shortTitle = bookTitle.length() > 20 ? bookTitle.substring(0, 20) : bookTitle;
-                        if (file.getName().startsWith(shortTitle)) {
-                            System.out.println("检测到书名前20个字符匹配文件已存在");
+                        
+                        // 2. 检测关键特征词匹配
+                        String[] keywords = extractKeywords(normalizedBookTitle);
+                        boolean allKeywordsMatch = true;
+                        for (String keyword : keywords) {
+                            if (!normalizedFileName.contains(keyword)) {
+                                allKeywordsMatch = false;
+                                break;
+                            }
+                        }
+                        if (allKeywordsMatch && keywords.length > 0) {
+                            System.out.println("检测到关键特征词匹配文件: " + file.getName());
+                            shouldBreak = true;
+                            break;
+                        }
+                        
+                        // 3. 检测书名前30个字符匹配（提高阈值）
+                        String shortTitle = normalizedBookTitle.length() > 30 ? 
+                            normalizedBookTitle.substring(0, 30) : normalizedBookTitle;
+                        if (normalizedFileName.contains(shortTitle) && shortTitle.length() >= 10) {
+                            System.out.println("检测到书名前30字符匹配文件: " + file.getName());
                             shouldBreak = true;
                             break;
                         }
@@ -195,10 +266,10 @@ public class GetDLinkImpl {
                 }
                 
                 if (!downloadStarted) {
-                    System.out.println("等待下载开始...");
+                    System.out.println("等待下载开始...剩余时间: " + (timeout - (System.currentTimeMillis() - startTime)) + "ms");
                 }
                 
-                Thread.sleep(2000); // 每2秒检查一次
+                Thread.sleep(3000); // 每3秒检查一次
             }
             
             System.out.println("下载检测完成，总耗时: " + (System.currentTimeMillis() - startTime) + "ms");
@@ -228,5 +299,58 @@ public class GetDLinkImpl {
             return matcher.group(1);
         }
         return "pdf"; // 默认扩展名
+    }
+    
+    /**
+     * 计算两个字符串的相似度（Levenshtein距离）
+     */
+    private double calculateSimilarity(String s1, String s2) {
+        int maxLength = Math.max(s1.length(), s2.length());
+        if (maxLength == 0) return 1.0;
+        return (maxLength - calculateLevenshteinDistance(s1, s2)) / (double) maxLength;
+    }
+    
+    /**
+     * 计算Levenshtein距离
+     */
+    private int calculateLevenshteinDistance(String s1, String s2) {
+        int[][] dp = new int[s1.length() + 1][s2.length() + 1];
+        
+        for (int i = 0; i <= s1.length(); i++) {
+            dp[i][0] = i;
+        }
+        
+        for (int j = 0; j <= s2.length(); j++) {
+            dp[0][j] = j;
+        }
+        
+        for (int i = 1; i <= s1.length(); i++) {
+            for (int j = 1; j <= s2.length(); j++) {
+                int cost = (s1.charAt(i - 1) == s2.charAt(j - 1)) ? 0 : 1;
+                dp[i][j] = Math.min(
+                    Math.min(dp[i - 1][j] + 1, dp[i][j - 1] + 1),
+                    dp[i - 1][j - 1] + cost
+                );
+            }
+        }
+        
+        return dp[s1.length()][s2.length()];
+    }
+    
+    /**
+     * 从书名中提取关键特征词
+     */
+    private String[] extractKeywords(String title) {
+        // 过滤掉常见无意义词
+        String[] stopWords = {"the", "and", "of", "in", "a", "to", "for", "with", "on", "at"};
+        String filtered = title;
+        for (String word : stopWords) {
+            filtered = filtered.replaceAll("\\b" + word + "\\b", "");
+        }
+        
+        // 提取长度大于3的词作为关键词
+        return Arrays.stream(filtered.split("\\s+"))
+            .filter(word -> word.length() > 3)
+            .toArray(String[]::new);
     }
 }

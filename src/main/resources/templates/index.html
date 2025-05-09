@@ -45,6 +45,70 @@
         .form-control:disabled {
             background-color: #2d2d2d;
         }
+
+        /* Clerk 组件样式覆盖 - 明确区分组件样式 */
+        .cl-component {
+            --clerk-primary: #1976d2;
+            --clerk-primary-hover: #1565c0;
+            --clerk-primary-active: #0d47a1;
+            --clerk-border: #dee2e6;
+            --clerk-shadow: 0 2px 8px rgba(0,0,0,0.15);
+        }
+        
+        /* 内部文本样式 */
+        .cl-internal {
+            color: #212529 !important;  /* 深色文字 */
+            background-color: transparent !important;
+        }
+        
+        /* 用户按钮弹出卡 */
+        .cl-userButtonPopoverCard {
+            background-color: #ffffff !important;
+            border: 1px solid var(--clerk-border) !important;
+            box-shadow: var(--clerk-shadow) !important;
+        }
+        
+        /* 主容器背景 */
+        .cl-card {
+            background-color: #ffffff !important;
+        }
+        
+        /* 次要背景 */
+        .cl-modalContent, .cl-navbar {
+            background-color: #f8f9fa !important;
+        }
+
+        .cl-userButtonPopoverCard {
+            background-color: #e0e0e0 !important;
+            border-color: #e0e0e0 !important;
+        }
+
+        .cl-userButtonPopoverActionButton {
+            color: #e0e0e0 !important;
+        }
+
+        .cl-userButtonPopoverActionButton:hover {
+            background-color: #333 !important;
+        }
+
+        .cl-signIn-root, .cl-signUp-root {
+            background-color: #1e1e1e !important;
+            color: #e0e0e0 !important;
+        }
+
+        .cl-formFieldInput {
+            background-color: #1e1e1e !important;
+            border-color: #333 !important;
+            color: #e0e0e0 !important;
+        }
+
+        .cl-formFieldLabel {
+            color: #e0e0e0 !important;
+        }
+
+        .cl-footerActionLink {
+            color: #1976d2 !important;
+        }
     </style>
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     
@@ -244,28 +308,43 @@
                     downloadInfoDiv.show();
 
                     // AJAX request to get download link
-                    $.ajax({
-                        url: "/getdlink",
-                        type: "POST",
-                        contentType: "application/json",
-                        data: JSON.stringify({ bookUrl: bookUrl }),
-                        dataType: "json",
-                        success: function (downloadData) {
-                            if (downloadData.downloadLink) {
-                                downloadInfoDiv.html(
-                                    `<p><strong>Direct Download Link:</strong> <a href="${downloadData.downloadLink}" target="_blank">Download Now</a></p>`
-                                );
-                            } else {
-                                downloadInfoDiv.html(`<div class="alert alert-warning" role="alert">Download link not available.</div>`);
+                        $.ajax({
+                            url: "/getdlink",
+                            type: "POST",
+                            contentType: "application/json",
+                            data: JSON.stringify({ bookUrl: bookUrl }),
+                            dataType: "json",
+                            success: function (downloadData) {
+                                if (downloadData.downloadLink === "NO_QUOTA_REMAINING|COOLING") {
+                                    downloadInfoDiv.html(`
+                                        <div class="alert alert-warning" role="alert">
+                                            <h4>下载限额已用完</h4>
+                                            <p>您的下载限额已用完，请等待24小时限额自动恢复</p>
+                                            <p>或升级为赞助会员解除限制</p>
+                                        </div>
+                                    `);
+                                } else if (downloadData.downloadLink === "NO_QUOTA_REMAINING|UNLOCKED") {
+                                    downloadInfoDiv.html(`
+                                        <div class="alert alert-info" role="alert">
+                                            <h4>下载限额已用完</h4>
+                                            <p>检测到您可能是赞助会员，请尝试重新下载</p>
+                                        </div>
+                                    `);
+                                } else if (downloadData.downloadLink) {
+                                    downloadInfoDiv.html(
+                                        `<p><strong>Direct Download Link:</strong> <a href="${downloadData.downloadLink}" target="_blank">Download Now</a></p>`
+                                    );
+                                } else {
+                                    downloadInfoDiv.html(`<div class="alert alert-warning" role="alert">Download link not available.Try click download from file server</div>`);
+                                }
+                            },
+                            error: function () {
+                                downloadInfoDiv.html(`<div class="alert alert-danger" role="alert">Download to flask server done but failed to retrieve direct download link..</div>`);
+                            },
+                            complete: function () {
+                                $(".download-button").prop('disabled', false); // Re-enable the download button
                             }
-                        },
-                        error: function () {
-                            downloadInfoDiv.html(`<div class="alert alert-danger" role="alert">Download to flask server done but failed to retrieve direct download link..</div>`);
-                        },
-                        complete: function () {
-                            $(".download-button").prop('disabled', false); // Re-enable the download button
-                        }
-                    });
+                        });
                 });
 
                 // Bind play audio button click events
