@@ -68,11 +68,11 @@ public class GetDLinkImpl {
                         int total = Integer.parseInt(limitParts[1].trim());
                         
                         // 检查下载限额状态
-                        if (total == 10 && remaining <= 0) {
+                        if (total == 10 && remaining == 10) {
                             System.out.println("Shutting Down Webdriver.");
                             driver.quit();
                             return "NO_QUOTA_REMAINING|COOLING";
-                        } else if (total == 999 && remaining <= 0) {
+                        } else if (total == 999 && remaining == 999) {
                             System.out.println("Shutting Down Webdriver.");
                             driver.quit();
                             return "NO_QUOTA_REMAINING|UNLOCKED";
