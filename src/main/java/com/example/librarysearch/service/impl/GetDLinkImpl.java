@@ -134,42 +134,97 @@ public class GetDLinkImpl {
                 extension = getFileExtension(bookUrl);
             }
             
-            // 检查目标文件夹是否已存在同名文件（不检查扩展名）
+            // 检查目标文件夹是否已存在同名文件（增加大小和格式匹配）
             String downloadDir = "C:\\Users\\PC\\eclipse-workspace\\LibrarySearch\\src\\main\\resources\\static\\books";
             File dir = new File(downloadDir);
             File[] files = dir.listFiles();
             if (files != null) {
+                // 获取远程文件信息
+                String remoteInfo = "";
+                String remoteSize = "";
+                String remoteFormat = "";
+                try {
+                    WebElement fileInfo = driver.findElement(By.cssSelector("div.bookProperty.property__file div.property_value"));
+                    remoteInfo = fileInfo.getText();
+                    System.out.println("远程文件信息: " + remoteInfo);
+                    
+                    // 解析远程文件大小和格式
+                    String[] remoteParts = remoteInfo.split(",");
+                    if (remoteParts.length >= 2) {
+                        remoteFormat = remoteParts[0].trim().toLowerCase();
+                        remoteSize = remoteParts[1].trim().toLowerCase().replace("mb", "").replace("kb", "").trim();
+                    }
+                } catch (Exception e) {
+                    System.out.println("无法获取远程文件信息: " + e.getMessage());
+                }
+                
                 for (File file : files) {
-                    // 检测完整书名或前20个字符匹配的文件
+                    // 获取书名头两个字母作为额外验证条件
+                    String firstTwoLetters = bookTitle.length() >= 2 ? 
+                        bookTitle.substring(0, 2).toLowerCase() : bookTitle.toLowerCase();
+                    
+                    // 检测完整书名、前20个字符或头两个字母匹配的文件
                     String shortTitle = bookTitle.length() > 20 ? bookTitle.substring(0, 20) : bookTitle;
-                    if (file.getName().startsWith(bookTitle) || file.getName().startsWith(shortTitle)) {
+                    if (file.getName().toLowerCase().startsWith(bookTitle.toLowerCase()) || 
+                        file.getName().toLowerCase().startsWith(shortTitle.toLowerCase()) ||
+                        file.getName().toLowerCase().startsWith(firstTwoLetters)) {
+                        
                         long fileSize = file.length();
                         String sizeFormatted = fileSize < 1024 ? fileSize + " B" : 
                             fileSize < 1024 * 1024 ? (fileSize / 1024) + " KB" : 
                             (fileSize / (1024 * 1024)) + " MB";
-                        System.out.println("文件已存在，跳过下载: " + file.getAbsolutePath());
+                        String fileExt = getFileExtension(file.getName()).toLowerCase();
+                        
+                        System.out.println("检测到可能匹配的文件: " + file.getAbsolutePath());
                         System.out.println("本地文件信息:");
                         System.out.println("  大小: " + sizeFormatted);
-                        System.out.println("  格式: " + getFileExtension(file.getName()));
-                        try {
-                            WebElement remoteFileInfo = driver.findElement(By.cssSelector("div.bookProperty.property__file div.property_value"));
-                            String remoteInfo = remoteFileInfo.getText();
-                            System.out.println("远程文件信息:");
-                            System.out.println("  " + remoteInfo);
-                        } catch (Exception e) {
-                            System.out.println("无法获取远程文件信息: " + e.getMessage());
+                        System.out.println("  格式: " + fileExt);
+                        
+                        // 如果获取到了远程文件信息，进行详细比较
+                        if (!remoteInfo.isEmpty()) {
+                            // 比较文件格式
+                            boolean formatMatch = fileExt.equals(remoteFormat);
+                            
+                            // 比较文件大小（允许10%的误差）
+                            boolean sizeMatch = false;
+                            try {
+                                double remoteSizeValue = Double.parseDouble(remoteSize);
+                                double localSizeValue = fileSize / (1024.0 * 1024.0); // 转换为MB
+                                sizeMatch = Math.abs(localSizeValue - remoteSizeValue) <= remoteSizeValue * 0.1;
+                            } catch (NumberFormatException e) {
+                                System.out.println("无法比较文件大小: " + e.getMessage());
+                            }
+                            
+                            if (formatMatch && sizeMatch) {
+                                System.out.println("文件大小和格式匹配，确认是同一文件，跳过下载");
+                                // 构建与下载URL相同格式的公网URL
+                                String[] titleWords = bookTitle.split("\\s+");
+                                String searchQuery = titleWords.length > 1 ? 
+                                    titleWords[0] + " " + titleWords[1] : 
+                                    titleWords[0];
+                                // 限制searchQuery最多20个字符
+                                if (searchQuery.length() > 20) {
+                                    searchQuery = searchQuery.substring(0, 20);
+                                }
+                                return "https://schxar.picp.vip/search?book_name=" + 
+                                    java.net.URLEncoder.encode(searchQuery, "UTF-8");
+                            } else {
+                                System.out.println("文件大小或格式不匹配，继续下载流程");
+                            }
+                        } else {
+                            System.out.println("无法获取远程文件信息，跳过详细比较");
+                            // 构建与下载URL相同格式的公网URL
+                            String[] titleWords = bookTitle.split("\\s+");
+                            String searchQuery = titleWords.length > 1 ? 
+                                titleWords[0] + " " + titleWords[1] : 
+                                titleWords[0];
+                            // 限制searchQuery最多20个字符
+                            if (searchQuery.length() > 20) {
+                                searchQuery = searchQuery.substring(0, 20);
+                            }
+                            return "https://schxar.picp.vip/search?book_name=" + 
+                                java.net.URLEncoder.encode(searchQuery, "UTF-8");
                         }
-                        // 构建与下载URL相同格式的公网URL
-                        String[] titleWords = bookTitle.split("\\s+");
-                        String searchQuery = titleWords.length > 1 ? 
-                            titleWords[0] + " " + titleWords[1] : 
-                            titleWords[0];
-                        // 限制searchQuery最多20个字符
-                        if (searchQuery.length() > 20) {
-                            searchQuery = searchQuery.substring(0, 20);
-                        }
-                        return "https://schxar.picp.vip/search?book_name=" + 
-                            java.net.URLEncoder.encode(searchQuery, "UTF-8");
                     }
                 }
             }
@@ -201,12 +256,12 @@ public class GetDLinkImpl {
             }
             
             // 初始等待，确保.crdownload文件创建
-            System.out.println("等待10秒确保下载启动...");
-            Thread.sleep(10000);
+            System.out.println("等待5秒确保下载启动...");
+            Thread.sleep(5000);
             
             // 增强版下载检测逻辑
             long startTime = System.currentTimeMillis();
-            long timeout = 300000; // 5分钟超时(大文件需要更长时间)
+            long timeout = 120000; // 5分钟超时(大文件需要更长时间)
             boolean downloadStarted = false;
             long lastFileSize = 0;
             int noProgressCount = 0;
@@ -247,8 +302,8 @@ public class GetDLinkImpl {
                             break;
                         }
                         
-                        // 检测书名前20个字符模糊搜索
-                        String shortTitle = bookTitle.length() > 20 ? bookTitle.substring(0, 20) : bookTitle;
+                        // 检测书名前10个字符模糊搜索
+                        String shortTitle = bookTitle.length() > 10 ? bookTitle.substring(0, 20) : bookTitle;
                         if (file.getName().startsWith(shortTitle)) {
                             System.out.println("检测到书名前20个字符匹配文件已存在");
                             shouldBreak = true;
@@ -273,6 +328,44 @@ public class GetDLinkImpl {
             
             if (System.currentTimeMillis() - startTime >= timeout) {
                 System.out.println("下载超时，请检查网络连接或尝试重新下载");
+                
+                // 检查是否已有完整文件
+                File[] downloadedFiles = dir.listFiles();
+                if (downloadedFiles != null) {
+                    for (File file : downloadedFiles) {
+                        // 检查是否匹配书名且不是.crdownload文件
+                        if ((file.getName().startsWith(bookTitle) || 
+                             file.getName().startsWith(titleWords[0] + " " + titleWords[1])) &&
+                            !file.getName().endsWith(".crdownload")) {
+                            
+                            long fileSize = file.length();
+                            String sizeFormatted = fileSize < 1024 ? fileSize + " B" : 
+                                fileSize < 1024 * 1024 ? (fileSize / 1024) + " KB" : 
+                                (fileSize / (1024 * 1024)) + " MB";
+                            String fileExt = getFileExtension(file.getName());
+                            
+                            System.out.println("检测到已下载文件: " + file.getAbsolutePath());
+                            System.out.println("文件大小: " + sizeFormatted);
+                            System.out.println("文件格式: " + fileExt);
+                            
+                            // 获取远程文件信息进行比较
+                            try {
+                                WebElement fileInfo = driver.findElement(By.cssSelector("div.bookProperty.property__file div.property_value"));
+                                String remoteInfo = fileInfo.getText();
+                                System.out.println("远程文件信息: " + remoteInfo);
+                                
+                                // 检查文件大小是否匹配
+                                if (remoteInfo.toLowerCase().contains(fileExt.toLowerCase()) && 
+                                    remoteInfo.contains(sizeFormatted.replace(" MB", "").replace(" KB", "").replace(" B", ""))) {
+                                    System.out.println("文件大小和格式验证成功，下载已完成");
+                                    return downloadUrl;
+                                }
+                            } catch (Exception e) {
+                                System.out.println("无法获取远程文件信息: " + e.getMessage());
+                            }
+                        }
+                    }
+                }
             } else {
                 System.out.println("下载检测完成，总耗时: " + (System.currentTimeMillis() - startTime) + "ms");
             }
