@@ -69,6 +69,10 @@
                     <li class="list-group-item">
                         <span>{{ file }}</span>
                         <a href="/download/{{ file }}" class="btn btn-success btn-sm" target="_blank">Download</a>
+                        <button class="btn btn-info btn-sm search-btn" 
+                                data-filename="{{ file }}">
+                            Search ID
+                        </button>
                         <form method="POST" action="/submit_ticket" style="display:inline;">
                             <input type="hidden" name="book_title" value="{{ file }}">
                             <input type="hidden" name="clerk_user_email" value="{{ session.user_email }}">
@@ -108,6 +112,19 @@
             await Clerk.load();
             // Mount user button
             Clerk.mountUserButton(document.getElementById('clerk-user-button'));
+            
+            // Add search button handlers
+            document.querySelectorAll('.search-btn').forEach(btn => {
+                btn.addEventListener('click', function() {
+                    const filename = this.getAttribute('data-filename');
+                    // Extract first 10 words
+                    const searchTerms = filename.slice(0, 5).join(' ');
+                    // Build search URL .split(/[\s_\.]+/)
+                    const searchUrl = `https://313m929k61.vicp.fun/search/books?book_name=${encodeURIComponent(searchTerms)}`;
+                    // Open in new tab
+                    window.open(searchUrl, '_blank');
+                });
+            });
         });
     </script>
 </body>

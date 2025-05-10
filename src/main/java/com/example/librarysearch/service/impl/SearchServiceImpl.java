@@ -148,10 +148,23 @@ public class SearchServiceImpl implements SearchService {
                 String booksDataDir = System.getProperty("user.dir") + "/src/main/resources/static/books_data/";
                 ensureDirectoryExists(booksDataDir);
                 
+                // 获取首字符分类文件夹
+                String firstChar = decodedTitle.substring(0, 1).toLowerCase();
+                String subFolder;
+                if (firstChar.matches("[a-z]")) {
+                    subFolder = firstChar.toUpperCase() + "/"; // 英文按首字母分组
+                } else {
+                    subFolder = "中文/" + firstChar + "/"; // 中文按首字符分组
+                }
+                
+                // 创建子文件夹
+                String categoryDir = booksDataDir + subFolder;
+                ensureDirectoryExists(categoryDir);
+                
                 // 使用ID和书名作为文件名，保留常见符号但替换不安全字符
                 String safeTitle = decodedTitle.replaceAll("[\\\\/:*?\"<>|]", "_") // 替换Windows文件名非法字符
                     .replaceAll("\\s+", " ").trim(); // 合并连续空格
-                String jsonFilePath = booksDataDir + safeTitle + "_" + id + ".json";
+                String jsonFilePath = categoryDir + safeTitle + "_" + id + ".json";
                 
                 try (FileWriter writer = new FileWriter(jsonFilePath)) {
                     new Gson().toJson(bookInfo, writer);

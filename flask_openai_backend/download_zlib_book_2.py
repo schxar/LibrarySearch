@@ -373,7 +373,49 @@ def serve_file(filename):
 def search_downloads():
     search_type = request.args.get('type')  # 'email' 或 'filename'
     search_value = request.args.get('value')
+
+@app.route('/SearchBookByTitle', methods=['GET', 'POST'])
+def SearchBookByTitle():
+    if request.method == 'GET':
+        return render_template('SearchBookByTitle.html')
+        
+    book_title = request.form['book_title'].strip()
+    if not book_title:
+        return render_template('SearchBookByTitle.html', message="Please enter a book title")
     
+    books_data_dir = os.path.join(os.getcwd(), "src/main/resources/static/books_data")
+    results = []
+    
+    # 1. 先按首字母搜索
+    first_char = book_title[0].lower()
+    if first_char.isalpha():
+        search_dir = os.path.join(books_data_dir, first_char.upper())
+        json_files = glob.glob(os.path.join(search_dir, '*.json'))
+        
+        for json_file in json_files:
+            with open(json_file, 'r', encoding='utf-8') as f:
+                data = json.load(f)
+                if book_title.lower() in data['title'].lower():
+                    results.append(data)
+    
+    # 2. 如果没有结果，搜索中文目录
+    if not results and any('\u4e00' <= c <= '\u9fff' for c in book_title):
+        first_char_cn = book_title[0]
+        search_dir = os.path.join(books_data_dir, '中文', first_char_cn)
+        json_files = glob.glob(os.path.join(search_dir, '*.json'))
+        
+        for json_file in json_files:
+            with open(json_file, 'r', encoding='utf-8') as f:
+                data = json.load(f)
+                if book_title in data['title']:
+                    results.append(data)
+    
+    if results:
+        return render_template('SearchBookByTitle.html', search_results=results)
+    else:
+        return render_template('SearchBookByTitle.html', 
+                            message=f"No records found for '{book_title}'")
+
     if not search_type or not search_value:
         return jsonify({"error": "Missing parameters"}), 400
     
@@ -468,6 +510,7 @@ def search_books():
         file_links = [
                 f'<li class="list-group-item"><span>{os.path.basename(f)}</span>'
                 f'<a href="/download/{os.path.basename(f)}" class="btn btn-success btn-sm" target="_blank">Download</a>'
+                f'<a href="https://313m929k61.vicp.fun/search/books?book_name={os.path.basename(f)}" class="btn btn-info btn-sm" target="_blank">查询该文件ID</a>'
                 f'<form method="POST" action="/submit_ticket" style="display:inline;">'
                 f'<input type="hidden" name="book_title" value="{os.path.basename(f)}">'
                 f'<input type="hidden" name="clerk_user_email" value="user@example.com">'

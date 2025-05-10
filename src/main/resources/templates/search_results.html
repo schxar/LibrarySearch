@@ -1,0 +1,83 @@
+
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>搜索结果</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css">
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; }
+        h1 { color: #333; }
+        .search-query { color: #0066cc; font-weight: bold; }
+        table { width: 100%; border-collapse: collapse; margin-top: 20px; }
+        th, td { padding: 12px; text-align: left; border-bottom: 1px solid #ddd; }
+        th { background-color: #f2f2f2; }
+        tr:hover { background-color: #f5f5f5; }
+        a { color: #0066cc; text-decoration: none; }
+        a:hover { text-decoration: underline; }
+        .back-link { margin-top: 20px; display: inline-block; }
+    </style>
+</head>
+<body>
+    <div style="margin-bottom: 20px;">
+        <a th:href="@{/}" class="btn btn-primary">
+            <i class="bi bi-house-door"></i> 返回主页
+        </a>
+        <a href="https://schxar.picp.vip/" class="btn btn-info ms-2">
+            <i class="bi bi-globe"></i> 返回主站
+        </a>
+        <a href="https://schxar.picp.vip/filemainpage" class="btn btn-secondary ms-2">
+            <i class="bi bi-folder"></i> 文件主页
+        </a>
+    </div>
+    <h1>搜索结果</h1>
+    <p>搜索词: <span class="search-query" th:text="${query}"></span></p>
+    
+    <div th:if="${results.empty}">
+        <p>没有找到匹配的结果。</p>
+    </div>
+    
+    <table th:unless="${results.empty}">
+        <thead>
+            <tr>
+                <th>书名</th>
+                <th>ID</th>
+                <th>链接</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr th:each="book : ${results}">
+                <td th:text="${book.title}"></td>
+                <td th:text="${book.id}"></td>
+                <td><a th:href="${book.bookUrl}" target="_blank">查看</a></td>
+            </tr>
+        </tbody>
+    </table>
+    
+    <a href="/booklist" class="btn btn-secondary mt-3">返回所有图书列表</a>
+
+    <!-- 分页导航 -->
+    <div class="mt-4" th:if="${totalPages > 1}">
+        <nav aria-label="Page navigation">
+            <ul class="pagination justify-content-center">
+                <li class="page-item" th:classappend="${currentPage == 1} ? 'disabled'">
+                    <a class="page-link" th:href="@{/search/books(book_name=${query}, page=${currentPage - 1})}" 
+                       th:if="${currentPage > 1}">上一页</a>
+                    <span class="page-link" th:unless="${currentPage > 1}">上一页</span>
+                </li>
+                <li class="page-item" th:each="i : ${#numbers.sequence(1, totalPages)}" 
+                    th:classappend="${i == currentPage} ? 'active'">
+                    <a class="page-link" th:href="@{/search/books(book_name=${query}, page=${i})}" 
+                       th:text="${i}"></a>
+                </li>
+                <li class="page-item" th:classappend="${currentPage == totalPages} ? 'disabled'">
+                    <a class="page-link" th:href="@{/search/books(book_name=${query}, page=${currentPage + 1})}" 
+                       th:if="${currentPage < totalPages}">下一页</a>
+                    <span class="page-link" th:unless="${currentPage < totalPages}">下一页</span>
+                </li>
+            </ul>
+        </nav>
+    </div>
+</body>
+</html>

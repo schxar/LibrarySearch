@@ -126,6 +126,15 @@
 
     <div id="app"></div> <!-- User interface will be injected here -->
 
+    <!-- Book Search Form -->
+    <div class="card mt-4 p-3">
+        <h4 class="card-title">本地记录图书对应ID搜索,如果没有请进行一次zlib搜索</h4>
+        <form action="/search/books" method="get" class="d-flex">
+            <input type="text" name="book_name" class="form-control me-2" placeholder="输入书名" required>
+            <button type="submit" class="btn btn-primary">搜索</button>
+        </form>
+    </div>
+
     <!-- Loading Spinner -->
     <div id="loading" class="text-center mb-3" style="display: none;">
         <div class="spinner-border" role="status">
@@ -135,8 +144,8 @@
 
     <!-- Search Bar -->
     <div class="input-group mb-3">
-        <input type="text" id="searchQuery" class="form-control" placeholder="Enter search keyword" aria-label="Search" disabled />
-        <button id="searchButton" class="btn btn-primary" disabled>Search</button>
+        <input type="text" id="searchQuery" class="form-control" placeholder="Enter search keyword to search zlib" aria-label="Search" disabled />
+        <button id="searchButton" class="btn btn-primary" disabled>Search Zlib</button>
     </div>
 
     <!-- Results Section -->
@@ -152,9 +161,12 @@
         <!-- Top searches will be dynamically loaded here -->
     </div>
 
-    <!-- New Button for NotebookLM -->
+
+
+    <!-- New Buttons -->
     <div class="mt-4 text-center">
         <a href="https://notebooklm.google.com/" target="_blank" class="btn btn-success">Go to NotebookLM</a>
+        <a href="/booklist" class="btn btn-info ms-3">View All Books</a>
     </div>
 
     <script>

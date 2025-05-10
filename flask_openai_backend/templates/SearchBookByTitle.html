@@ -1,0 +1,55 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Search Book by Title</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        .search-container {
+            max-width: 800px;
+            margin: 50px auto;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+        }
+        .result-item {
+            margin-bottom: 10px;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container search-container">
+        <h1 class="text-center mb-4">Search Book by Title</h1>
+        
+        <form action="/search_book_by_title" method="post" class="mb-4">
+            <div class="input-group">
+                <input type="text" name="book_title" class="form-control" placeholder="Enter book title" required>
+                <button type="submit" class="btn btn-primary">Search</button>
+            </div>
+        </form>
+
+        {% if search_results %}
+        <div class="results-section">
+            <h3>Search Results</h3>
+            {% for result in search_results %}
+            <div class="result-item">
+                <h5>{{ result.title }}</h5>
+                <p>ID: {{ result.id }}</p>
+                <a href="{{ result.bookUrl }}" target="_blank" class="btn btn-sm btn-info">View Book</a>
+                <a href="/download_book_record/{{ result.id }}" class="btn btn-sm btn-success">Download JSON</a>
+            </div>
+            {% endfor %}
+        </div>
+        {% elif message %}
+        <div class="alert alert-info">{{ message }}</div>
+        {% endif %}
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
