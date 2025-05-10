@@ -74,16 +74,6 @@ public class GetDLinkImpl {
                         int remaining = Integer.parseInt(limitParts[0].trim());
                         int total = Integer.parseInt(limitParts[1].trim());
                         
-                        // 检查下载限额状态
-                        if (total == 10 && remaining == 10) {
-                            System.out.println("Shutting Down Webdriver.");
-                            driver.quit();
-                            return "NO_QUOTA_REMAINING|COOLING";
-                        } else if (total == 999 && remaining == 999) {
-                            System.out.println("Shutting Down Webdriver.");
-                            driver.quit();
-                            return "NO_QUOTA_REMAINING|UNLOCKED";
-                        }
                     } catch (NumberFormatException e) {
                         System.out.println("无法解析下载限额: " + downloadLimitText);
                     }
@@ -93,6 +83,27 @@ public class GetDLinkImpl {
                 WebElement progressBar = driver.findElement(By.cssSelector("div.progress-bar"));
                 String progress = progressBar.getAttribute("style");
                 System.out.println("下载额度消耗进度: " + progress);
+                
+                // 解析进度百分比并检查下载限额状态
+                if (progress != null && progress.contains("width:")) {
+                    String widthStr = progress.split("width:")[1].split("%")[0].trim();
+                    try {
+                        double progressPercent = Double.parseDouble(widthStr);
+                        System.out.println("解析到下载额度剩余进度百分比: " + progressPercent + "%");
+                        
+                        if (progressPercent >= 100) {
+                            System.out.println("Shutting Down Webdriver.");
+                            driver.quit();
+                            return "NO_QUOTA_REMAINING|COOLING";
+                        } else if (progressPercent > 90) {
+                            System.out.println("Shutting Down Webdriver.");
+                            driver.quit();
+                            return "NO_QUOTA_REMAINING|UNLOCKED";
+                        }
+                    } catch (NumberFormatException e) {
+                        System.out.println("无法解析进度百分比: " + progress);
+                    }
+                }
                 
             } catch (Exception e) {
                 System.out.println("无法获取下载信息: " + e.getMessage());

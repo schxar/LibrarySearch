@@ -31,14 +31,31 @@ public class BookController {
     private final RestTemplate restTemplate = new RestTemplate();
 
     @GetMapping("/booklist")
-    public String listBooks(Model model) throws IOException {
+    public String listBooks(
+        @RequestParam(defaultValue = "1") int page,
+        Model model) throws IOException {
         List<Book> books = new ArrayList<>();
         scanBooksDirectory(Paths.get(BOOKS_DIR), books);
         
         // 按书名排序
         books.sort(Comparator.comparing(Book::getTitle));
         
-        model.addAttribute("books", books);
+        // 分页处理
+        int pageSize = 10; // 每页显示10条结果
+        int totalItems = books.size();
+        int totalPages = (int) Math.ceil((double) totalItems / pageSize);
+        
+        // 确保页码在有效范围内
+        page = Math.max(1, Math.min(page, totalPages));
+        
+        // 获取当前页数据
+        int fromIndex = (page - 1) * pageSize;
+        int toIndex = Math.min(fromIndex + pageSize, totalItems);
+        List<Book> pagedBooks = books.subList(fromIndex, toIndex);
+        
+        model.addAttribute("books", pagedBooks);
+        model.addAttribute("currentPage", page);
+        model.addAttribute("totalPages", totalPages);
         model.addAttribute("homeUrl", "/"); // 添加主页URL
         return "books";
     }

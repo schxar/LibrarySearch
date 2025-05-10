@@ -21,9 +21,32 @@
             color: white;
         }
         .list-group-item {
+            padding: 12px 15px;
+        }
+        .list-group-item .file-name {
+            display: block;
+            margin-bottom: 10px;
+            word-break: break-word;
+        }
+        .list-group-item .btn-group {
             display: flex;
-            justify-content: space-between;
-            align-items: center;
+            flex-direction: column;
+            gap: 8px;
+        }
+        .list-group-item .btn {
+            width: 100%;
+            padding: 8px 12px;
+            font-size: 14px;
+        }
+        @media (min-width: 768px) {
+            .list-group-item .btn-group {
+                flex-direction: row;
+                flex-wrap: wrap;
+                justify-content: flex-start;
+            }
+            .list-group-item .btn {
+                width: auto;
+            }
         }
         .pagination {
             margin-top: 20px;
@@ -53,10 +76,23 @@
                     <div class="card-body">
                         <form method="GET" action="/search" class="d-flex">
                             <input type="text" id="bookName" name="book_name" class="form-control me-2" placeholder="Enter book name keyword" required>
-                            <button type="submit" class="btn btn-primary">Search</button>
+                            <button type="submit" class="btn btn-primary btn-xs">Search</button>
                         </form>
                     </div>
                 </div>
+
+        <!-- Quick Links -->
+        <div class="card">
+            <div class="card-header">
+                <h2 class="card-title mb-0">Quick Links</h2>
+            </div>
+            <div class="card-body">
+                <div class="d-flex justify-content-center gap-3">
+                    <a href="https://313m929k61.vicp.fun/" class="btn btn-primary btn-xs" target="_blank">Library Search</a>
+                    <a href="https://schxar.picp.vip/" class="btn btn-primary btn-xs" target="_blank">File Search</a>
+                </div>
+            </div>
+        </div>
 
         <!-- List Downloaded Files -->
         <div class="card">
@@ -67,17 +103,19 @@
                 <ul class="list-group">
                     {% for file in files %}
                     <li class="list-group-item">
-                        <span>{{ file }}</span>
-                        <a href="/download/{{ file }}" class="btn btn-success btn-sm" target="_blank">Download</a>
-                        <button class="btn btn-info btn-sm search-btn" 
-                                data-filename="{{ file }}">
-                            Search ID
-                        </button>
-                        <form method="POST" action="/submit_ticket" style="display:inline;">
-                            <input type="hidden" name="book_title" value="{{ file }}">
-                            <input type="hidden" name="clerk_user_email" value="{{ session.user_email }}">
-                            <button type="submit" class="btn btn-warning btn-sm">Submit Ticket</button>
-                        </form>
+                        <span class="file-name">{{ file }}</span>
+                        <div class="btn-group">
+                            <a href="/download/{{ file }}" class="btn btn-success btn-xs" target="_blank">Download</a>
+                            <button class="btn btn-info btn-xs search-btn" 
+                                    data-filename="{{ file }}">
+                                Search ID
+                            </button>
+                            <form method="POST" action="/submit_ticket" style="display:inline;">
+                                <input type="hidden" name="book_title" value="{{ file }}">
+                                <input type="hidden" name="clerk_user_email" value="{{ session.user_email }}">
+                                <button type="submit" class="btn btn-warning btn-xs">Submit Ticket</button>
+                            </form>
+                        </div>
                     </li>
                     {% endfor %}
                 </ul>
@@ -87,7 +125,7 @@
                     <ul class="pagination">
                         {% if page > 1 %}
                         <li class="page-item">
-                            <a class="page-link" href="{{ url_for('filemainpage', page=page-1, per_page=per_page) }}">Previous</a>
+                            <a class="page-link btn-xs" href="{{ url_for('filemainpage', page=page-1, per_page=per_page) }}">Previous</a>
                         </li>
                         {% endif %}
                         <li class="page-item active">
@@ -95,7 +133,7 @@
                         </li>
                         {% if page < total_pages %}
                         <li class="page-item">
-                            <a class="page-link" href="{{ url_for('filemainpage', page=page+1, per_page=per_page) }}">Next</a>
+                            <a class="page-link btn-xs" href="{{ url_for('filemainpage', page=page+1, per_page=per_page) }}">Next</a>
                         </li>
                         {% endif %}
                     </ul>

@@ -244,6 +244,8 @@ HTML_LOGIN = """
     <!-- New Button for NotebookLM -->
     <div class="mt-4 text-center">
         <a href="https://notebooklm.google.com/" target="_blank" class="btn btn-success">Go to NotebookLM</a>
+        <a href="https://313m929k61.vicp.fun/" target="_blank" class="btn btn-info ms-2">Search Homepage</a>
+        <a href="https://schxar.picp.vip/download_history" target="_blank" class="btn btn-info ms-2">Download history</a>
     </div>
 
     <script>
@@ -511,6 +513,7 @@ def search_books():
                 f'<li class="list-group-item"><span>{os.path.basename(f)}</span>'
                 f'<a href="/download/{os.path.basename(f)}" class="btn btn-success btn-sm" target="_blank">Download</a>'
                 f'<a href="https://313m929k61.vicp.fun/search/books?book_name={os.path.basename(f)}" class="btn btn-info btn-sm" target="_blank">查询该文件ID</a>'
+                
                 f'<form method="POST" action="/submit_ticket" style="display:inline;">'
                 f'<input type="hidden" name="book_title" value="{os.path.basename(f)}">'
                 f'<input type="hidden" name="clerk_user_email" value="user@example.com">'
@@ -556,6 +559,7 @@ def search_books():
                         <div class="navigation-buttons">
                             <a href="/" class="btn btn-primary">返回主页</a>
                             <a href="/filemainpage" class="btn btn-secondary">文件主页</a>
+                            <a href="https://313m929k61.vicp.fun/" class="btn btn-warning" target="_blank">访问搜索</a>'
                         </div>
                         <h1 class="text-center mb-4">Search Results</h1>
                         <div class="card">
@@ -816,6 +820,42 @@ def view_recommendations():
         return render_template('error.html', error="无法获取推荐记录")
     finally:
         connection.close()
+
+@app.route('/download_history', methods=['GET', 'POST'])
+def download_history():
+    """查询下载记录"""
+    if request.method == 'POST':
+        user_email = request.form.get('user_email')
+        if not user_email:
+            return render_template('download_history_form.html', error="请输入邮箱地址")
+
+        try:
+            conn = get_db_connection()
+            with conn.cursor() as cursor:
+                # 查询下载记录
+                cursor.execute('''
+                    SELECT filename, download_date 
+                    FROM DownloadHistory 
+                    WHERE user_email = %s 
+                    ORDER BY download_date DESC
+                ''', (user_email,))
+                records = cursor.fetchall()
+                
+                if not records:
+                    return render_template('download_history_form.html', 
+                                        error="没有找到该邮箱的下载记录")
+                
+                return render_template('download_history_results.html',
+                                    email=user_email,
+                                    records=records)
+        except Exception as e:
+            app.logger.error(f"查询下载记录失败: {str(e)}")
+            return render_template('download_history_form.html', 
+                                error="查询失败，请稍后重试")
+        finally:
+            conn.close()
+    
+    return render_template('download_history_form.html')
 
 if __name__ == '__main__':
     # 创建所有需要的表

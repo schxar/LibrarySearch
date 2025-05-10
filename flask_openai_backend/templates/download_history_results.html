@@ -1,0 +1,53 @@
+
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>下载记录 - {{ email }}</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        body {
+            padding: 20px;
+            background-color: #f8f9fa;
+        }
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+        }
+        .table {
+            margin-top: 20px;
+        }
+        .back-link {
+            margin-top: 20px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>{{ email }} 的下载记录</h1>
+        <p class="text-muted">共 {{ records|length }} 条记录</p>
+        
+        <table class="table table-striped">
+            <thead>
+                <tr>
+                    <th>文件名</th>
+                    <th>下载时间</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for record in records %}
+                <tr>
+                    <td>{{ record.filename }}</td>
+                    <td>{{ record.download_date.strftime('%Y-%m-%d %H:%M:%S') }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        
+        <div class="back-link">
+            <a href="/download_history" class="btn btn-primary">返回查询</a>
+            <a href="/" class="btn btn-secondary">返回首页</a>
+        </div>
+    </div>
+</body>
+</html>

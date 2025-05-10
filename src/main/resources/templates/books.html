@@ -40,5 +40,33 @@
             </tr>
         </tbody>
     </table>
+    
+    <!-- 分页导航 -->
+    <div th:if="${totalPages > 1}" class="pagination" style="margin-top: 20px; text-align: center;">
+        <ul class="pagination justify-content-center">
+            <!-- 上一页按钮 -->
+            <li class="page-item" th:classappend="${currentPage == 1} ? 'disabled'">
+                <a class="page-link" th:href="@{/booklist(page=${currentPage - 1})}" th:unless="${currentPage == 1}">
+                    &laquo; 上一页
+                </a>
+                <span class="page-link" th:if="${currentPage == 1}">&laquo; 上一页</span>
+            </li>
+            
+            <!-- 页码链接 -->
+            <li th:each="page : ${#numbers.sequence(1, totalPages)}" 
+                class="page-item" 
+                th:classappend="${page == currentPage} ? 'active'">
+                <a class="page-link" th:href="@{/booklist(page=${page})}" th:text="${page}"></a>
+            </li>
+            
+            <!-- 下一页按钮 -->
+            <li class="page-item" th:classappend="${currentPage == totalPages} ? 'disabled'">
+                <a class="page-link" th:href="@{/booklist(page=${currentPage + 1})}" th:unless="${currentPage == totalPages}">
+                    下一页 &raquo;
+                </a>
+                <span class="page-link" th:if="${currentPage == totalPages}">下一页 &raquo;</span>
+            </li>
+        </ul>
+    </div>
 </body>
 </html>
