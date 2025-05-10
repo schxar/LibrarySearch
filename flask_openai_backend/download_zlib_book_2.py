@@ -460,9 +460,9 @@ def search_books():
             break  # 找到匹配就停止
     matching_files = glob.glob(pattern)
 
-        if matching_files:
+    if matching_files:
             # 生成带有下载链接的 HTML 内容
-            file_links = [
+        file_links = [
                 f'<li class="list-group-item"><span>{os.path.basename(f)}</span>'
                 f'<a href="/download/{os.path.basename(f)}" class="btn btn-success btn-sm" target="_blank">Download</a>'
                 f'<form method="POST" action="/submit_ticket" style="display:inline;">'
@@ -472,7 +472,7 @@ def search_books():
                 f'</form></li>'
                 for f in matching_files
             ]
-            return render_template_string(
+        return render_template_string(
                 """
                 <!DOCTYPE html>
                 <html lang="en">
