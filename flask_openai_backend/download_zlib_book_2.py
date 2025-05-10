@@ -385,8 +385,8 @@ def search_downloads():
         else:
             return jsonify({"error": "Invalid search type"}), 400
 
-        conn = get_db_connection()
-        cursor = conn.cursor(dictionary=True)
+        conn = pymysql.connect(**DB_CONFIG)
+        cursor = conn.cursor()
         cursor.execute(f'''
             SELECT * FROM DownloadHistory 
             WHERE {sql_condition}
@@ -576,7 +576,7 @@ def login_required(f):
 @login_required
 def tickets():
     conn = get_db_connection()
-    cursor = conn.cursor(dictionary=True)
+    cursor = conn.cursor()
     cursor.execute('SELECT * FROM NotebookLMAudioRequests')
     tickets = cursor.fetchall()
     cursor.close()
