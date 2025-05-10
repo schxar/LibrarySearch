@@ -460,69 +460,76 @@ def search_books():
             break  # 找到匹配就停止
     matching_files = glob.glob(pattern)
 
-    if matching_files:
-        # 生成带有下载链接的 HTML 内容
-        file_links = [
-            f'<li class="list-group-item"><span>{os.path.basename(f)}</span>'
-            f'<a href="/download/{os.path.basename(f)}" class="btn btn-success btn-sm" target="_blank">Download</a>'
-            f'<form method="POST" action="/submit_ticket" style="display:inline;">'
-            f'<input type="hidden" name="book_title" value="{os.path.basename(f)}">'
-            f'<input type="hidden" name="clerk_user_email" value="user@example.com">'
-            f'<button type="submit" class="btn btn-warning btn-sm">Submit Ticket</button>'
-            f'</form></li>'
-            for f in matching_files
-        ]
-        return render_template_string(
-            """
-            <!DOCTYPE html>
-            <html lang="en">
-            <head>
-                <meta charset="UTF-8">
-                <meta name="viewport" content="width=device-width, initial-scale=1.0">
-                <title>Search Results</title>
-                <!-- Bootstrap CSS -->
-                <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-                <style>
-                    body {
-                        background-color: #f8f9fa;
-                        padding: 20px;
-                    }
-                    .card {
-                        margin-bottom: 20px;
-                        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-                    }
-                    .card-header {
-                        background-color: #007bff;
-                        color: white;
-                    }
-                    .list-group-item {
-                        display: flex;
-                        justify-content: space-between;
-                        align-items: center;
-                    }
-                </style>
-            </head>
-            <body>
-                <div class="container">
-                    <h1 class="text-center mb-4">Search Results</h1>
-                    <div class="card">
-                        <div class="card-header">
-                            <h2 class="card-title mb-0">Matching Files</h2>
+        if matching_files:
+            # 生成带有下载链接的 HTML 内容
+            file_links = [
+                f'<li class="list-group-item"><span>{os.path.basename(f)}</span>'
+                f'<a href="/download/{os.path.basename(f)}" class="btn btn-success btn-sm" target="_blank">Download</a>'
+                f'<form method="POST" action="/submit_ticket" style="display:inline;">'
+                f'<input type="hidden" name="book_title" value="{os.path.basename(f)}">'
+                f'<input type="hidden" name="clerk_user_email" value="user@example.com">'
+                f'<button type="submit" class="btn btn-warning btn-sm">Submit Ticket</button>'
+                f'</form></li>'
+                for f in matching_files
+            ]
+            return render_template_string(
+                """
+                <!DOCTYPE html>
+                <html lang="en">
+                <head>
+                    <meta charset="UTF-8">
+                    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+                    <title>Search Results</title>
+                    <!-- Bootstrap CSS -->
+                    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+                    <style>
+                        body {
+                            background-color: #f8f9fa;
+                            padding: 20px;
+                        }
+                        .card {
+                            margin-bottom: 20px;
+                            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+                        }
+                        .card-header {
+                            background-color: #007bff;
+                            color: white;
+                        }
+                        .list-group-item {
+                            display: flex;
+                            justify-content: space-between;
+                            align-items: center;
+                        }
+                        .navigation-buttons {
+                            margin-bottom: 20px;
+                        }
+                    </style>
+                </head>
+                <body>
+                    <div class="container">
+                        <div class="navigation-buttons">
+                            <a href="/" class="btn btn-primary">返回主页</a>
+                            <a href="/filemainpage" class="btn btn-secondary">文件主页</a>
                         </div>
-                        <div class="card-body">
-                            <ul class="list-group">
-                                {{ file_links | safe }}
-                            </ul>
+                        <h1 class="text-center mb-4">Search Results</h1>
+                        <div class="card">
+                            <div class="card-header">
+                                <h2 class="card-title mb-0">Matching Files</h2>
+                            </div>
+                            <div class="card-body">
+                                <ul class="list-group">
+                                    {{ file_links | safe }}
+                                </ul>
+                            </div>
                         </div>
                     </div>
-                </div>
-                <!-- Bootstrap JS -->
-                <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-            </body>
-            </html>
-            """,
-            file_links="".join(file_links)
-        )
+                    <!-- Bootstrap JS -->
+                    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+                </body>
+                </html>
+                """,
+                file_links="".join(file_links)
+            )
     else:
         return jsonify({"message": "No matching files found"}), 200
 

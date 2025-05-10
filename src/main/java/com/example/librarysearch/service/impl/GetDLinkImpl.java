@@ -7,6 +7,7 @@ import org.openqa.selenium.chrome.ChromeDriver;
 import org.openqa.selenium.chrome.ChromeOptions;
 import org.springframework.stereotype.Service;
 import java.io.File;
+import java.util.HashMap;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -23,20 +24,26 @@ public class GetDLinkImpl {
      * @return 下载链接URL，如果获取失败则返回null
      */
     public String getDownloadLink(String bookUrl) {
-        // 配置Chrome浏览器选项
-        ChromeOptions options = new ChromeOptions();
+            // 配置Chrome浏览器选项
+            ChromeOptions options = new ChromeOptions();
 
-        // Specify the path to the user data directory using %USERPROFILE%
-        //String userProfile = System.getenv("USERPROFILE");
-        //options.addArguments("user-data-dir=" + userProfile + "\\AppData\\Local\\Google\\Chrome\\User Data");
-        // 使用项目内的持久化profile目录
-        String profileDir = new File("chrome-profiles/GetDLinkImpl").getAbsolutePath();
-        options.addArguments("user-data-dir=" + profileDir);
-        // Remove "--headless" if you want to see browser actions
-        //options.addArguments("--headless"); 
-        options.addArguments("--disable-gpu");
-        options.addArguments("--no-sandbox");
-        options.addArguments("--disable-dev-shm-usage");
+            // 使用项目内的持久化profile目录
+            String profileDir = new File("chrome-profiles/GetDLinkImpl").getAbsolutePath();
+            options.addArguments("user-data-dir=" + profileDir);
+            // Remove "--headless" if you want to see browser actions
+            //options.addArguments("--headless"); 
+
+            // 设置下载目录
+            String downloadDir = new File("src/main/resources/static/books").getAbsolutePath();
+            HashMap<String, Object> chromePrefs = new HashMap<>();
+            chromePrefs.put("download.default_directory", downloadDir);
+            chromePrefs.put("download.prompt_for_download", false);
+            options.setExperimentalOption("prefs", chromePrefs);
+            
+            // 其他Chrome选项
+            options.addArguments("--disable-gpu");
+            options.addArguments("--no-sandbox");
+            options.addArguments("--disable-dev-shm-usage");
 
         // 初始化WebDriver实例
         WebDriver driver = new ChromeDriver(options);
@@ -135,8 +142,16 @@ public class GetDLinkImpl {
             }
             
             // 检查目标文件夹是否已存在同名文件（增加大小和格式匹配）
-            String downloadDir = "C:\\Users\\PC\\eclipse-workspace\\LibrarySearch\\src\\main\\resources\\static\\books";
             File dir = new File(downloadDir);
+            // 确保下载目录存在
+            if (!dir.exists()) {
+                boolean created = dir.mkdirs();
+                if (created) {
+                    System.out.println("Created download directory: " + downloadDir);
+                } else {
+                    System.err.println("Failed to create download directory: " + downloadDir);
+                }
+            }
             File[] files = dir.listFiles();
             if (files != null) {
                 // 获取远程文件信息
@@ -229,17 +244,25 @@ public class GetDLinkImpl {
                 }
             }
 
-            // 构建搜索URL使用书名前两个词
-            String[] titleWords = bookTitle.split("\\s+");
-            String searchQuery = titleWords.length > 1 ? 
-                titleWords[0] + " " + titleWords[1] : 
-                titleWords[0];
-            // 限制searchQuery最多20个字符
-            if (searchQuery.length() > 20) {
-                searchQuery = searchQuery.substring(0, 20);
-            }
-            downloadUrl = "https://schxar.picp.vip/search?book_name=" + 
-                java.net.URLEncoder.encode(searchQuery, "UTF-8");
+                    // 构建搜索URL使用书名前两个词
+                    String[] titleWords = bookTitle.split("\\s+");
+                    String searchQuery = "";
+                    if (titleWords.length > 0) {
+                        searchQuery = titleWords[0];
+                        if (titleWords.length > 1) {
+                            searchQuery += " " + titleWords[1];
+                        }
+                    }
+                    // 安全限制searchQuery最多20个字符
+                    if (!searchQuery.isEmpty() && searchQuery.length() > 20) {
+                        searchQuery = searchQuery.substring(0, Math.min(searchQuery.length(), 20));
+                    }
+                    if (!searchQuery.isEmpty()) {
+                        downloadUrl = "https://schxar.picp.vip/search?book_name=" + 
+                            java.net.URLEncoder.encode(searchQuery, "UTF-8");
+                    } else {
+                        downloadUrl = "https://schxar.picp.vip/search";
+                    }
 
             // 点击下载按钮触发下载
             Thread.sleep(4000); // 等待4秒确保页面加载完成
@@ -302,13 +325,16 @@ public class GetDLinkImpl {
                             break;
                         }
                         
-                        // 检测书名前10个字符模糊搜索
-                        String shortTitle = bookTitle.length() > 10 ? bookTitle.substring(0, 20) : bookTitle;
-                        if (file.getName().startsWith(shortTitle)) {
-                            System.out.println("检测到书名前20个字符匹配文件已存在");
-                            shouldBreak = true;
-                            break;
-                        }
+                        // 安全检测书名前20个字符模糊搜索
+                    String shortTitle = "";
+                    if (!bookTitle.isEmpty()) {
+                        shortTitle = bookTitle.substring(0, Math.min(bookTitle.length(), 20));
+                    }
+                    if (!shortTitle.isEmpty() && file.getName().startsWith(shortTitle)) {
+                        System.out.println("检测到书名前20个字符匹配文件已存在");
+                        shouldBreak = true;
+                        break;
+                    }
                     }
                     if (shouldBreak) break;
                     
