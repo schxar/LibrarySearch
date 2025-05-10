@@ -233,18 +233,32 @@ public class SearchServiceImpl implements SearchService {
      */
     private void checkTables() {
         try {
-            // 确保目录存在
-            new File(SEARCH_HISTORY_DIRECTORY).mkdirs();
-            new File(CACHE_DIRECTORY).mkdirs();
+            // 确保所有需要的目录都存在
+            ensureDirectoryExists(SEARCH_HISTORY_DIRECTORY);
+            ensureDirectoryExists(CACHE_DIRECTORY);
+            ensureDirectoryExists(AUDIO_DIRECTORY);
             
-            // 检查并创建搜索历史表
-            searchHistoryMapper.createSearchHistoryTableIfNotExists();
-            
-            // 其他表检查逻辑可以在这里添加
-            System.out.println("所有表结构验证完成");
+            // 表结构验证已完成
+            System.out.println("所有目录结构验证完成");
         } catch (Exception e) {
-            System.err.println("表结构验证失败: " + e.getMessage());
-            throw new RuntimeException("数据库表初始化失败", e);
+            System.err.println("目录结构验证失败: " + e.getMessage());
+            throw new RuntimeException("目录初始化失败", e);
+        }
+    }
+
+    /**
+     * 确保指定目录存在，不存在则创建
+     * @param directoryPath 目录路径
+     */
+    private void ensureDirectoryExists(String directoryPath) {
+        File dir = new File(directoryPath);
+        if (!dir.exists()) {
+            boolean created = dir.mkdirs();
+            if (created) {
+                System.out.println("Created directory: " + directoryPath);
+            } else {
+                System.err.println("Failed to create directory: " + directoryPath);
+            }
         }
     }
 
@@ -257,11 +271,8 @@ public class SearchServiceImpl implements SearchService {
             // 确保表存在
             checkTables();
             
-            // Ensure the search history directory exists
-            File historyDir = new File(SEARCH_HISTORY_DIRECTORY);
-            if (!historyDir.exists()) {
-                historyDir.mkdirs();
-            }
+            // 确保搜索历史目录存在
+            ensureDirectoryExists(SEARCH_HISTORY_DIRECTORY);
 
             // Get today's date for the file name
             String date = new SimpleDateFormat("yyyy-MM-dd").format(new Date());
@@ -316,13 +327,25 @@ public class SearchServiceImpl implements SearchService {
         File countFile = new File(SEARCH_COUNT_FILE);
         int count = 0;
 
+        // 确保目录和文件存在
+        File historyDir = new File(SEARCH_HISTORY_DIRECTORY);
+        if (!historyDir.exists()) {
+            historyDir.mkdirs();
+        }
+        
+        // 如果文件不存在则创建并初始化计数为0
+        if (!countFile.exists()) {
+            try (BufferedWriter writer = new BufferedWriter(new FileWriter(countFile))) {
+                writer.write("0");
+            }
+            System.out.println("Created new search count file: " + SEARCH_COUNT_FILE);
+        }
+
         // Read the current count from the file
-        if (countFile.exists()) {
-            try (BufferedReader reader = new BufferedReader(new FileReader(countFile))) {
-                String line = reader.readLine();
-                if (line != null) {
-                    count = Integer.parseInt(line.trim());
-                }
+        try (BufferedReader reader = new BufferedReader(new FileReader(countFile))) {
+            String line = reader.readLine();
+            if (line != null) {
+                count = Integer.parseInt(line.trim());
             }
         }
 
@@ -448,11 +471,8 @@ public class SearchServiceImpl implements SearchService {
             // 确保表存在
             checkTables();
             
-            // Ensure the cache directory exists
-            File cacheDir = new File(CACHE_DIRECTORY);
-            if (!cacheDir.exists()) {
-                cacheDir.mkdirs();
-            }
+            // 确保缓存目录存在
+            ensureDirectoryExists(CACHE_DIRECTORY);
 
             // Create a file for the cached HTML
             String cacheFilePath = CACHE_DIRECTORY + query + ".html";
