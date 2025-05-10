@@ -136,6 +136,29 @@ public class SearchServiceImpl implements SearchService {
             for (Element item : items) {
                 String id = item.attr("id");
                 String title = item.select("[slot=title]").text();
+                // 保存书籍信息到JSON文件
+                Map<String, Object> bookInfo = new HashMap<>();
+                bookInfo.put("id", id);
+                // 对中文标题进行URL解码处理
+                String decodedTitle = java.net.URLDecoder.decode(title, StandardCharsets.UTF_8.name());
+                bookInfo.put("title", decodedTitle);
+                bookInfo.put("bookUrl", "https://zh.z-lib.gl" + item.attr("href"));
+                
+                // 确保书籍数据目录存在
+                String booksDataDir = System.getProperty("user.dir") + "/src/main/resources/static/books_data/";
+                ensureDirectoryExists(booksDataDir);
+                
+                // 使用ID和书名作为文件名，保留常见符号但替换不安全字符
+                String safeTitle = decodedTitle.replaceAll("[\\\\/:*?\"<>|]", "_") // 替换Windows文件名非法字符
+                    .replaceAll("\\s+", " ").trim(); // 合并连续空格
+                String jsonFilePath = booksDataDir + safeTitle + "_" + id + ".json";
+                
+                try (FileWriter writer = new FileWriter(jsonFilePath)) {
+                    new Gson().toJson(bookInfo, writer);
+                } catch (IOException e) {
+                    System.err.println("Error saving book info: " + e.getMessage());
+                }
+                
                 String author = item.select("[slot=author]").text();
                 System.out.println(author);
                 String isbn = item.attr("isbn");
