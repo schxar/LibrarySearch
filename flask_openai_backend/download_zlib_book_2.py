@@ -1,7 +1,9 @@
-from flask import Flask, render_template, request, jsonify, send_file, render_template_string, redirect, url_for, session, send_from_directory
+from flask import Flask, Response, render_template, request, jsonify, send_file, render_template_string, redirect, url_for, session, send_from_directory
+from flask_caching import Cache
 import os
 import json
 import glob
+import base64
 import os
 import glob
 from math import ceil
@@ -14,12 +16,16 @@ import re
 import traceback
 from dotenv import load_dotenv
 
+from doubao_vlm_service import vlm_upload as doubao_vlm_upload, chat as doubao_chat
+
 
 # 加载环境变量
 load_dotenv()
 
 app = Flask(__name__)
 app.config['SECRET_KEY'] = os.getenv('FLASK_SECRET_KEY', 'your_secret_key')
+app.config['CACHE_TYPE'] = 'SimpleCache'
+cache = Cache(app)
 
 # DeepSeek客户端配置
 try:
@@ -33,6 +39,8 @@ try:
 except Exception as e:
     print(f"DeepSeek初始化失败: {str(e)}")
     deepseek_client = None
+
+
 
 # 自定义下载目录
 download_directory = os.path.join(os.getcwd(), "C:\\Users\\PC\\eclipse-workspace\\LibrarySearch\\src\\main\\resources\\static\\books")
@@ -202,106 +210,9 @@ def login_required(f):
         return f(*args, **kwargs)
     return decorated_function
 
-# 登录页面HTML模板
-HTML_LOGIN = """
-<!-- Updated login HTML template -->
-<!DOCTYPE html>
-<html>
-<head>
-    <meta charset="UTF-8">
-    <title>Flask Test with Clerk</title>
-    <!-- Include Bootstrap CSS for styling -->
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-    <!-- Include jQuery -->
-    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-
-    <!-- Clerk SDK -->
-    <script
-        async
-        crossorigin="anonymous"
-        data-clerk-publishable-key="pk_test_bGFyZ2UtY3JheWZpc2gtMzIuY2xlcmsuYWNjb3VudHMuZGV2JA"
-        src="https://intense-guppy-8.clerk.accounts.dev/npm/@clerk/clerk-js@latest/dist/clerk.browser.js"
-        type="text/javascript"
-    ></script>
-</head>
-<body class="container mt-5">
-    <h1 class="mb-4">Flask Test with Clerk Authentication</h1>
-
-    <!-- User Interface Placeholder -->
-    <div id="app"></div>
-
-    <!-- New Button for File Main Page (Hidden by default, shown after login) -->
-    <div id="fileMainButton" class="mt-4" style="display: none;">
-        <button class="btn btn-primary" onclick="window.location.href='/filemainpage'">Go to File Main Page</button>
-    </div>
-
-    <!-- Recommendation Buttons (Hidden by default, shown after login) -->
-    <div id="recommendationButtons" class="mt-4" style="display: none;">
-        <button class="btn btn-info me-2" onclick="window.location.href='/recommend'">Get Recommendations</button>
-        <button class="btn btn-secondary" onclick="window.location.href='/view_recommendations'">View Recommendation History</button>
-    </div>
-
-    <!-- New Button for NotebookLM -->
-    <div class="mt-4 text-center">
-        <a href="https://notebooklm.google.com/" target="_blank" class="btn btn-success">Go to NotebookLM</a>
-        <a href="https://313m929k61.vicp.fun/" target="_blank" class="btn btn-info ms-2">Search Homepage</a>
-        <a href="https://schxar.picp.vip/download_history" target="_blank" class="btn btn-info ms-2">Download history</a>
-    </div>
-
-    <script>
-        window.addEventListener('load', async function () {
-            // Initialize Clerk
-            await Clerk.load();
-
-            // Check if the user is logged in
-            if (Clerk.user) {
-                // Show user button
-                document.getElementById('app').innerHTML = '<div id="user-button"></div>';
-                Clerk.mountUserButton(document.getElementById('user-button'));
-
-                // Show the buttons for logged-in users
-                $("#fileMainButton").show();
-                $("#recommendationButtons").show();
-
-    // Set session user_email
-    $.ajax({
-        url: '/set_user_session',
-        type: 'POST',
-        data: { email: Clerk.user.emailAddresses[0].emailAddress },
-        success: function(response) {
-            console.log('Session set:', response);
-            
-            // 检查是否从搜索页面返回
-            if(document.referrer.indexOf('/search') > -1) {
-                // 显示已登录提示和返回按钮
-                $("#app").append(`
-                    <div class="alert alert-success mt-3">
-                        您已成功登录，请<a href="${document.referrer}" class="alert-link">返回搜索页面</a>重试下载
-                    </div>
-                `);
-            }
-        },
-        error: function(error) {
-            console.error('Failed to set session:', error);
-        }
-    });
-            } else {
-                // Show sign-in button for non-logged-in users
-                document.getElementById('app').innerHTML = '<div id="sign-in"></div>';
-                Clerk.mountSignIn(document.getElementById('sign-in'));
-
-                // Hide the file main page button for non-logged-in users
-                $("#fileMainButton").hide();
-            }
-        });
-    </script>
-</body>
-</html>
-"""
-
 @app.route('/', methods=['GET'])
 def index():
-    return render_template_string(HTML_LOGIN)
+    return render_template('login.html')
 
 @app.route('/set_session', methods=['POST'])
 def set_session():
@@ -314,6 +225,7 @@ def set_session():
 
 # 保护路由的装饰器
 from functools import wraps
+
 
 def login_required(f):
     @wraps(f)
@@ -498,14 +410,21 @@ def search_books():
     search_terms = [term for term in search_terms if term is not None]
     
     matching_files = []
+    seen_files = set()  # 用于去重
+    
     for term in search_terms:
+        # 不区分大小写的搜索
         pattern = os.path.join(download_directory, f"*{term}*")
-        current_matches = glob.glob(pattern)
+        current_matches = [
+            f for f in glob.glob(pattern, recursive=True) 
+            if f.lower() not in seen_files
+        ]
+        
         if current_matches:
+            seen_files.update(f.lower() for f in current_matches)
             matching_files.extend(current_matches)
             print(f"使用搜索词 '{term}' 找到 {len(current_matches)} 个匹配文件")
             break  # 找到匹配就停止
-    matching_files = glob.glob(pattern)
 
     if matching_files:
             # 生成带有下载链接的 HTML 内容
@@ -513,6 +432,7 @@ def search_books():
                 f'<li class="list-group-item"><span>{os.path.basename(f)}</span>'
                 f'<a href="/download/{os.path.basename(f)}" class="btn btn-success btn-sm" target="_blank">Download</a>'
                 f'<a href="https://313m929k61.vicp.fun/search/books?book_name={os.path.basename(f)}" class="btn btn-info btn-sm" target="_blank">查询该文件ID</a>'
+                f'<a href="{DOUBAO_SERVICE_URL}/doubao_chat?query={os.path.basename(f).replace("(Z-Library)","").rsplit(".", 1)[0]}" class="btn btn-primary btn-sm">Chat with Doubao</a>'
                 
                 f'<form method="POST" action="/submit_ticket" style="display:inline;">'
                 f'<input type="hidden" name="book_title" value="{os.path.basename(f)}">'
@@ -521,65 +441,23 @@ def search_books():
                 f'</form></li>'
                 for f in matching_files
             ]
-        return render_template_string(
-                """
-                <!DOCTYPE html>
-                <html lang="en">
-                <head>
-                    <meta charset="UTF-8">
-                    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-                    <title>Search Results</title>
-                    <!-- Bootstrap CSS -->
-                    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-                    <style>
-                        body {
-                            background-color: #f8f9fa;
-                            padding: 20px;
-                        }
-                        .card {
-                            margin-bottom: 20px;
-                            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-                        }
-                        .card-header {
-                            background-color: #007bff;
-                            color: white;
-                        }
-                        .list-group-item {
-                            display: flex;
-                            justify-content: space-between;
-                            align-items: center;
-                        }
-                        .navigation-buttons {
-                            margin-bottom: 20px;
-                        }
-                    </style>
-                </head>
-                <body>
-                    <div class="container">
-                        <div class="navigation-buttons">
-                            <a href="/" class="btn btn-primary">返回主页</a>
-                            <a href="/filemainpage" class="btn btn-secondary">文件主页</a>
-                            <a href="https://313m929k61.vicp.fun/" class="btn btn-warning" target="_blank">访问搜索</a>'
-                        </div>
-                        <h1 class="text-center mb-4">Search Results</h1>
-                        <div class="card">
-                            <div class="card-header">
-                                <h2 class="card-title mb-0">Matching Files</h2>
-                            </div>
-                            <div class="card-body">
-                                <ul class="list-group">
-                                    {{ file_links | safe }}
-                                </ul>
-                            </div>
-                        </div>
-                    </div>
-                    <!-- Bootstrap JS -->
-                    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-                </body>
-                </html>
-                """,
-                file_links="".join(file_links)
-            )
+        # 添加缓存键
+        cache_key = f"search:{book_name}"
+        
+        # 尝试从缓存获取
+        cached_result = app.extensions['cache'].get(cache_key)
+        if cached_result is not None:
+            return cached_result
+            
+        # 渲染模板
+        result = render_template(
+            'search_results.html',
+            file_links=file_links
+        )
+        
+        # 设置缓存，有效期5分钟
+        cache.set(cache_key, result, timeout=300)
+        return result
     else:
         return jsonify({"message": "No matching files found"}), 200
 
@@ -821,6 +699,12 @@ def view_recommendations():
     finally:
         connection.close()
 
+@app.route('/chat', methods=['GET'])
+def handle_chat_page():
+    """处理聊天页面请求"""
+    query = request.args.get('query', '')
+    return render_template('doubao_chat.html', query=query)
+
 @app.route('/download_history', methods=['GET', 'POST'])
 def download_history():
     """查询下载记录"""
@@ -857,55 +741,21 @@ def download_history():
     
     return render_template('download_history_form.html')
 
-if __name__ == '__main__':
-    # 创建所有需要的表
-    try:
-        conn = get_db_connection()
-        with conn.cursor() as cursor:
-            # 创建下载历史表
-            cursor.execute('''
-                CREATE TABLE IF NOT EXISTS DownloadHistory (
-                    id INT AUTO_INCREMENT PRIMARY KEY,
-                    user_email VARCHAR(255) NOT NULL,
-                    filename VARCHAR(255) NOT NULL,
-                    email_hash VARCHAR(64) NOT NULL,
-                    filename_hash VARCHAR(64) NOT NULL,
-                    download_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-                ) CHARSET=utf8mb4;
-            ''')
-            
-            # 创建推荐记录表
-            cursor.execute('''
-                CREATE TABLE IF NOT EXISTS SearchRecommendations (
-                    id INT AUTO_INCREMENT PRIMARY KEY,
-                    user_email VARCHAR(255) NOT NULL,
-                    email_hash VARCHAR(64) NOT NULL,
-                    search_terms TEXT NOT NULL,
-                    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-                ) CHARSET=utf8mb4;
-            ''')
-            
-            # 创建NotebookLM请求表
-            cursor.execute('''
-                CREATE TABLE IF NOT EXISTS NotebookLMAudioRequests (
-                    id INT AUTO_INCREMENT PRIMARY KEY,
-                    book_title VARCHAR(255) NOT NULL,
-                    book_hash VARCHAR(64) NOT NULL,
-                    request_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-                    clerk_user_email VARCHAR(255) NOT NULL,
-                    status ENUM('pending', 'processing', 'completed') DEFAULT 'pending'
-                ) CHARSET=utf8mb4;
-            ''')
-        conn.commit()
-        print("所有表结构验证完成")
-    except Exception as e:
-        print(f"表结构验证失败: {str(e)}")
-        exit(1)
-    finally:
-        conn.close()
-    
-    # 清理重复文件
-    remove_duplicate_files(download_directory)
+
+
+
+
+
+
+    # 启动豆包VLM服务
+#doubao_vlm_process = subprocess.Popen(
+#    ['python', 'flask_openai_backend\\doubao_vlm_service.py'],
+#    cwd=os.getcwd()  # 确保工作目录正确
+#    )
     
     # 启动主应用
-    app.run(host='0.0.0.0', port=10805, debug=False)
+#try:
+app.run(host='0.0.0.0', port=10805, debug=True)
+#finally:
+        # 确保主应用退出时终止子进程
+#    doubao_vlm_process.terminate()

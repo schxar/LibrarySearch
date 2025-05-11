@@ -110,6 +110,10 @@
                                     data-filename="{{ file }}">
                                 Search ID
                             </button>
+                            {% set clean_filename = file|replace('(Z-Library)','')|replace(' ','')|replace('.mobi','')|replace('.epub','')|replace('.pdf','') %}
+                            <a href="/doubao_chat?query={{ clean_filename | urlencode }}" class="btn btn-primary btn-xs">
+                                Chat with Doubao
+                            </a>
                             <form method="POST" action="/submit_ticket" style="display:inline;">
                                 <input type="hidden" name="book_title" value="{{ file }}">
                                 <input type="hidden" name="clerk_user_email" value="{{ session.user_email }}">

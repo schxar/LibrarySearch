@@ -1,3 +1,4 @@
+<!-- Updated login HTML template -->
 <!DOCTYPE html>
 <html>
 <head>
@@ -23,31 +24,22 @@
     <!-- User Interface Placeholder -->
     <div id="app"></div>
 
-    <!-- Loading Spinner -->
-    <div id="loading" class="text-center mb-3" style="display: none;">
-        <div class="spinner-border" role="status">
-            <span class="visually-hidden">Loading...</span>
-        </div>
+    <!-- New Button for File Main Page (Hidden by default, shown after login) -->
+    <div id="fileMainButton" class="mt-4" style="display: none;">
+        <button class="btn btn-primary" onclick="window.location.href='/filemainpage'">Go to File Main Page</button>
     </div>
 
-    <!-- Search Bar -->
-    <div class="input-group mb-3">
-        <input type="text" id="searchQuery" class="form-control" placeholder="Enter search keyword" aria-label="Search" disabled />
-        <button id="searchButton" class="btn btn-primary" disabled>Search</button>
-    </div>
-
-    <!-- Results Section -->
-    <div id="results"></div>
-
-    <!-- Direct Access Button (Hidden by default, shown after login) -->
-    <div id="directAccessButton" class="mt-4" style="display: none;">
-        <button class="btn btn-warning" onclick="window.open('https://schxar.picp.vip/', '_blank')">Visit Flask File Server</button>
+    <!-- Recommendation Buttons (Hidden by default, shown after login) -->
+    <div id="recommendationButtons" class="mt-4" style="display: none;">
+        <button class="btn btn-info me-2" onclick="window.location.href='/recommend'">Get Recommendations</button>
+        <button class="btn btn-secondary" onclick="window.location.href='/view_recommendations'">View Recommendation History</button>
     </div>
 
     <!-- New Button for NotebookLM -->
     <div class="mt-4 text-center">
         <a href="https://notebooklm.google.com/" target="_blank" class="btn btn-success">Go to NotebookLM</a>
         <a href="https://313m929k61.vicp.fun/" target="_blank" class="btn btn-info ms-2">Search Homepage</a>
+        <a href="https://schxar.picp.vip/download_history" target="_blank" class="btn btn-info ms-2">Download history</a>
     </div>
 
     <script>
@@ -61,94 +53,39 @@
                 document.getElementById('app').innerHTML = '<div id="user-button"></div>';
                 Clerk.mountUserButton(document.getElementById('user-button'));
 
-                // Enable search functionality for logged-in users
-                $("#searchQuery").prop("disabled", false);  // Enable the search input
-                $("#searchButton").prop("disabled", false);  // Enable the search button
+                // Show the buttons for logged-in users
+                $("#fileMainButton").show();
+                $("#recommendationButtons").show();
 
-                // Show the direct access button for logged-in users
-                $("#directAccessButton").show();
+    // Set session user_email
+    $.ajax({
+        url: '/set_user_session',
+        type: 'POST',
+        data: { email: Clerk.user.emailAddresses[0].emailAddress },
+        success: function(response) {
+            console.log('Session set:', response);
+            
+            // 检查是否从搜索页面返回
+            if(document.referrer.indexOf('/search') > -1) {
+                // 显示已登录提示和返回按钮
+                $("#app").append(`
+                    <div class="alert alert-success mt-3">
+                        您已成功登录，请<a href="${document.referrer}" class="alert-link">返回搜索页面</a>重试下载
+                    </div>
+                `);
+            }
+        },
+        error: function(error) {
+            console.error('Failed to set session:', error);
+        }
+    });
             } else {
                 // Show sign-in button for non-logged-in users
                 document.getElementById('app').innerHTML = '<div id="sign-in"></div>';
                 Clerk.mountSignIn(document.getElementById('sign-in'));
 
-                // Disable search input and button for non-logged-in users
-                $("#searchQuery").prop("disabled", true);  // Disable the search input
-                $("#searchButton").prop("disabled", true);  // Disable the search button
-
-                // Hide the direct access button for non-logged-in users
-                $("#directAccessButton").hide();
-            }
-        });
-
-        // Handle Search Functionality
-        $(document).ready(function() {
-            $("#searchButton").click(function() {
-                if (Clerk.user) { // Only allow search if user is logged in
-                    performSearch();
-                }
-            });
-
-            // Allow pressing Enter to trigger search (only if logged in)
-            $("#searchQuery").keypress(function(e) {
-                if (e.which === 13 && Clerk.user) { // Only allow Enter key if logged in
-                    performSearch();
-                }
-            });
-
-            function performSearch() {
-                const query = $("#searchQuery").val().trim();
-
-                if (query === "") {
-                    displayError("Please enter a search keyword.");
-                    return;
-                }
-
-                // Clear results and show loading spinner
-                $("#results").html("");
-                $("#loading").show();
-
-                // AJAX request to fetch search results
-                $.ajax({
-                    url: "/search",
-                    type: "GET",
-                    data: { q: query },
-                    dataType: "json",
-                    success: function(data) {
-                        $("#loading").hide(); // Hide spinner
-                        renderResults(data);
-                    },
-                    error: function() {
-                        $("#loading").hide(); // Hide spinner
-                        displayError("Search failed. Please try again later.");
-                    }
-                });
-            }
-
-            function renderResults(data) {
-                let html = "";
-
-                if (data.results && data.results.length > 0) {
-                    html += "<ul class='list-group'>";
-                    data.results.forEach(function (item) {
-                        html += `
-                            <li class="list-group-item">
-                                <h5>${item.title}</h5>
-                                <p>${item.description}</p>
-                                <a href="${item.url}" target="_blank">View Details</a>
-                            </li>
-                        `;
-                    });
-                    html += "</ul>";
-                } else {
-                    html = "<div class='alert alert-warning' role='alert'>No results found.</div>";
-                }
-
-                $("#results").html(html);
-            }
-
-            function displayError(message) {
-                $("#results").html(`<div class='alert alert-danger' role='alert'>${message}</div>`);
+                // Hide the file main page button for non-logged-in users
+                $("#fileMainButton").hide();
             }
         });
     </script>

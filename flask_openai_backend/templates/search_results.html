@@ -1,0 +1,63 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Search Results</title>
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        body {
+            background-color: #f8f9fa;
+            padding: 20px;
+        }
+        .card {
+            margin-bottom: 20px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+        .card-header {
+            background-color: #007bff;
+            color: white;
+        }
+        .list-group-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+        .navigation-buttons {
+            margin-bottom: 20px;
+        }
+        .file-actions {
+            display: flex;
+            gap: 0.5rem;
+            margin-top: 0.5rem;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="navigation-buttons">
+            <a href="/" class="btn btn-primary">返回主页</a>
+            <a href="/filemainpage" class="btn btn-secondary">文件主页</a>
+            <a href="https://313m929k61.vicp.fun/" class="btn btn-warning" target="_blank">访问搜索</a>
+        </div>
+        <h1 class="text-center mb-4">Search Results</h1>
+        <div class="card">
+            <div class="card-header">
+                <h2 class="card-title mb-0">Matching Files</h2>
+            </div>
+            <div class="card-body">
+                <ul class="list-group">
+                    {% for file_link in file_links %}
+                        {{ file_link | safe }}
+                    {% endfor %}
+                </ul>
+            </div>
+        </div>
+    </div>
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
