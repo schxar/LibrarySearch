@@ -1,4 +1,5 @@
 
+import json
 from flask import Flask, render_template, request, jsonify
 from flask_cors import CORS
 from openai import OpenAI
@@ -9,6 +10,7 @@ import pymysql
 import re
 import traceback
 from dotenv import load_dotenv
+from requests import Response
 
 download_directory = os.path.join(os.getcwd(), "C:\\Users\\PC\\eclipse-workspace\\LibrarySearch\\src\\main\\resources\\static\\books")
 
@@ -23,7 +25,13 @@ DB_CONFIG = {
 }
 
 app = Flask(__name__)
-CORS(app)  # 启用CORS支持
+CORS(app, resources={
+    r"/api/*": {
+        "origins": "*",
+        "methods": ["GET", "POST", "OPTIONS"],
+        "allow_headers": ["Content-Type"]
+    }
+})  # 启用CORS支持并配置详细规则
 
 # 初始化豆包客户端
 with open(os.path.join(os.path.dirname(__file__), 'templates', 'doubao.txt'), 'r') as f:
@@ -40,6 +48,8 @@ text_client = OpenAI(
     api_key=api_key,
     base_url="https://ark.cn-beijing.volces.com/api/v3/bots"
 )
+
+# 删除 DeepSeek 客户端配置
 
 @app.route('/api/doubao/vlm_upload', methods=['POST'])
 def vlm_upload():
@@ -96,22 +106,84 @@ def chat():
             return jsonify({'error': '缺少必要参数'}), 400
         
         try:
-            response = text_client.chat.completions.create(
-                model="bot-20250506042211-5bscp",
-                messages=[
-                    {"role": "system", "content": "你是豆包，是由字节跳动开发的 AI 人工智能助手"},
-                    *data['messages']
-                ],
-            )
+            # 优先从环境变量获取API Key
+            api_key = os.environ.get("ARK_API_KEY")
+            if not api_key:
+                # 环境变量不存在则从文件读取
+                with open(os.path.join(os.path.dirname(__file__), 'templates', 'doubao.txt'), 'r') as f:
+                    api_key = f.read().strip()
             
-            result = {
-                'content': response.choices[0].message.content
-            }
-            
-            if hasattr(response, "references"):
-                result['references'] = response.references
+            if not api_key:
+                return jsonify({'error': 'API Key未配置'}), 500
                 
-            return jsonify(result)
+            # 初始化客户端
+            client = OpenAI(
+                api_key=api_key,
+                base_url="https://ark.cn-beijing.volces.com/api/v3/bots"
+            )
+
+            # 检查最后一条用户消息是否包含URL
+            last_message = data['messages'][-1]['content']
+            url_pattern = re.compile(
+                r'http[s]?://(?:[a-zA-Z]|[0-9]|[$-_@.&+]|[!*\\(\\),]|(?:%[0-9a-fA-F][0-9a-fA-F]))+'
+            )
+            url_match = url_pattern.search(last_message)
+            
+            if url_match:
+                # 如果包含URL，调用专门的URL解析模型
+                url = url_match.group()
+                response = client.chat.completions.create(
+                    model="bot-20250506034902-4psdn",
+                    messages=[
+                        {
+                            "role": "system", 
+                            "content": "你是一个专业的URL内容解析器，请解析用户提供的URL内容，返回标题和主要内容"
+                        },
+                        {
+                            "role": "user",
+                            "content": f"请解析以下URL内容并返回标题和主要内容：{url}"
+                        }
+                    ]
+                )
+                
+                result = {
+                    'content': response.choices[0].message.content,
+                    'is_url_response': True
+                }
+                
+                if hasattr(response, "references"):
+                    result['references'] = response.references
+                    
+                return jsonify(result)
+            else:
+                # 普通聊天处理
+                response = client.chat.completions.create(
+                    model="bot-20250506042211-5bscp",
+                    messages=[
+                        {"role": "system", "content": "你是豆包，是由字节跳动开发的 AI 人工智能助手"},
+                        *data['messages']
+                    ],
+                    stream=data.get('stream', False)
+                )
+                
+                if data.get('stream', False):
+                    # 流式响应
+                    def generate():
+                        for chunk in response:
+                            if chunk.choices and chunk.choices[0].delta.content:
+                                yield chunk.choices[0].delta.content
+                    
+                    return Response(generate(), mimetype='text/plain')
+                else:
+                    # 标准响应
+                    result = {
+                        'content': response.choices[0].message.content
+                    }
+                    
+                    if hasattr(response, "references"):
+                        result['references'] = response.references
+                        
+                    return jsonify(result)
             
         except Exception as e:
             return jsonify({'error': str(e)}), 500
@@ -195,6 +267,67 @@ def doubao_websearch():
             return jsonify(parsed_result)
         except json.JSONDecodeError:
             return jsonify({"content": result})
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
+
+@app.route('/api/doubao/url_parse', methods=['POST'])
+def doubao_url_parse():
+    """URL解析API接口"""
+    if not text_client:
+        return jsonify({"error": "豆包客户端未初始化"}), 500
+        
+    data = request.get_json()
+    if not data or not data.get('url'):
+        return jsonify({"error": "请求体必须包含url参数"}), 400
+    
+    try:
+        # 调用豆包API解析URL内容
+        response = text_client.chat.completions.create(
+            model="bot-20250506042211-5bscp",
+            messages=[
+                {
+                    "role": "system",
+                    "content": "你是一个专业的URL内容解析器，请解析用户提供的URL内容，返回标题和主要内容"
+                },
+                {
+                    "role": "user",
+                    "content": f"请解析以下URL内容并返回标题和主要内容：{data['url']}"
+                }
+            ]
+        )
+        
+        # 获取解析结果
+        parsed_content = response.choices[0].message.content
+        
+        # 将解析结果传入search流程
+        search_response = text_client.chat.completions.create(
+            model="bot-20250506042211-5bscp",
+            messages=[
+                {
+                    "role": "system",
+                    "content": "你是一个搜索引擎，请根据以下内容返回相关信息"
+                },
+                {
+                    "role": "user",
+                    "content": parsed_content
+                }
+            ]
+        )
+        
+        result = search_response.choices[0].message.content
+        try:
+            parsed_result = json.loads(result)
+            return jsonify({
+                "original_url": data['url'],
+                "parsed_content": parsed_content,
+                "search_results": parsed_result
+            })
+        except json.JSONDecodeError:
+            return jsonify({
+                "original_url": data['url'],
+                "parsed_content": parsed_content,
+                "search_results": result
+            })
     except Exception as e:
         return jsonify({"error": str(e)}), 500
 
@@ -353,5 +486,4 @@ if __name__ == '__main__':
     # 清理重复文件
     remove_duplicate_files(download_directory)
 
-if __name__ == '__main__':
     app.run(host='0.0.0.0', port=10807, debug=True)

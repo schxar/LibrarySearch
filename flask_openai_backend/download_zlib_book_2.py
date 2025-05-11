@@ -432,7 +432,7 @@ def search_books():
                 f'<li class="list-group-item"><span>{os.path.basename(f)}</span>'
                 f'<a href="/download/{os.path.basename(f)}" class="btn btn-success btn-sm" target="_blank">Download</a>'
                 f'<a href="https://313m929k61.vicp.fun/search/books?book_name={os.path.basename(f)}" class="btn btn-info btn-sm" target="_blank">查询该文件ID</a>'
-                f'<a href="{DOUBAO_SERVICE_URL}/doubao_chat?query={os.path.basename(f).replace("(Z-Library)","").rsplit(".", 1)[0]}" class="btn btn-primary btn-sm">Chat with Doubao</a>'
+                f'<a href="/doubao_chat?query={os.path.basename(f).replace("(Z-Library)","").rsplit(".", 1)[0]}" class="btn btn-primary btn-sm">Chat with Doubao</a>'
                 
                 f'<form method="POST" action="/submit_ticket" style="display:inline;">'
                 f'<input type="hidden" name="book_title" value="{os.path.basename(f)}">'
@@ -699,11 +699,58 @@ def view_recommendations():
     finally:
         connection.close()
 
-@app.route('/chat', methods=['GET'])
+@app.route('/doubao_chat', methods=['GET'])
 def handle_chat_page():
     """处理聊天页面请求"""
     query = request.args.get('query', '')
     return render_template('doubao_chat.html', query=query)
+
+@app.route('/api/doubao/chat', methods=['POST'])
+def doubao_chat_api():
+    """处理豆包聊天API请求，转发到10807端口"""
+    try:
+        # 处理multipart/form-data类型的图片上传
+        if 'multipart/form-data' in request.content_type:
+            file = request.files.get('file')
+            if not file:
+                return jsonify({'error': 'No file uploaded'}), 400
+                
+            # 转发文件到10807端口
+            import requests
+            files = {'file': (file.filename, file.stream, file.mimetype)}
+            data = {'question': request.form.get('question', '')}
+            
+            response = requests.post(
+                'http://localhost:10807/api/doubao/chat',
+                files=files,
+                data=data
+            )
+        else:
+            # 处理JSON或表单数据
+            if request.content_type == 'application/json':
+                data = request.get_json()
+            else:
+                data = request.form.to_dict()
+            
+            # 转发请求到10807端口
+            import requests
+            response = requests.post(
+                'http://localhost:10807/api/doubao/chat',
+                json=data if 'application/json' in request.content_type else None,
+                data=data if 'application/json' not in request.content_type else None,
+                headers={'Content-Type': request.content_type}
+            )
+        
+        # 返回响应
+        return jsonify(response.json()), response.status_code
+        
+    except Exception as e:
+        import traceback
+        traceback.print_exc()
+        return jsonify({
+            'error': str(e),
+            'message': 'Failed to forward request to Doubao service'
+        }), 500
 
 @app.route('/download_history', methods=['GET', 'POST'])
 def download_history():
@@ -742,20 +789,20 @@ def download_history():
     return render_template('download_history_form.html')
 
 
+from threading import Thread
+import time
 
+def run_vlm_service():
+    """运行VLM服务的线程函数"""
+    from doubao_vlm_service import app as vlm_app
+    vlm_app.run(host='0.0.0.0', port=10807, debug=False, use_reloader=False)
 
+# 启动VLM服务线程
+vlm_thread = Thread(target=run_vlm_service, daemon=True)
+vlm_thread.start()
 
+# 等待VLM服务启动
+time.sleep(2)
 
-
-    # 启动豆包VLM服务
-#doubao_vlm_process = subprocess.Popen(
-#    ['python', 'flask_openai_backend\\doubao_vlm_service.py'],
-#    cwd=os.getcwd()  # 确保工作目录正确
-#    )
-    
-    # 启动主应用
-#try:
+# 启动主应用
 app.run(host='0.0.0.0', port=10805, debug=True)
-#finally:
-        # 确保主应用退出时终止子进程
-#    doubao_vlm_process.terminate()
