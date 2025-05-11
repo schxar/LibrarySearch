@@ -7,6 +7,60 @@
     <title>Doubao Chat</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <style>
+        .sidebar {
+            width: 260px;
+            height: 100vh;
+            position: fixed;
+            left: 0;
+            top: 0;
+            background-color: #f8f9fa;
+            border-right: 1px solid #dee2e6;
+            padding: 20px;
+            overflow-y: auto;
+            transition: transform 0.3s ease;
+            z-index: 1000;
+        }
+        .sidebar-header {
+            margin-bottom: 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .chat-item {
+            padding: 10px;
+            margin-bottom: 5px;
+            border-radius: 5px;
+            cursor: pointer;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+        .chat-item:hover {
+            background-color: #e9ecef;
+        }
+        .chat-item.active {
+            background-color: #e3f2fd;
+        }
+        .new-chat-btn {
+            width: 100%;
+            margin-bottom: 15px;
+        }
+        .sidebar-toggle {
+            position: fixed;
+            left: 10px;
+            top: 10px;
+            z-index: 1001;
+        }
+        .main-content {
+            margin-left: 260px;
+            transition: margin-left 0.3s ease;
+        }
+        .sidebar-collapsed .sidebar {
+            transform: translateX(-100%);
+        }
+        .sidebar-collapsed .main-content {
+            margin-left: 0;
+        }
         body {
             background-color: #f8f9fa;
             padding: 20px;
@@ -89,10 +143,21 @@
     </style>
 </head>
 <body>
-    <div class="container chat-container">
-        <h1 class="text-center mb-4">Doubao Chat</h1>
-        
-        <div class="card">
+    <button id="sidebarToggle" class="btn btn-primary sidebar-toggle">☰</button>
+    
+    <div class="sidebar">
+        <div class="sidebar-header">
+            <h5>Chat History</h5>
+        </div>
+        <button id="new-chat-sidebar" class="btn btn-primary new-chat-btn">+ New Chat</button>
+        <div id="chat-list"></div>
+    </div>
+    
+    <div class="main-content">
+        <div class="container chat-container">
+            <h1 class="text-center mb-4">Doubao Chat</h1>
+            
+            <div class="card">
             <div class="card-header">
                 <h5 class="mb-0">Chat with Doubao</h5>
             </div>
@@ -116,8 +181,23 @@
                 </form>
                 
                 <div class="mt-3">
-                    <button id="new-chat" class="btn btn-secondary">New Chat</button>
-                    <a href="/filemainpage" class="btn btn-info">Back to Files</a>
+                    <div class="dropdown d-inline-block me-2">
+                        <button class="btn btn-outline-primary dropdown-toggle" type="button" id="chatHistoryDropdown" data-bs-toggle="dropdown" aria-expanded="false">
+                            Chat Histories
+                        </button>
+                        <ul class="dropdown-menu" id="chatHistoryList" aria-labelledby="chatHistoryDropdown">
+                            <!-- 聊天历史将通过JS动态加载 -->
+                        </ul>
+                    </div>
+                    
+                    <div class="d-inline-flex flex-wrap gap-2">
+                        <button id="new-chat" class="btn btn-secondary">New Chat</button>
+                        <button id="save-chat" class="btn btn-primary">Save Chat</button>
+                        <a href="/filemainpage" class="btn btn-info">Back to Files</a>
+                        <a href="https://notebooklm.google.com/" target="_blank" class="btn btn-success">Go to NotebookLM</a>
+                        <a href="https://313m929k61.vicp.fun/" target="_blank" class="btn btn-info">Search Homepage</a>
+                        <a href="https://schxar.picp.vip/download_history" target="_blank" class="btn btn-info">Download history</a>
+                    </div>
                 </div>
             </div>
         </div>
@@ -130,9 +210,100 @@
             const chatForm = document.getElementById('chat-form');
             const userInput = document.getElementById('user-input');
             const newChatBtn = document.getElementById('new-chat');
+            const sidebarToggle = document.getElementById('sidebarToggle');
+            const newChatSidebarBtn = document.getElementById('new-chat-sidebar');
+            const chatList = document.getElementById('chat-list');
             
-            let conversationId = Date.now().toString();
+            let currentChatId = 'chat-' + Date.now().toString();
             let messages = [];
+            
+            // 侧边栏切换
+            sidebarToggle.addEventListener('click', function() {
+                document.body.classList.toggle('sidebar-collapsed');
+            });
+            
+            // 侧边栏新建聊天
+            newChatSidebarBtn.addEventListener('click', function() {
+                newChatBtn.click();
+            });
+            
+            // 增强版加载聊天历史列表
+            function loadChatHistories() {
+                fetch('/api/chat/histories')
+                .then(response => response.json())
+                .then(data => {
+                    const chatHistoryList = document.getElementById('chatHistoryList');
+                    chatHistoryList.innerHTML = '';
+                    chatList.innerHTML = '';
+                    
+                    data.histories.forEach(history => {
+                        // 更新下拉菜单
+                        const li = document.createElement('li');
+                        const a = document.createElement('a');
+                        a.className = 'dropdown-item d-flex justify-content-between align-items-center';
+                        a.href = '#';
+                        
+                        const titleSpan = document.createElement('span');
+                        titleSpan.textContent = history.title;
+                        
+                        const timeSpan = document.createElement('small');
+                        timeSpan.className = 'text-muted ms-2';
+                        timeSpan.textContent = new Date(history.timestamp * 1000).toLocaleString();
+                        
+                        const deleteBtn = document.createElement('button');
+                        deleteBtn.className = 'btn btn-sm btn-outline-danger ms-2';
+                        deleteBtn.innerHTML = '&times;';
+                        deleteBtn.onclick = (e) => {
+                            e.stopPropagation();
+                            deleteChatHistory(history.id);
+                        };
+                        
+                        a.appendChild(titleSpan);
+                        a.appendChild(timeSpan);
+                        a.appendChild(deleteBtn);
+                        
+                        a.onclick = (e) => {
+                            e.preventDefault();
+                            loadChatHistory(history.id);
+                        };
+                        
+                        if (history.id === currentChatId) {
+                            a.classList.add('active');
+                        }
+                        
+                        li.appendChild(a);
+                        chatHistoryList.appendChild(li);
+                        
+                        // 添加到侧边栏
+                        const chatItem = document.createElement('div');
+                        chatItem.className = `chat-item ${history.id === currentChatId ? 'active' : ''}`;
+                        chatItem.textContent = history.title;
+                        chatItem.onclick = () => {
+                            loadChatHistory(history.id);
+                        };
+                        
+                        chatList.appendChild(chatItem);
+                    });
+                })
+                .catch(error => {
+                    console.error('Error loading chat histories:', error);
+                });
+            }
+            
+            // 初始化加载
+            loadChatHistories();
+            
+            // 渲染历史消息
+            function renderMessages() {
+                chatHistory.innerHTML = '';
+                messages.forEach(msg => {
+                    if (msg.role === 'user') {
+                        addMessage('user', msg.content);
+                    } else if (msg.role === 'assistant') {
+                        addMessage('bot', msg.content);
+                    }
+                });
+            }
             
             // Load initial message if coming from search
             const urlParams = new URLSearchParams(window.location.search);
@@ -178,10 +349,187 @@
             });
             
             newChatBtn.addEventListener('click', function() {
-                conversationId = Date.now().toString();
+                // 保存当前聊天
+                saveCurrentChat();
+                
+                // 创建新聊天
+                currentChatId = 'chat-' + Date.now().toString();
+                localStorage.setItem(browserId + '-currentChatId', currentChatId);
                 messages = [];
                 chatHistory.innerHTML = '';
+                
+                // 更新历史记录
+                updateChatList();
+                
+                // 显示通知
+                showToast('New chat created');
             });
+            
+            // 添加保存按钮事件监听
+            document.getElementById('save-chat').addEventListener('click', function() {
+                saveCurrentChat();
+                showToast('Chat saved successfully');
+                updateChatList();
+            });
+            
+            // 显示通知的函数
+            function showToast(message) {
+                const toast = document.createElement('div');
+                toast.className = 'position-fixed bottom-0 end-0 p-3';
+                toast.style.zIndex = '11';
+                
+                const toastInner = document.createElement('div');
+                toastInner.className = 'toast show';
+                toastInner.role = 'alert';
+                toastInner.setAttribute('aria-live', 'assertive');
+                toastInner.setAttribute('aria-atomic', 'true');
+                
+                toastInner.innerHTML = `
+                    <div class="toast-header">
+                        <strong class="me-auto">Notification</strong>
+                        <button type="button" class="btn-close" data-bs-dismiss="toast" aria-label="Close"></button>
+                    </div>
+                    <div class="toast-body">
+                        ${message}
+                    </div>
+                `;
+                
+                toast.appendChild(toastInner);
+                document.body.appendChild(toast);
+                
+                // 3秒后自动消失
+                setTimeout(() => {
+                    toast.remove();
+                }, 3000);
+            }
+            
+            // 保存当前聊天到服务器
+            function saveCurrentChat() {
+                const payload = {
+                    id: currentChatId,
+                    messages: messages,
+                    title: messages.length > 0 ? messages[0].content.substring(0, 30) : 'New Chat'
+                };
+                
+                fetch('/api/chat/history', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(payload)
+                })
+                .then(response => response.json())
+                .then(data => {
+                    currentChatId = data.id;
+                    showToast('Chat saved successfully');
+                    loadChatHistories();
+                })
+                .catch(error => {
+                    console.error('Error saving chat:', error);
+                    showToast('Failed to save chat');
+                });
+            }
+            
+            // 加载聊天历史列表
+            function loadChatHistories() {
+                fetch('/api/chat/histories')
+                .then(response => response.json())
+                .then(data => {
+                    const chatHistoryList = document.getElementById('chatHistoryList');
+                    chatHistoryList.innerHTML = '';
+                    
+                    data.histories.forEach(history => {
+                        const li = document.createElement('li');
+                        const a = document.createElement('a');
+                        a.className = 'dropdown-item d-flex justify-content-between align-items-center';
+                        a.href = '#';
+                        
+                        // 显示聊天标题和时间
+                        const titleSpan = document.createElement('span');
+                        titleSpan.textContent = history.title;
+                        
+                        const timeSpan = document.createElement('small');
+                        timeSpan.className = 'text-muted ms-2';
+                        timeSpan.textContent = new Date(history.timestamp * 1000).toLocaleString();
+                        
+                        // 添加删除按钮
+                        const deleteBtn = document.createElement('button');
+                        deleteBtn.className = 'btn btn-sm btn-outline-danger ms-2';
+                        deleteBtn.innerHTML = '&times;';
+                        deleteBtn.onclick = (e) => {
+                            e.stopPropagation();
+                            deleteChatHistory(history.id);
+                        };
+                        
+                        a.appendChild(titleSpan);
+                        a.appendChild(timeSpan);
+                        a.appendChild(deleteBtn);
+                        
+                        a.onclick = (e) => {
+                            e.preventDefault();
+                            loadChatHistory(history.id);
+                        };
+                        
+                        // 高亮当前聊天
+                        if (history.id === currentChatId) {
+                            a.classList.add('active');
+                        }
+                        
+                        li.appendChild(a);
+                        chatHistoryList.appendChild(li);
+                    });
+                })
+                .catch(error => {
+                    console.error('Error loading chat histories:', error);
+                });
+            }
+            
+            // 加载指定聊天历史
+            function loadChatHistory(chatId) {
+                fetch(`/api/chat/history/${chatId}`)
+                .then(response => response.json())
+                .then(data => {
+                    if (data.error) {
+                        throw new Error(data.error);
+                    }
+                    
+                    currentChatId = chatId;
+                    messages = data.messages;
+                    renderMessages();
+                    loadChatHistories();
+                })
+                .catch(error => {
+                    console.error('Error loading chat history:', error);
+                    showToast('Failed to load chat history');
+                });
+            }
+            
+            // 删除聊天历史
+            function deleteChatHistory(chatId) {
+                if (confirm('Are you sure you want to delete this chat history?')) {
+                    fetch(`/api/chat/history/${chatId}`, {
+                        method: 'DELETE'
+                    })
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.error) {
+                            throw new Error(data.error);
+                        }
+                        
+                        if (currentChatId === chatId) {
+                            // 如果删除的是当前聊天，创建一个新聊天
+                            newChatBtn.click();
+                        }
+                        
+                        loadChatHistories();
+                        showToast('Chat history deleted');
+                    })
+                    .catch(error => {
+                        console.error('Error deleting chat history:', error);
+                        showToast('Failed to delete chat history');
+                    });
+                }
+            }
             
             function addMessage(role, content, searchResults) {
                 const messageDiv = document.createElement('div');
@@ -232,6 +580,9 @@
             }
             
             function sendMessage(message) {
+                // 保存当前状态
+                saveCurrentChat();
+                
                 const payload = {
                     messages: [
                         {"role": "system", "content": "你是豆包，是由字节跳动开发的 AI 人工智能助手"},
@@ -273,6 +624,9 @@
             }
             
             function sendVlmMessage(imageBase64) {
+                // 保存当前状态
+                saveCurrentChat();
+                
                 const fileInput = document.getElementById('image-upload');
                 const file = fileInput.files[0];
                 
@@ -344,5 +698,7 @@
             }
         });
     </script>
+        </div>
+    </div>
 </body>
 </html>

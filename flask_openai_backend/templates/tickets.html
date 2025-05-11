@@ -1,41 +1,48 @@
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>View Tickets</title>
+    <title>Tickets</title>
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
 </head>
 <body>
-    <h1>All Tickets</h1>
-    <table border="1">
-        <thead>
-            <tr>
-                <th>ID</th>
-                <th>Book Title</th>
-                <th>Book Hash</th>
-                <th>Request Date</th>
-                <th>Clerk Email</th>
-                <th>Status</th>
-                <th>Actions</th>
-            </tr>
-        </thead>
-        <tbody>
-            {% for ticket in tickets %}
-            <tr>
-                <td>{{ ticket.id }}</td>
-                <td>{{ ticket.book_title }}</td>
-                <td>{{ ticket.book_hash }}</td>
-                <td>{{ ticket.request_date }}</td>
-                <td>{{ ticket.clerk_user_email }}</td>
-                <td>{{ ticket.status }}</td>
-                <td>
-                    <a href="/update_status/{{ ticket.id }}/pending">Pending</a>
-                    <a href="/update_status/{{ ticket.id }}/processing">Processing</a>
-                    <a href="/update_status/{{ ticket.id }}/completed">Completed</a>
-                </td>
-            </tr>
-            {% endfor %}
-        </tbody>
-    </table>
+    <div class="container">
+        <h1 class="text-center mb-4">Tickets</h1>
+        <table class="table table-striped">
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Book Title</th>
+                    <th>Book Hash</th>
+                    <th>Request Date</th>
+                    <th>Clerk User Email</th>
+                    <th>Status</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for ticket in tickets %}
+                <tr>
+                    <td>{{ ticket.id }}</td>
+                    <td>{{ ticket.book_title }}</td>
+                    <td>{{ ticket.book_hash }}</td>
+                    <td>{{ ticket.request_date }}</td>
+                    <td>{{ ticket.clerk_user_email }}</td>
+                    <td>{{ ticket.status }}</td>
+                    <td>
+                        <a href="/update_status/{{ ticket.id }}/pending" class="btn btn-warning btn-sm">Pending</a>
+                        <a href="/update_status/{{ ticket.id }}/processing" class="btn btn-info btn-sm">Processing</a>
+                        <a href="/update_status/{{ ticket.id }}/completed" class="btn btn-success btn-sm">Completed</a>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>

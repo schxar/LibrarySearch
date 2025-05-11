@@ -1,5 +1,4 @@
 from flask import Flask, Response, render_template, request, jsonify, send_file, render_template_string, redirect, url_for, session, send_from_directory
-from flask_caching import Cache
 import os
 import json
 import glob
@@ -15,17 +14,13 @@ import pymysql
 import re
 import traceback
 from dotenv import load_dotenv
-
-from doubao_vlm_service import vlm_upload as doubao_vlm_upload, chat as doubao_chat
-
+from doubao_vlm_service import check_tables
 
 # 加载环境变量
 load_dotenv()
 
 app = Flask(__name__)
 app.config['SECRET_KEY'] = os.getenv('FLASK_SECRET_KEY', 'your_secret_key')
-app.config['CACHE_TYPE'] = 'SimpleCache'
-cache = Cache(app)
 
 # DeepSeek客户端配置
 try:
@@ -121,49 +116,10 @@ def generate_hash(input_string):
     """生成SHA-256哈希值"""
     return hashlib.sha256(input_string.encode('utf-8')).hexdigest()
 
-def check_tables(conn):
-    """检查所有需要的表是否存在，不存在则创建"""
-    with conn.cursor() as cursor:
-        # 检查并创建DownloadHistory表
-        cursor.execute('''
-            CREATE TABLE IF NOT EXISTS DownloadHistory (
-                id INT AUTO_INCREMENT PRIMARY KEY,
-                user_email VARCHAR(255) NOT NULL,
-                filename VARCHAR(255) NOT NULL,
-                email_hash VARCHAR(64) NOT NULL,
-                filename_hash VARCHAR(64) NOT NULL,
-                download_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-            ) CHARSET=utf8mb4;
-        ''')
-        
-        # 检查并创建SearchRecommendations表
-        cursor.execute('''
-            CREATE TABLE IF NOT EXISTS SearchRecommendations (
-                id INT AUTO_INCREMENT PRIMARY KEY,
-                user_email VARCHAR(255) NOT NULL,
-                email_hash VARCHAR(64) NOT NULL,
-                search_terms TEXT NOT NULL,
-                created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-            ) CHARSET=utf8mb4;
-        ''')
-        
-        # 检查并创建NotebookLMAudioRequests表
-        cursor.execute('''
-            CREATE TABLE IF NOT EXISTS NotebookLMAudioRequests (
-                id INT AUTO_INCREMENT PRIMARY KEY,
-                book_title VARCHAR(255) NOT NULL,
-                book_hash VARCHAR(64) NOT NULL,
-                request_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-                clerk_user_email VARCHAR(255) NOT NULL,
-                status ENUM('pending', 'processing', 'completed') DEFAULT 'pending'
-            ) CHARSET=utf8mb4;
-        ''')
-        conn.commit()
-
 def get_db_connection():
     """获取数据库连接并确保表存在"""
     conn = pymysql.connect(**DB_CONFIG)
-    check_tables(conn)
+    #check_tables(conn)
     return conn
 
 def clean_recommendations(raw_text):
@@ -187,6 +143,8 @@ def clean_recommendations(raw_text):
 def create_table():
     conn = get_db_connection()
     cursor = conn.cursor()
+    
+    # 创建NotebookLMAudioRequests表
     cursor.execute('''
         CREATE TABLE IF NOT EXISTS NotebookLMAudioRequests (
             id INT AUTO_INCREMENT PRIMARY KEY,
@@ -197,6 +155,32 @@ def create_table():
             status ENUM('pending', 'processing', 'completed') DEFAULT 'pending'
         )
     ''')
+    
+    # 创建聊天会话表
+    cursor.execute('''
+        CREATE TABLE IF NOT EXISTS chat_sessions (
+            session_id VARCHAR(64) PRIMARY KEY,
+            user_agent_hash VARCHAR(64) NOT NULL,
+            title VARCHAR(255) NOT NULL,
+            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+            updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+            INDEX idx_user_agent (user_agent_hash)
+        )
+    ''')
+    
+    # 创建聊天消息表
+    cursor.execute('''
+        CREATE TABLE IF NOT EXISTS chat_messages (
+            id INT AUTO_INCREMENT PRIMARY KEY,
+            session_id VARCHAR(64) NOT NULL,
+            role ENUM('system', 'user', 'assistant') NOT NULL,
+            content TEXT NOT NULL,
+            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+            FOREIGN KEY (session_id) REFERENCES chat_sessions(session_id) ON DELETE CASCADE,
+            INDEX idx_session (session_id)
+        )
+    ''')
+    
     conn.commit()
     cursor.close()
     conn.close()
@@ -212,7 +196,7 @@ def login_required(f):
 
 @app.route('/', methods=['GET'])
 def index():
-    return render_template('login.html')
+    return render_template('doubao_chat.html')
 
 @app.route('/set_session', methods=['POST'])
 def set_session():
@@ -441,23 +425,11 @@ def search_books():
                 f'</form></li>'
                 for f in matching_files
             ]
-        # 添加缓存键
-        cache_key = f"search:{book_name}"
-        
-        # 尝试从缓存获取
-        cached_result = app.extensions['cache'].get(cache_key)
-        if cached_result is not None:
-            return cached_result
-            
         # 渲染模板
-        result = render_template(
+        return render_template(
             'search_results.html',
             file_links=file_links
         )
-        
-        # 设置缓存，有效期5分钟
-        cache.set(cache_key, result, timeout=300)
-        return result
     else:
         return jsonify({"message": "No matching files found"}), 200
 
@@ -509,58 +481,7 @@ def tickets():
     tickets = cursor.fetchall()
     cursor.close()
     conn.close()
-    return render_template_string(
-        """
-        <!DOCTYPE html>
-        <html lang="en">
-        <head>
-            <meta charset="UTF-8">
-            <meta name="viewport" content="width=device-width, initial-scale=1.0">
-            <title>Tickets</title>
-            <!-- Bootstrap CSS -->
-            <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-        </head>
-        <body>
-            <div class="container">
-                <h1 class="text-center mb-4">Tickets</h1>
-                <table class="table table-striped">
-                    <thead>
-                        <tr>
-                            <th>ID</th>
-                            <th>Book Title</th>
-                            <th>Book Hash</th>
-                            <th>Request Date</th>
-                            <th>Clerk User Email</th>
-                            <th>Status</th>
-                            <th>Actions</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {% for ticket in tickets %}
-                        <tr>
-                            <td>{{ ticket.id }}</td>
-                            <td>{{ ticket.book_title }}</td>
-                            <td>{{ ticket.book_hash }}</td>
-                            <td>{{ ticket.request_date }}</td>
-                            <td>{{ ticket.clerk_user_email }}</td>
-                            <td>{{ ticket.status }}</td>
-                            <td>
-                                <a href="/update_status/{{ ticket.id }}/pending" class="btn btn-warning btn-sm">Pending</a>
-                                <a href="/update_status/{{ ticket.id }}/processing" class="btn btn-info btn-sm">Processing</a>
-                                <a href="/update_status/{{ ticket.id }}/completed" class="btn btn-success btn-sm">Completed</a>
-                            </td>
-                        </tr>
-                        {% endfor %}
-                    </tbody>
-                </table>
-            </div>
-            <!-- Bootstrap JS -->
-            <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-        </body>
-        </html>
-        """,
-        tickets=tickets
-    )
+    return render_template('tickets.html', tickets=tickets)
 
 @app.route('/update_status/<int:ticket_id>/<status>')
 @login_required
@@ -741,6 +662,34 @@ def doubao_chat_api():
                 headers={'Content-Type': request.content_type}
             )
         
+        # 保存聊天记录到数据库
+        if response.status_code == 200 and 'user_email' in session:
+            try:
+                conn = get_db_connection()
+                with conn.cursor() as cursor:
+                    # 获取或创建会话记录
+                    conversation_id = request.json.get('conversation_id', str(int(time.time())))
+                    title = request.json.get('messages', [{}])[0].get('content', 'New Chat')[:255]
+                    
+                    cursor.execute('''
+                        INSERT INTO ChatHistory 
+                        (user_email, conversation_id, title, messages)
+                        VALUES (%s, %s, %s, %s)
+                        ON DUPLICATE KEY UPDATE 
+                        messages = VALUES(messages),
+                        updated_at = CURRENT_TIMESTAMP
+                    ''', (
+                        session['user_email'],
+                        conversation_id,
+                        title,
+                        json.dumps(request.json.get('messages', []))
+                    ))
+                conn.commit()
+            except Exception as e:
+                app.logger.error(f"保存聊天记录失败: {str(e)}")
+            finally:
+                conn.close()
+        
         # 返回响应
         return jsonify(response.json()), response.status_code
         
@@ -751,6 +700,173 @@ def doubao_chat_api():
             'error': str(e),
             'message': 'Failed to forward request to Doubao service'
         }), 500
+
+# 聊天记录存储路径
+CHAT_HISTORY_DIR = os.path.join(os.path.dirname(__file__), 'ChatHistory')
+
+@app.route('/api/chat/histories', methods=['GET'])
+def list_chat_histories():
+    """获取所有聊天历史记录列表"""
+    try:
+        # 确保表存在
+        create_table()
+        
+        user_agent = request.headers.get('User-Agent', '')
+        if not user_agent:
+            return jsonify({'error': 'User-Agent header is required'}), 400
+            
+        user_agent_hash = hashlib.sha256(user_agent.encode()).hexdigest()
+        
+        conn = get_db_connection()
+        with conn.cursor() as cursor:
+            # 检查表是否存在
+            cursor.execute("SHOW TABLES LIKE 'chat_sessions'")
+            if not cursor.fetchone():
+                return jsonify({'error': 'Chat sessions table not found'}), 500
+                
+            cursor.execute('''
+                SELECT session_id as id, title, UNIX_TIMESTAMP(updated_at) as timestamp
+                FROM chat_sessions
+                WHERE user_agent_hash = %s
+                ORDER BY updated_at DESC
+            ''', (user_agent_hash,))
+            
+            histories = cursor.fetchall()
+            return jsonify({
+                'histories': histories,
+                'message': 'Successfully retrieved chat histories'
+            }), 200
+            
+    except pymysql.Error as e:
+        app.logger.error(f"Database error: {str(e)}")
+        return jsonify({
+            'error': 'Database operation failed',
+            'details': str(e)
+        }), 500
+    except Exception as e:
+        app.logger.error(f"Unexpected error: {str(e)}")
+        return jsonify({
+            'error': 'An unexpected error occurred',
+            'details': str(e)
+        }), 500
+    finally:
+        if 'conn' in locals() and conn:
+            conn.close()
+
+@app.route('/api/chat/history/<history_id>', methods=['GET'])
+def get_chat_history(history_id):
+    """获取特定聊天历史记录"""
+    try:
+        user_agent = request.headers.get('User-Agent', '')
+        user_agent_hash = hashlib.sha256(user_agent.encode()).hexdigest()
+        
+        conn = get_db_connection()
+        with conn.cursor() as cursor:
+            # 验证会话属于当前用户
+            cursor.execute('''
+                SELECT 1 FROM chat_sessions
+                WHERE session_id = %s AND user_agent_hash = %s
+            ''', (history_id, user_agent_hash))
+            
+            if not cursor.fetchone():
+                return jsonify({'error': 'History not found or access denied'}), 404
+            
+            # 获取消息
+            cursor.execute('''
+                SELECT role, content
+                FROM chat_messages
+                WHERE session_id = %s
+                ORDER BY created_at
+            ''', (history_id,))
+            
+            messages = [{'role': row['role'], 'content': row['content']} 
+                       for row in cursor.fetchall()]
+            
+            return jsonify({
+                'id': history_id,
+                'messages': messages,
+                'title': messages[0]['content'][:30] if messages else 'Untitled Chat'
+            }), 200
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
+    finally:
+        conn.close()
+
+@app.route('/api/chat/history', methods=['POST'])
+def save_chat_history():
+    """保存当前聊天历史记录"""
+    try:
+        data = request.get_json()
+        if not data or 'messages' not in data:
+            return jsonify({'error': 'Invalid data'}), 400
+            
+        user_agent = request.headers.get('User-Agent', '')
+        user_agent_hash = hashlib.sha256(user_agent.encode()).hexdigest()
+        
+        # 生成或使用现有ID
+        history_id = f'chat-{int(time.time())}'
+        if 'id' in data and data['id']:
+            history_id = data['id']
+            
+        # 设置默认标题
+        title = data.get('title', '')
+        if not title and data['messages'] and len(data['messages']) > 0:
+            title = data['messages'][0]['content'][:30]
+            
+        conn = get_db_connection()
+        with conn.cursor() as cursor:
+            # 创建或更新会话
+            cursor.execute('''
+                INSERT INTO chat_sessions (session_id, user_agent_hash, title)
+                VALUES (%s, %s, %s)
+                ON DUPLICATE KEY UPDATE 
+                title = VALUES(title),
+                updated_at = CURRENT_TIMESTAMP
+            ''', (history_id, user_agent_hash, title))
+            
+            # 删除旧消息
+            cursor.execute('''
+                DELETE FROM chat_messages WHERE session_id = %s
+            ''', (history_id,))
+            
+            # 插入新消息
+            for msg in data['messages']:
+                cursor.execute('''
+                    INSERT INTO chat_messages (session_id, role, content)
+                    VALUES (%s, %s, %s)
+                ''', (history_id, msg['role'], msg['content']))
+            
+            conn.commit()
+            return jsonify({'id': history_id, 'title': title}), 200
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
+    finally:
+        conn.close()
+
+@app.route('/api/chat/history/<history_id>', methods=['DELETE'])
+def delete_chat_history(history_id):
+    """删除特定聊天历史记录"""
+    try:
+        user_agent = request.headers.get('User-Agent', '')
+        user_agent_hash = hashlib.sha256(user_agent.encode()).hexdigest()
+        
+        conn = get_db_connection()
+        with conn.cursor() as cursor:
+            # 验证会话属于当前用户
+            cursor.execute('''
+                DELETE FROM chat_sessions
+                WHERE session_id = %s AND user_agent_hash = %s
+            ''', (history_id, user_agent_hash))
+            
+            if cursor.rowcount == 0:
+                return jsonify({'error': 'History not found or access denied'}), 404
+                
+            conn.commit()
+            return jsonify({'success': True}), 200
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
+    finally:
+        conn.close()
 
 @app.route('/download_history', methods=['GET', 'POST'])
 def download_history():

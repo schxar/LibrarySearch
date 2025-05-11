@@ -151,22 +151,47 @@
     <script>
         // Initialize Clerk
         window.addEventListener('load', async function () {
-            await Clerk.load();
-            // Mount user button
-            Clerk.mountUserButton(document.getElementById('clerk-user-button'));
-            
-            // Add search button handlers
-            document.querySelectorAll('.search-btn').forEach(btn => {
-                btn.addEventListener('click', function() {
-                    const filename = this.getAttribute('data-filename');
-                    // Extract first 10 words
-                    const searchTerms = filename.slice(0, 5).join(' ');
-                    // Build search URL .split(/[\s_\.]+/)
-                    const searchUrl = `https://313m929k61.vicp.fun/search/books?book_name=${encodeURIComponent(searchTerms)}`;
-                    // Open in new tab
-                    window.open(searchUrl, '_blank');
+            try {
+                await Clerk.load();
+                
+                // Check authentication state
+                const isSignedIn = await Clerk.user !== null;
+                
+                // Mount user button
+                Clerk.mountUserButton(document.getElementById('clerk-user-button'));
+                
+                // Update UI based on auth state
+                if (isSignedIn) {
+                    const user = Clerk.user;
+                    console.log('User email:', user.primaryEmailAddress.emailAddress);
+                    
+                    // Add user email to all forms
+                    document.querySelectorAll('form').forEach(form => {
+                        const emailInput = document.createElement('input');
+                        emailInput.type = 'hidden';
+                        emailInput.name = 'clerk_user_email';
+                        emailInput.value = user.primaryEmailAddress.emailAddress;
+                        form.appendChild(emailInput);
+                    });
+                } else {
+                    console.log('User not signed in');
+                }
+                
+                // Add search button handlers
+                document.querySelectorAll('.search-btn').forEach(btn => {
+                    btn.addEventListener('click', function() {
+                        const filename = this.getAttribute('data-filename');
+                        // Extract first 10 words
+                        const searchTerms = filename.slice(0, 5).join(' ');
+                        // Build search URL .split(/[\s_\.]+/)
+                        const searchUrl = `https://313m929k61.vicp.fun/search/books?book_name=${encodeURIComponent(searchTerms)}`;
+                        // Open in new tab
+                        window.open(searchUrl, '_blank');
+                    });
                 });
-            });
+            } catch (error) {
+                console.error('Clerk initialization error:', error);
+            }
         });
     </script>
 </body>
