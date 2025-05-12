@@ -452,6 +452,46 @@ def update_status(ticket_id, status):
     conn.close()
     return redirect(url_for('tickets'))
 
+@app.route('/api/chat/histories', methods=['GET'])
+def forward_to_10806():
+    """从10805转发请求到10806的/api/chat/histories"""
+    try:
+        import requests
+        # 构建目标URL
+        target_url = 'http://localhost:10806/api/chat/histories'
+        
+        # 设置请求头
+        headers = {
+            'Content-Type': 'application/json',
+            'X-Forwarded-Port': '10805'
+        }
+        
+        # 转发请求参数
+        params = dict(request.args)
+        
+        # 发送请求（3秒超时）
+        response = requests.get(
+            target_url,
+            headers=headers,
+            params=params,
+            timeout=3
+        )
+        
+        # 返回响应
+        return (response.content, 
+                response.status_code,
+                response.headers.items())
+                
+    except requests.Timeout:
+        app.logger.error("转发到10806超时")
+        return jsonify({'error': 'Service timeout'}), 504
+    except requests.RequestException as e:
+        app.logger.error(f"转发请求失败: {str(e)}")
+        return jsonify({'error': 'Forwarding failed'}), 502
+    except Exception as e:
+        app.logger.error(f"转发异常: {str(e)}")
+        return jsonify({'error': 'Internal error'}), 500
+
 import subprocess
 
 # 添加推荐服务路由

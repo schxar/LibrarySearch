@@ -110,6 +110,12 @@ def doubao_chat_api():
             image_base64 = base64.b64encode(file.read()).decode('utf-8')
             question = request.form.get('question', '请描述这张图片的内容')
             
+            # 创建新的headers字典
+            headers = {
+                'Content-Type': request.content_type,
+                'X-Original-Path': request.path
+            }
+            
             response = vlm_client.chat.completions.create(
                 model="doubao-1.5-vision-pro-250328",
                 messages=[
@@ -126,6 +132,7 @@ def doubao_chat_api():
                         ],
                     }
                 ],
+                headers=headers
             )
             
             return jsonify({
@@ -141,6 +148,12 @@ def doubao_chat_api():
             
             if not data or 'messages' not in data:
                 return jsonify({'error': '缺少必要参数'}), 400
+                
+            # 创建新的headers字典
+            headers = {
+                'Content-Type': request.content_type,
+                'X-Original-Path': request.path
+            }
             
             # 检查最后一条用户消息是否包含URL
             last_message = data['messages'][-1]['content']
@@ -163,7 +176,8 @@ def doubao_chat_api():
                             "role": "user",
                             "content": f"请解析以下URL内容并返回标题和主要内容：{url}"
                         }
-                    ]
+                    ],
+                    headers=headers
                 )
                 
                 result = {
@@ -183,7 +197,8 @@ def doubao_chat_api():
                         {"role": "system", "content": "你是豆包，是由字节跳动开发的 AI 人工智能助手"},
                         *data['messages']
                     ],
-                    stream=data.get('stream', False)
+                    stream=data.get('stream', False),
+                    headers=headers
                 )
                 
                 if data.get('stream', False):
@@ -225,6 +240,12 @@ def doubao_websearch():
         return jsonify({"error": "请求体必须包含query参数"}), 400
     
     try:
+        # 创建新的headers字典
+        headers = {
+            'Content-Type': 'application/json',
+            'X-Original-Path': request.path
+        }
+        
         response = text_client.chat.completions.create(
             model="bot-20250506042211-5bscp",
             messages=[
@@ -232,7 +253,8 @@ def doubao_websearch():
                     "role": "user",
                     "content": f"请帮我搜索关于'{data['query']}'的信息，返回格式为JSON数组，每个结果包含title和url字段"
                 }
-            ]
+            ],
+            headers=headers
         )
         
         result = response.choices[0].message.content
@@ -252,6 +274,12 @@ def doubao_url_parse():
         return jsonify({"error": "请求体必须包含url参数"}), 400
     
     try:
+        # 创建新的headers字典
+        headers = {
+            'Content-Type': 'application/json',
+            'X-Original-Path': request.path
+        }
+        
         # 调用豆包API解析URL内容
         response = text_client.chat.completions.create(
             model="bot-20250506034902-4psdn",
@@ -264,7 +292,8 @@ def doubao_url_parse():
                     "role": "user",
                     "content": f"请解析以下URL内容并返回标题和主要内容：{data['url']}"
                 }
-            ]
+            ],
+            headers=headers
         )
         
         # 获取解析结果
@@ -313,20 +342,49 @@ os.makedirs(CHAT_HISTORY_DIR, exist_ok=True)
 def list_chat_histories():
     """获取所有聊天历史记录列表"""
     try:
-        files = [f for f in os.listdir(CHAT_HISTORY_DIR) if f.endswith('.json')]
+        # 确保目录存在
+        if not os.path.exists(CHAT_HISTORY_DIR):
+            os.makedirs(CHAT_HISTORY_DIR, exist_ok=True)
+            return jsonify({'histories': [], 'message': 'Chat history directory created'}), 200
+
+        # 获取文件列表并处理权限错误
+        try:
+            files = [f for f in os.listdir(CHAT_HISTORY_DIR) if f.endswith('.json')]
+        except PermissionError as e:
+            app.logger.error(f"Permission denied accessing {CHAT_HISTORY_DIR}: {str(e)}")
+            return jsonify({'error': 'Permission denied accessing chat histories'}), 403
+            
         histories = []
         
         for filename in files:
+            filepath = os.path.join(CHAT_HISTORY_DIR, filename)
             try:
-                with open(os.path.join(CHAT_HISTORY_DIR, filename), 'r', encoding='utf-8') as f:
-                    data = json.load(f)
-                    histories.append({
-                        'id': filename[:-5],  # 去掉.json后缀
-                        'title': data.get('title', 'Untitled Chat'),
-                        'timestamp': os.path.getmtime(os.path.join(CHAT_HISTORY_DIR, filename))
-                    })
+                # 检查文件是否存在且可读
+                if not os.path.isfile(filepath):
+                    continue
+                    
+                if not os.access(filepath, os.R_OK):
+                    app.logger.warning(f"Skipping unreadable file: {filepath}")
+                    continue
+                    
+                with open(filepath, 'r', encoding='utf-8') as f:
+                    try:
+                        data = json.load(f)
+                        histories.append({
+                            'id': filename[:-5],  # 去掉.json后缀
+                            'title': data.get('title', 'Untitled Chat'),
+                            'timestamp': os.path.getmtime(filepath)
+                        })
+                    except json.JSONDecodeError as e:
+                        app.logger.error(f"Invalid JSON in {filename}: {str(e)}")
+                        continue
+                        
             except Exception as e:
+                app.logger.error(f"Error processing {filename}: {str(e)}")
                 continue
+                
+        if not histories:
+            return jsonify({'histories': [], 'message': 'No chat histories found'}), 200
                 
         # 按时间倒序排序
         histories.sort(key=lambda x: x['timestamp'], reverse=True)
@@ -337,7 +395,11 @@ def list_chat_histories():
         }), 200
         
     except Exception as e:
-        return jsonify({'error': str(e)}), 500
+        app.logger.error(f"Unexpected error in list_chat_histories: {str(e)}")
+        return jsonify({
+            'error': 'Internal server error',
+            'message': str(e)
+        }), 500
 
 @app.route('/api/chat/histories/list', methods=['GET'])
 def list_chat_histories_html():
