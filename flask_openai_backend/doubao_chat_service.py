@@ -246,5 +246,5 @@ def delete_chat_history(history_id):
         conn.close()
 
 
-if __name__ == '__main__':
-    app.run(host='0.0.0.0', port=10806, debug=False)
+
+app.run(host='0.0.0.0', port=10806, debug=False)
