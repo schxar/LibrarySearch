@@ -68,7 +68,7 @@ def login_required(f):
 def handle_chat_page():
     """处理主聊天页面请求"""
     query = request.args.get('query', '')
-    return render_template('doubao_chat.html', query=query)
+    return render_template('doubao_chat3.html', query=query)
 
 @app.route('/c/<chat_id>', methods=['GET'])
 def load_chat_history(chat_id):

@@ -1,0 +1,647 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Doubao Chat</title>
+
+    <!-- Bootstrap 5 -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet" />
+    <!-- Google Font -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet" />
+
+    <!-- Icons -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" />
+
+    <style>
+        /* ----------  CSS Variables  ---------- */
+        :root {
+            --bg-light: #f5f7fa;
+            --bg-dark: #0d1117;
+            --sidebar-light: #ffffff;
+            --sidebar-dark: #161b22;
+            --card-light: #ffffff;
+            --card-dark: #161b22;
+            --primary-light: #2563eb;
+            --primary-dark: #3b82f6;
+            --user-bubble-light: #d1e9ff;
+            --user-bubble-dark: #1e40af;
+            --bot-bubble-light: #eaeef2;
+            --bot-bubble-dark: #21262d;
+            --scrollbar-thumb: rgba(0, 0, 0, 0.15);
+        }
+
+        body {
+            font-family: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+            background: var(--bg-light);
+            color: #333;
+            transition: background 0.3s ease, color 0.3s ease;
+            padding: 0; /* remove extra padding (we'll manage layout) */
+            overflow: hidden; /* full‑height layout */
+        }
+
+        .dark-mode body {
+            background: var(--bg-dark);
+            color: #e6edf3;
+        }
+
+        /* ----------  Layout  ---------- */
+        .sidebar {
+            width: 260px;
+            height: 100vh;
+            position: fixed;
+            left: 0;
+            top: 0;
+            background: var(--sidebar-light);
+            border-right: 1px solid rgba(0, 0, 0, 0.06);
+            padding: 18px 14px;
+            overflow-y: auto;
+            transition: transform 0.3s ease, background 0.3s ease;
+            z-index: 1020;
+        }
+
+        .dark-mode .sidebar {
+            background: var(--sidebar-dark);
+            border-right-color: rgba(255, 255, 255, 0.08);
+        }
+
+        .sidebar::-webkit-scrollbar {
+            width: 6px;
+        }
+        .sidebar::-webkit-scrollbar-thumb {
+            background: var(--scrollbar-thumb);
+            border-radius: 3px;
+        }
+
+        .main-content {
+            margin-left: 260px;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            transition: margin-left 0.3s ease;
+            overflow: hidden;
+        }
+
+        .sidebar-collapsed .sidebar {
+            transform: translateX(-100%);
+        }
+        .sidebar-collapsed .main-content {
+            margin-left: 0;
+        }
+
+        /* ----------  Navbar  ---------- */
+        .app-navbar {
+            backdrop-filter: blur(10px);
+            background: rgba(255, 255, 255, 0.75);
+            border-bottom: 1px solid rgba(0, 0, 0, 0.06);
+        }
+        .dark-mode .app-navbar {
+            background: rgba(22, 27, 34, 0.75);
+            border-bottom-color: rgba(255, 255, 255, 0.08);
+        }
+
+        /* ----------  Chat Card  ---------- */
+        .chat-card {
+            flex: 1 1 auto;
+            display: flex;
+            flex-direction: column;
+            background: var(--card-light);
+            border: none;
+            border-radius: 16px;
+            box-shadow: 0 6px 24px rgba(0, 0, 0, 0.05);
+            overflow: hidden;
+            transition: background 0.3s ease;
+        }
+        .dark-mode .chat-card {
+            background: var(--card-dark);
+            box-shadow: 0 6px 24px rgba(0, 0, 0, 0.15);
+        }
+
+        /* ----------  Chat History  ---------- */
+        #chat-history {
+            flex: 1 1 auto;
+            overflow-y: auto;
+            padding: 24px 24px 12px;
+        }
+        #chat-history::-webkit-scrollbar {
+            width: 8px;
+        }
+        #chat-history::-webkit-scrollbar-thumb {
+            background: var(--scrollbar-thumb);
+            border-radius: 4px;
+        }
+
+        /* ----------  Message Bubbles  ---------- */
+        .message {
+            max-width: 75%;
+            padding: 10px 14px;
+            border-radius: 18px;
+            margin-bottom: 14px;
+            line-height: 1.5;
+            position: relative;
+            word-wrap: break-word;
+        }
+        .user-message {
+            align-self: flex-end;
+            background: var(--user-bubble-light);
+            color: #0f172a;
+        }
+        .dark-mode .user-message {
+            background: var(--user-bubble-dark);
+            color: #e6edf3;
+        }
+        .bot-message {
+            align-self: flex-start;
+            background: var(--bot-bubble-light);
+            color: #111827;
+        }
+        .dark-mode .bot-message {
+            background: var(--bot-bubble-dark);
+            color: #e6edf3;
+        }
+        /* Bubble tails */
+        .user-message::after,
+        .bot-message::after {
+            content: "";
+            position: absolute;
+            top: 10px;
+            width: 0;
+            height: 0;
+            border: 8px solid transparent;
+        }
+        .user-message::after {
+            right: -6px;
+            border-left-color: var(--user-bubble-light);
+        }
+        .dark-mode .user-message::after {
+            border-left-color: var(--user-bubble-dark);
+        }
+        .bot-message::after {
+            left: -6px;
+            border-right-color: var(--bot-bubble-light);
+        }
+        .dark-mode .bot-message::after {
+            border-right-color: var(--bot-bubble-dark);
+        }
+
+        /* ----------  Image Preview & Input Area  ---------- */
+        .image-preview-container {
+            display: none;
+            padding: 12px 18px;
+            border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+            background: var(--card-light);
+            transition: background 0.3s ease;
+        }
+        .dark-mode .image-preview-container {
+            background: var(--card-dark);
+            border-bottom-color: rgba(255, 255, 255, 0.08);
+        }
+        .image-preview {
+            position: relative;
+            margin-bottom: 12px;
+        }
+        .image-preview img {
+            max-width: 100%;
+            max-height: 200px;
+            border-radius: 8px;
+        }
+        .remove-image-btn {
+            position: absolute;
+            top: 8px;
+            right: 8px;
+            width: 24px;
+            height: 24px;
+            background: rgba(0, 0, 0, 0.5);
+            color: white;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            border: none;
+        }
+        .prompt-edit {
+            margin-top: 8px;
+        }
+        .prompt-edit textarea {
+            width: 100%;
+            min-height: 60px;
+            padding: 8px;
+            border-radius: 8px;
+            border: 1px solid rgba(0, 0, 0, 0.1);
+            background: var(--bot-bubble-light);
+            resize: vertical;
+        }
+        .dark-mode .prompt-edit textarea {
+            background: var(--bot-bubble-dark);
+            border-color: rgba(255, 255, 255, 0.1);
+            color: #e6edf3;
+        }
+
+        /* ----------  Input Area  ---------- */
+        .chat-input-bar {
+            border-top: 1px solid rgba(0, 0, 0, 0.05);
+            padding: 14px 18px;
+            background: transparent;
+        }
+        .dark-mode .chat-input-bar {
+            border-top-color: rgba(255, 255, 255, 0.08);
+        }
+        .chat-input-bar .input-group > .form-control {
+            background: var(--bot-bubble-light);
+            border: none;
+            border-radius: 10px;
+        }
+        .dark-mode .chat-input-bar .input-group > .form-control {
+            background: var(--bot-bubble-dark);
+            color: #e6edf3;
+        }
+
+        /* ----------  Sidebar Items  ---------- */
+        .chat-item {
+            padding: 10px 12px;
+            border-radius: 8px;
+            margin-bottom: 6px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            cursor: pointer;
+            transition: background 0.2s ease;
+            font-size: 0.925rem;
+        }
+        .chat-item:hover {
+            background: rgba(0, 0, 0, 0.04);
+        }
+        .chat-item.active {
+            background: var(--primary-light);
+            color: #ffffff;
+        }
+        .dark-mode .chat-item:hover {
+            background: rgba(255, 255, 255, 0.08);
+        }
+        .dark-mode .chat-item.active {
+            background: var(--primary-dark);
+        }
+
+        /* ----------  Responsive  ---------- */
+        @media (max-width: 992px) {
+            .sidebar {
+                transform: translateX(-100%);
+            }
+            .main-content {
+                margin-left: 0;
+            }
+            .sidebar-open .sidebar {
+                transform: translateX(0);
+            }
+            .sidebar-open .main-content {
+                margin-left: 260px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Sidebar Toggle (visible on all screens) -->
+    <button id="sidebarToggle" class="btn btn-primary position-fixed top-0 start-0 m-3 rounded-circle d-lg-none" style="z-index: 1030; width: 44px; height: 44px">
+        <i class="bi bi-list"></i>
+    </button>
+
+    <!-- Navbar / Header -->
+    <nav class="navbar app-navbar px-3 px-lg-4 sticky-top shadow-sm">
+        <div class="d-flex align-items-center gap-3">
+            <button id="sidebarToggleLg" class="btn btn-link d-none d-lg-inline-block text-decoration-none text-reset"><i class="bi bi-list fs-4"></i></button>
+            <h5 class="mb-0 fw-semibold">Doubao Chat</h5>
+        </div>
+
+        <div class="ms-auto d-flex align-items-center gap-3">
+            <button id="themeToggle" class="btn btn-sm btn-outline-secondary"><i class="bi bi-moon"></i></button>
+        </div>
+    </nav>
+
+    <!-- Sidebar -->
+    <aside class="sidebar">
+        <h6 class="fw-semibold mb-3">Chat History</h6>
+        <button id="new-chat-sidebar" class="btn btn-outline-primary w-100 mb-3"><i class="bi bi-plus-circle"></i> New Chat</button>
+        <div id="chat-list"></div>
+    </aside>
+
+    <!-- Main Content -->
+    <div class="main-content">
+        <div class="container-fluid h-100 pt-4 pt-lg-5 pb-3">
+            <div class="chat-card d-flex flex-column mx-auto" style="max-width: 960px;">
+                <!-- Chat History -->
+                <div id="chat-history" class="flex-grow-1"></div>
+
+                <!-- Image Preview & Prompt Edit -->
+                <div class="image-preview-container" id="image-preview-container">
+                    <div class="image-preview">
+                        <img id="preview-image" src="" alt="Preview">
+                        <button class="remove-image-btn" id="remove-image-btn"><i class="bi bi-x"></i></button>
+                    </div>
+                    <div class="prompt-edit">
+                        <textarea id="image-prompt" placeholder="Edit your prompt for this image..."></textarea>
+                    </div>
+                </div>
+
+                <!-- Input Bar -->
+                <div class="chat-input-bar">
+                    <form id="chat-form" class="d-flex gap-2">
+                        <div class="input-group flex-grow-1">
+                            <input type="text" id="user-input" class="form-control" placeholder="Type your message..." autocomplete="off" required />
+                        </div>
+                        <input type="file" id="image-upload" accept="image/*" hidden />
+                        <button type="button" id="upload-btn" class="btn btn-outline-secondary"><i class="bi bi-image"></i></button>
+                        <button type="submit" class="btn btn-primary"><i class="bi bi-send-fill"></i></button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Bootstrap JS Bundle -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
+    <!-- Existing Chat Logic -->
+    <script>
+        // Preserve original JS from previous version (assumed to be included below)
+    </script>
+    <script>
+        // ----------  Layout & Theme Toggles  ----------
+        const bodyRoot = document.documentElement; // We'll toggle class on <html>
+        const sidebar = document.querySelector(".sidebar");
+        const sidebarToggle = document.getElementById("sidebarToggle");
+        const sidebarToggleLg = document.getElementById("sidebarToggleLg");
+        const themeToggle = document.getElementById("themeToggle");
+
+        function setDarkMode(enable) {
+            if (enable) {
+                bodyRoot.classList.add("dark-mode");
+                localStorage.setItem("prefersDark", "1");
+                themeToggle.innerHTML = '<i class="bi bi-sun"></i>';
+            } else {
+                bodyRoot.classList.remove("dark-mode");
+                localStorage.setItem("prefersDark", "0");
+                themeToggle.innerHTML = '<i class="bi bi-moon"></i>';
+            }
+        }
+
+        // Initialise theme from storage / system preference
+        const prefersDark = localStorage.getItem("prefersDark");
+        setDarkMode(prefersDark ? prefersDark === "1" : window.matchMedia("(prefers-color-scheme: dark)").matches);
+
+        themeToggle.addEventListener("click", () => setDarkMode(!bodyRoot.classList.contains("dark-mode")));
+
+        // ----------  Sidebar toggle (mobile & desktop) ----------
+        function toggleSidebar() {
+            if (window.innerWidth < 992) {
+                bodyRoot.classList.toggle("sidebar-open");
+            } else {
+                bodyRoot.classList.toggle("sidebar-collapsed");
+            }
+        }
+        sidebarToggle.addEventListener("click", toggleSidebar);
+        sidebarToggleLg.addEventListener("click", toggleSidebar);
+
+        // Close sidebar on route change (mobile)
+        window.addEventListener("resize", () => {
+            if (window.innerWidth >= 992) {
+                bodyRoot.classList.remove("sidebar-open");
+            }
+        });
+    </script>
+
+    <!-- Main Chat Functionality -->
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const chatHistory = document.getElementById('chat-history');
+            const chatForm = document.getElementById('chat-form');
+            const userInput = document.getElementById('user-input');
+            const newChatSidebarBtn = document.getElementById('new-chat-sidebar');
+            const chatList = document.getElementById('chat-list');
+            const uploadBtn = document.getElementById('upload-btn');
+            
+            let currentChatId = 'chat-' + Date.now().toString();
+            let messages = [];
+            
+            // Initialize chat
+            loadChatHistories();
+            
+            // New chat button
+            newChatSidebarBtn.addEventListener('click', function() {
+                saveCurrentChat();
+                currentChatId = 'chat-' + Date.now().toString();
+                messages = [];
+                chatHistory.innerHTML = '';
+            });
+
+            // Image upload and preview
+            let currentImageData = null;
+            
+            uploadBtn.addEventListener('click', function() {
+                document.getElementById('image-upload').click();
+            });
+
+            document.getElementById('image-upload').addEventListener('change', function(e) {
+                const file = e.target.files[0];
+                if (file) {
+                    const reader = new FileReader();
+                    reader.onload = function(event) {
+                        currentImageData = event.target.result.split(',')[1];
+                        document.getElementById('preview-image').src = `data:image/jpeg;base64,${currentImageData}`;
+                        document.getElementById('image-prompt').value = 'Analyze this image:';
+                        document.getElementById('image-preview-container').style.display = 'block';
+                        document.getElementById('user-input').focus();
+                    };
+                    reader.readAsDataURL(file);
+                }
+            });
+
+            // Remove image
+            document.getElementById('remove-image-btn').addEventListener('click', function() {
+                currentImageData = null;
+                document.getElementById('preview-image').src = '';
+                document.getElementById('image-prompt').value = '';
+                document.getElementById('image-preview-container').style.display = 'none';
+                document.getElementById('image-upload').value = '';
+            });
+
+            // Chat form submission
+            chatForm.addEventListener('submit', function(e) {
+                e.preventDefault();
+                const message = userInput.value.trim();
+                
+                if (currentImageData) {
+                    // Send image with prompt
+                    const prompt = document.getElementById('image-prompt').value.trim() || 'Analyze this image:';
+                    addMessage('user', prompt, null, currentImageData);
+                    sendVlmMessage(currentImageData, prompt);
+                    
+                    // Reset image preview
+                    currentImageData = null;
+                    document.getElementById('preview-image').src = '';
+                    document.getElementById('image-prompt').value = '';
+                    document.getElementById('image-preview-container').style.display = 'none';
+                    document.getElementById('image-upload').value = '';
+                } else if (message) {
+                    // Send text message only
+                    addMessage('user', message);
+                    sendMessage(message);
+                }
+                
+                userInput.value = '';
+            });
+
+            // Load chat histories
+            function loadChatHistories() {
+                fetch('/api/chat/histories')
+                .then(response => response.json())
+                .then(data => {
+                    chatList.innerHTML = '';
+                    data.histories.forEach(history => {
+                        const chatItem = document.createElement('div');
+                        chatItem.className = `chat-item ${history.id === currentChatId ? 'active' : ''}`;
+                        chatItem.innerHTML = `
+                            <div class="d-flex justify-content-between align-items-center">
+                                <div class="text-truncate" style="max-width: 180px;">${history.title}</div>
+                                <small class="text-muted">${new Date(history.timestamp * 1000).toLocaleTimeString()}</small>
+                            </div>
+                        `;
+                        chatItem.onclick = () => loadChatHistory(history.id);
+                        chatList.appendChild(chatItem);
+                    });
+                });
+            }
+
+            // Load specific chat history
+            function loadChatHistory(chatId) {
+                fetch(`/api/chat/history/${chatId}`)
+                .then(response => response.json())
+                .then(data => {
+                    currentChatId = chatId;
+                    messages = data.messages;
+                    chatHistory.innerHTML = '';
+                    messages.forEach(msg => {
+                        if (msg.role === 'user') {
+                            addMessage('user', msg.content, null, msg.image_data);
+                        } else if (msg.role === 'assistant') {
+                            addMessage('bot', msg.content);
+                        }
+                    });
+                    loadChatHistories();
+                });
+            }
+
+            // Save current chat
+            function saveCurrentChat() {
+                const title = messages.length > 0 ? 
+                    (messages[0].image_data ? 'Image Analysis' : messages[0].content.substring(0, 30)) : 
+                    'New Chat';
+                
+                fetch('/api/chat/history', {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify({
+                        id: currentChatId,
+                        messages: messages,
+                        title: title
+                    })
+                }).then(() => loadChatHistories());
+            }
+
+            // Add message to chat
+            function addMessage(role, content, searchResults, imageData) {
+                const messageDiv = document.createElement('div');
+                messageDiv.className = `message ${role}-message`;
+                
+                if (imageData) {
+                    // 添加文本内容
+                    if (content) {
+                        const textDiv = document.createElement('div');
+                        textDiv.textContent = content;
+                        textDiv.style.marginBottom = '8px';
+                        messageDiv.appendChild(textDiv);
+                    }
+                    
+                    // 添加图片
+                    const img = document.createElement('img');
+                    img.src = `data:image/jpeg;base64,${imageData}`;
+                    img.style.maxWidth = '100%';
+                    img.style.maxHeight = '300px';
+                    img.style.borderRadius = '8px';
+                    messageDiv.appendChild(img);
+                } else {
+                    messageDiv.textContent = content;
+                }
+                
+                chatHistory.appendChild(messageDiv);
+                chatHistory.scrollTop = chatHistory.scrollHeight;
+                
+                if (role === 'user') {
+                    messages.push({
+                        role: 'user',
+                        content: content,
+                        ...(imageData && {image_data: imageData})
+                    });
+                }
+            }
+
+            // Send text message
+            function sendMessage(message) {
+                saveCurrentChat();
+                
+                fetch('/api/doubao/chat', {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify({
+                        messages: [
+                            {"role": "system", "content": "你是豆包，是由字节跳动开发的 AI 人工智能助手"},
+                            ...messages,
+                            {role: 'user', content: message}
+                        ]
+                    })
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.content) {
+                        addMessage('bot', data.content);
+                        messages.push({role: 'assistant', content: data.content});
+                        saveCurrentChat();
+                    }
+                });
+            }
+
+            // Send image message with prompt
+            function sendVlmMessage(imageBase64, prompt) {
+                const formData = new FormData();
+                formData.append('file', dataURLtoBlob(`data:image/jpeg;base64,${imageBase64}`));
+                formData.append('question', prompt);
+                
+                fetch('/api/doubao/chat', {
+                    method: 'POST',
+                    body: formData
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.content) {
+                        addMessage('bot', data.content);
+                        messages.push({role: 'assistant', content: data.content});
+                        saveCurrentChat();
+                    }
+                });
+            }
+
+            // Helper function
+            function dataURLtoBlob(dataurl) {
+                var arr = dataurl.split(','), mime = arr[0].match(/:(.*?);/)[1],
+                    bstr = atob(arr[1]), n = bstr.length, u8arr = new Uint8Array(n);
+                while(n--){
+                    u8arr[n] = bstr.charCodeAt(n);
+                }
+                return new Blob([u8arr], {type:mime});
+            }
+        });
+    </script>
+</body>
+</html>
