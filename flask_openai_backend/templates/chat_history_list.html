@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>聊天历史记录</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background-color: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        h1 {
+            color: #333;
+            text-align: center;
+        }
+        .history-list {
+            list-style: none;
+            padding: 0;
+        }
+        .history-item {
+            padding: 15px;
+            border-bottom: 1px solid #eee;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .history-item:last-child {
+            border-bottom: none;
+        }
+        .history-item:hover {
+            background-color: #f9f9f9;
+        }
+        .history-title {
+            font-weight: bold;
+            color: #333;
+        }
+        .history-date {
+            color: #666;
+            font-size: 0.9em;
+        }
+        .history-link {
+            color: #1a73e8;
+            text-decoration: none;
+        }
+        .history-link:hover {
+            text-decoration: underline;
+        }
+        .history-actions {
+            display: flex;
+            gap: 10px;
+        }
+        .continue-link {
+            background-color: #1a73e8;
+            color: white;
+            padding: 5px 10px;
+            border-radius: 4px;
+        }
+        .continue-link:hover {
+            background-color: #0d5bba;
+            text-decoration: none;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>聊天历史记录</h1>
+        <ul class="history-list">
+            {% for history in histories %}
+            <li class="history-item">
+                <div>
+                    <span class="history-title">{{ history.title }}</span>
+                    <div class="history-date">{{ history.timestamp }}</div>
+                </div>
+                <div class="history-actions">
+                    <a href="/api/chat/history/{{ history.id }}" class="history-link">查看详情</a>
+                    <a href="/c/{{ history.id }}" class="history-link continue-link">继续谈话</a>
+                </div>
+            </li>
+            {% endfor %}
+        </ul>
+    </div>
+</body>
+</html>

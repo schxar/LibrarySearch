@@ -1,4 +1,5 @@
 from flask import Flask, Response, render_template, request, jsonify, send_file, render_template_string, redirect, url_for, session, send_from_directory
+from flask_caching import Cache
 import os
 import json
 import glob
@@ -9,31 +10,35 @@ from math import ceil
 import mysql.connector
 import hashlib
 from datetime import datetime
+from openai import OpenAI
 import pymysql
 import re
 import traceback
 from dotenv import load_dotenv
-from shared_utils import check_tables, create_table
-from openai import OpenAI
+
+from doubao_vlm_service import vlm_upload as doubao_vlm_upload, chat as doubao_chat
+
 
 # 加载环境变量
 load_dotenv()
 
 app = Flask(__name__)
 app.config['SECRET_KEY'] = os.getenv('FLASK_SECRET_KEY', 'your_secret_key')
+app.config['CACHE_TYPE'] = 'SimpleCache'
+cache = Cache(app)
 
-# 豆包search客户端配置
+# DeepSeek客户端配置
 try:
-    with open("flask_openai_backend/doubao.txt", "r") as f:
-        doubao_api_key = f.read().strip()
+    with open("flask_openai_backend/deepseek.txt", "r") as f:
+        DeepSeek_API_KEY = f.read().strip()
     
-    doubao_client = OpenAI(
-        api_key=doubao_api_key,
-        base_url="https://ark.cn-beijing.volces.com/api/v3"
+    deepseek_client = OpenAI(
+        api_key=DeepSeek_API_KEY,
+        base_url="https://api.deepseek.com"
     )
 except Exception as e:
-    print(f"豆包search客户端初始化失败: {str(e)}")
-    doubao_client = None
+    print(f"DeepSeek初始化失败: {str(e)}")
+    deepseek_client = None
 
 
 
@@ -116,6 +121,45 @@ def generate_hash(input_string):
     """生成SHA-256哈希值"""
     return hashlib.sha256(input_string.encode('utf-8')).hexdigest()
 
+def check_tables(conn):
+    """检查所有需要的表是否存在，不存在则创建"""
+    with conn.cursor() as cursor:
+        # 检查并创建DownloadHistory表
+        cursor.execute('''
+            CREATE TABLE IF NOT EXISTS DownloadHistory (
+                id INT AUTO_INCREMENT PRIMARY KEY,
+                user_email VARCHAR(255) NOT NULL,
+                filename VARCHAR(255) NOT NULL,
+                email_hash VARCHAR(64) NOT NULL,
+                filename_hash VARCHAR(64) NOT NULL,
+                download_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+            ) CHARSET=utf8mb4;
+        ''')
+        
+        # 检查并创建SearchRecommendations表
+        cursor.execute('''
+            CREATE TABLE IF NOT EXISTS SearchRecommendations (
+                id INT AUTO_INCREMENT PRIMARY KEY,
+                user_email VARCHAR(255) NOT NULL,
+                email_hash VARCHAR(64) NOT NULL,
+                search_terms TEXT NOT NULL,
+                created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+            ) CHARSET=utf8mb4;
+        ''')
+        
+        # 检查并创建NotebookLMAudioRequests表
+        cursor.execute('''
+            CREATE TABLE IF NOT EXISTS NotebookLMAudioRequests (
+                id INT AUTO_INCREMENT PRIMARY KEY,
+                book_title VARCHAR(255) NOT NULL,
+                book_hash VARCHAR(64) NOT NULL,
+                request_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                clerk_user_email VARCHAR(255) NOT NULL,
+                status ENUM('pending', 'processing', 'completed') DEFAULT 'pending'
+            ) CHARSET=utf8mb4;
+        ''')
+        conn.commit()
+
 def get_db_connection():
     """获取数据库连接并确保表存在"""
     conn = pymysql.connect(**DB_CONFIG)
@@ -143,8 +187,6 @@ def clean_recommendations(raw_text):
 def create_table():
     conn = get_db_connection()
     cursor = conn.cursor()
-    
-    # 创建NotebookLMAudioRequests表
     cursor.execute('''
         CREATE TABLE IF NOT EXISTS NotebookLMAudioRequests (
             id INT AUTO_INCREMENT PRIMARY KEY,
@@ -155,32 +197,6 @@ def create_table():
             status ENUM('pending', 'processing', 'completed') DEFAULT 'pending'
         )
     ''')
-    
-    # 创建聊天会话表
-    cursor.execute('''
-        CREATE TABLE IF NOT EXISTS chat_sessions (
-            session_id VARCHAR(64) PRIMARY KEY,
-            user_agent_hash VARCHAR(64) NOT NULL,
-            title VARCHAR(255) NOT NULL,
-            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-            updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-            INDEX idx_user_agent (user_agent_hash)
-        )
-    ''')
-    
-    # 创建聊天消息表
-    cursor.execute('''
-        CREATE TABLE IF NOT EXISTS chat_messages (
-            id INT AUTO_INCREMENT PRIMARY KEY,
-            session_id VARCHAR(64) NOT NULL,
-            role ENUM('system', 'user', 'assistant') NOT NULL,
-            content TEXT NOT NULL,
-            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-            FOREIGN KEY (session_id) REFERENCES chat_sessions(session_id) ON DELETE CASCADE,
-            INDEX idx_session (session_id)
-        )
-    ''')
-    
     conn.commit()
     cursor.close()
     conn.close()
@@ -194,109 +210,9 @@ def login_required(f):
         return f(*args, **kwargs)
     return decorated_function
 
-
-
-
-# 登录页面HTML模板
-HTML_LOGIN = """
-<!-- Updated login HTML template -->
-<!DOCTYPE html>
-<html>
-<head>
-    <meta charset="UTF-8">
-    <title>Flask Test with Clerk</title>
-    <!-- Include Bootstrap CSS for styling -->
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-    <!-- Include jQuery -->
-    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-
-    <!-- Clerk SDK -->
-    <script
-        async
-        crossorigin="anonymous"
-        data-clerk-publishable-key="pk_test_bGFyZ2UtY3JheWZpc2gtMzIuY2xlcmsuYWNjb3VudHMuZGV2JA"
-        src="https://intense-guppy-8.clerk.accounts.dev/npm/@clerk/clerk-js@latest/dist/clerk.browser.js"
-        type="text/javascript"
-    ></script>
-</head>
-<body class="container mt-5">
-    <h1 class="mb-4">Flask Test with Clerk Authentication</h1>
-
-    <!-- User Interface Placeholder -->
-    <div id="app"></div>
-
-    <!-- New Button for File Main Page (Hidden by default, shown after login) -->
-    <div id="fileMainButton" class="mt-4" style="display: none;">
-        <button class="btn btn-primary" onclick="window.location.href='/filemainpage'">Go to File Main Page</button>
-    </div>
-
-    <!-- Recommendation Buttons (Hidden by default, shown after login) -->
-    <div id="recommendationButtons" class="mt-4" style="display: none;">
-        <button class="btn btn-info me-2" onclick="window.location.href='/recommend'">Get Recommendations</button>
-        <button class="btn btn-secondary" onclick="window.location.href='/view_recommendations'">View Recommendation History</button>
-    </div>
-
-    <!-- New Button for NotebookLM -->
-    <div class="mt-4 text-center">
-        <a href="https://notebooklm.google.com/" target="_blank" class="btn btn-success">Go to NotebookLM</a>
-        <a href="https://313m929k61.vicp.fun/" target="_blank" class="btn btn-info ms-2">Search Homepage</a>
-        <a href="https://schxar.picp.vip/download_history" target="_blank" class="btn btn-info ms-2">Download history</a>
-    </div>
-
-    <script>
-        window.addEventListener('load', async function () {
-            // Initialize Clerk
-            await Clerk.load();
-
-            // Check if the user is logged in
-            if (Clerk.user) {
-                // Show user button
-                document.getElementById('app').innerHTML = '<div id="user-button"></div>';
-                Clerk.mountUserButton(document.getElementById('user-button'));
-
-                // Show the buttons for logged-in users
-                $("#fileMainButton").show();
-                $("#recommendationButtons").show();
-
-    // Set session user_email
-    $.ajax({
-        url: '/set_user_session',
-        type: 'POST',
-        data: { email: Clerk.user.emailAddresses[0].emailAddress },
-        success: function(response) {
-            console.log('Session set:', response);
-            
-            // 检查是否从搜索页面返回
-            if(document.referrer.indexOf('/search') > -1) {
-                // 显示已登录提示和返回按钮
-                $("#app").append(`
-                    <div class="alert alert-success mt-3">
-                        您已成功登录，请<a href="${document.referrer}" class="alert-link">返回搜索页面</a>重试下载
-                    </div>
-                `);
-            }
-        },
-        error: function(error) {
-            console.error('Failed to set session:', error);
-        }
-    });
-            } else {
-                // Show sign-in button for non-logged-in users
-                document.getElementById('app').innerHTML = '<div id="sign-in"></div>';
-                Clerk.mountSignIn(document.getElementById('sign-in'));
-
-                // Hide the file main page button for non-logged-in users
-                $("#fileMainButton").hide();
-            }
-        });
-    </script>
-</body>
-</html>
-"""
-
 @app.route('/', methods=['GET'])
 def index():
-    return render_template_string(HTML_LOGIN)
+    return render_template('login.html')
 
 @app.route('/set_session', methods=['POST'])
 def set_session():
@@ -516,7 +432,7 @@ def search_books():
                 f'<li class="list-group-item"><span>{os.path.basename(f)}</span>'
                 f'<a href="/download/{os.path.basename(f)}" class="btn btn-success btn-sm" target="_blank">Download</a>'
                 f'<a href="https://313m929k61.vicp.fun/search/books?book_name={os.path.basename(f)}" class="btn btn-info btn-sm" target="_blank">查询该文件ID</a>'
-                f'<a href="/doubao_chat?query={os.path.basename(f).replace("(Z-Library)","").rsplit(".", 1)[0]}" class="btn btn-primary btn-sm">Chat with Doubao</a>'
+                f'<a href="{DOUBAO_SERVICE_URL}/doubao_chat?query={os.path.basename(f).replace("(Z-Library)","").rsplit(".", 1)[0]}" class="btn btn-primary btn-sm">Chat with Doubao</a>'
                 
                 f'<form method="POST" action="/submit_ticket" style="display:inline;">'
                 f'<input type="hidden" name="book_title" value="{os.path.basename(f)}">'
@@ -525,11 +441,23 @@ def search_books():
                 f'</form></li>'
                 for f in matching_files
             ]
+        # 添加缓存键
+        cache_key = f"search:{book_name}"
+        
+        # 尝试从缓存获取
+        cached_result = app.extensions['cache'].get(cache_key)
+        if cached_result is not None:
+            return cached_result
+            
         # 渲染模板
-        return render_template(
+        result = render_template(
             'search_results.html',
             file_links=file_links
         )
+        
+        # 设置缓存，有效期5分钟
+        cache.set(cache_key, result, timeout=300)
+        return result
     else:
         return jsonify({"message": "No matching files found"}), 200
 
@@ -581,7 +509,58 @@ def tickets():
     tickets = cursor.fetchall()
     cursor.close()
     conn.close()
-    return render_template('tickets.html', tickets=tickets)
+    return render_template_string(
+        """
+        <!DOCTYPE html>
+        <html lang="en">
+        <head>
+            <meta charset="UTF-8">
+            <meta name="viewport" content="width=device-width, initial-scale=1.0">
+            <title>Tickets</title>
+            <!-- Bootstrap CSS -->
+            <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+        </head>
+        <body>
+            <div class="container">
+                <h1 class="text-center mb-4">Tickets</h1>
+                <table class="table table-striped">
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Book Title</th>
+                            <th>Book Hash</th>
+                            <th>Request Date</th>
+                            <th>Clerk User Email</th>
+                            <th>Status</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for ticket in tickets %}
+                        <tr>
+                            <td>{{ ticket.id }}</td>
+                            <td>{{ ticket.book_title }}</td>
+                            <td>{{ ticket.book_hash }}</td>
+                            <td>{{ ticket.request_date }}</td>
+                            <td>{{ ticket.clerk_user_email }}</td>
+                            <td>{{ ticket.status }}</td>
+                            <td>
+                                <a href="/update_status/{{ ticket.id }}/pending" class="btn btn-warning btn-sm">Pending</a>
+                                <a href="/update_status/{{ ticket.id }}/processing" class="btn btn-info btn-sm">Processing</a>
+                                <a href="/update_status/{{ ticket.id }}/completed" class="btn btn-success btn-sm">Completed</a>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            <!-- Bootstrap JS -->
+            <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+        </body>
+        </html>
+        """,
+        tickets=tickets
+    )
 
 @app.route('/update_status/<int:ticket_id>/<status>')
 @login_required
@@ -632,11 +611,11 @@ def recommendation_form():
         推荐关键词："""
 
         try:
-            if not doubao_client:
-                raise Exception("豆包search客户端未初始化")
+            if not deepseek_client:
+                raise Exception("DeepSeek客户端未初始化")
                 
-            response = doubao_client.chat.completions.create(
-                model="bot-20250506042211-5bscp",
+            response = deepseek_client.chat.completions.create(
+                model="deepseek-chat",
                 messages=[
                     {"role": "system", "content": "你是一个专业的用户行为分析师"},
                     {"role": "user", "content": prompt}
@@ -720,73 +699,11 @@ def view_recommendations():
     finally:
         connection.close()
 
-@app.route('/doubao_chat', methods=['GET'])
+@app.route('/chat', methods=['GET'])
 def handle_chat_page():
-    """转发聊天页面请求到10806端口"""
-    import requests
-    response = requests.get(f'http://localhost:10806/doubao_chat?{request.query_string.decode()}')
-    return response.content, response.status_code, response.headers.items()
-
-@app.route('/api/doubao/chat', methods=['POST'])
-def doubao_chat_api():
-    """转发聊天API请求到10806和10807端口"""
-    try:
-        # 转发到10806端口
-        import requests
-        if 'multipart/form-data' in request.content_type:
-            files = {'file': (request.files['file'].filename, request.files['file'].stream, request.files['file'].mimetype)}
-            data = request.form.to_dict()
-            response = requests.post(
-                'http://localhost:10806/api/doubao/chat',
-                files=files,
-                data=data
-            )
-        else:
-            headers = {'Content-Type': request.content_type}
-            if request.content_type == 'application/json':
-                response = requests.post(
-                    'http://localhost:10806/api/doubao/chat',
-                    json=request.get_json(),
-                    headers=headers
-                )
-            else:
-                response = requests.post(
-                    'http://localhost:10806/api/doubao/chat',
-                    data=request.form.to_dict(),
-                    headers=headers
-                )
-        
-        # 同时转发到10807端口保持兼容
-        if 'multipart/form-data' in request.content_type:
-            files = {'file': (request.files['file'].filename, request.files['file'].stream, request.files['file'].mimetype)}
-            data = request.form.to_dict()
-            requests.post(
-                'http://localhost:10807/api/doubao/chat',
-                files=files,
-                data=data
-            )
-        else:
-            headers = {'Content-Type': request.content_type}
-            if request.content_type == 'application/json':
-                requests.post(
-                    'http://localhost:10807/api/doubao/chat',
-                    json=request.get_json(),
-                    headers=headers
-                )
-            else:
-                requests.post(
-                    'http://localhost:10807/api/doubao/chat',
-                    data=request.form.to_dict(),
-                    headers=headers
-                )
-        
-        return jsonify(response.json()), response.status_code
-        
-    except Exception as e:
-        return jsonify({
-            'error': str(e),
-            'message': 'Failed to forward request to Doubao services'
-        }), 500
+    """处理聊天页面请求"""
+    query = request.args.get('query', '')
+    return render_template('doubao_chat.html', query=query)
 
 @app.route('/download_history', methods=['GET', 'POST'])
 def download_history():
@@ -824,47 +741,21 @@ def download_history():
     
     return render_template('download_history_form.html')
 
-# 清理重复文件
-remove_duplicate_files(download_directory)
 
 
 
 
-from threading import Thread
-import time
-import atexit
-from flask import Flask
 
-# 创建独立的应用实例避免冲突
-vlm_app = Flask(__name__)
-doubao_app = Flask(__name__)
-main_app = Flask(__name__)
 
-def run_vlm_service():
-    """运行VLM服务"""
-    vlm_app.run(host='0.0.0.0', port=10807, debug=False, use_reloader=False)
-
-def run_doubao_service():
-    """运行豆包聊天服务"""
-    doubao_app.run(host='0.0.0.0', port=10806, debug=False, use_reloader=False)
-
-# 创建并启动服务线程
-vlm_thread = Thread(target=run_vlm_service, daemon=True)
-doubao_thread = Thread(target=run_doubao_service, daemon=True)
-
-vlm_thread.start()
-time.sleep(1)  # 间隔启动
-doubao_thread.start()
-time.sleep(1)  # 确保服务启动
-
-# 注册退出清理
-atexit.register(lambda: [t.join(timeout=1) for t in [vlm_thread, doubao_thread]])
-
-# 启动主应用
-
-try:
-    app.run(host='0.0.0.0', port=10805, debug=False)
-finally:
-    # 确保线程退出
-    vlm_thread.join(timeout=1)
-    doubao_thread.join(timeout=1)
+    # 启动豆包VLM服务
+#doubao_vlm_process = subprocess.Popen(
+#    ['python', 'flask_openai_backend\\doubao_vlm_service.py'],
+#    cwd=os.getcwd()  # 确保工作目录正确
+#    )
+    
+    # 启动主应用
+#try:
+app.run(host='0.0.0.0', port=10805, debug=True)
+#finally:
+        # 确保主应用退出时终止子进程
+#    doubao_vlm_process.terminate()

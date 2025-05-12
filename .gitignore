@@ -52,3 +52,5 @@ flask_openai_backend/templates/doubao.txt
 doubao.txt
 *.crdownload
 *.pyc
+/flask_openai_backend/ChatHistory
+flask_openai_backend/ChatHistory/chat-1746996933642.json

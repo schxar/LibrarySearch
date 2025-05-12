@@ -236,6 +236,42 @@
                     chatHistoryList.innerHTML = '';
                     chatList.innerHTML = '';
                     
+                    // 添加搜索框
+                    const searchContainer = document.createElement('div');
+                    searchContainer.className = 'mb-3';
+                    searchContainer.innerHTML = `
+                        <input type="text" id="chat-search" class="form-control" placeholder="Search chats...">
+                    `;
+                    chatList.appendChild(searchContainer);
+                    
+                    // 添加搜索功能
+                    document.getElementById('chat-search')?.addEventListener('input', function(e) {
+                        const searchTerm = e.target.value.toLowerCase();
+                        const items = chatList.querySelectorAll('.chat-item');
+                        items.forEach(item => {
+                            const text = item.textContent.toLowerCase();
+                            item.style.display = text.includes(searchTerm) ? '' : 'none';
+                        });
+                    });
+                    
+                    // 添加排序选项
+                    const sortContainer = document.createElement('div');
+                    sortContainer.className = 'mb-3';
+                    sortContainer.innerHTML = `
+                        <select id="chat-sort" class="form-select">
+                            <option value="newest">Newest first</option>
+                            <option value="oldest">Oldest first</option>
+                            <option value="name">By name</option>
+                        </select>
+                    `;
+                    chatList.appendChild(sortContainer);
+                    
+                    // 添加排序功能
+                    document.getElementById('chat-sort')?.addEventListener('change', function() {
+                        sortChatHistories();
+                    });
+                    
+                    // 处理历史记录
                     data.histories.forEach(history => {
                         // 更新下拉菜单
                         const li = document.createElement('li');
@@ -277,17 +313,58 @@
                         // 添加到侧边栏
                         const chatItem = document.createElement('div');
                         chatItem.className = `chat-item ${history.id === currentChatId ? 'active' : ''}`;
-                        chatItem.textContent = history.title;
+                        
+                        const chatItemContent = document.createElement('div');
+                        chatItemContent.className = 'd-flex justify-content-between align-items-center';
+                        
+                        const titleDiv = document.createElement('div');
+                        titleDiv.textContent = history.title;
+                        titleDiv.className = 'text-truncate';
+                        titleDiv.style.maxWidth = '180px';
+                        
+                        const timeDiv = document.createElement('small');
+                        timeDiv.className = 'text-muted';
+                        timeDiv.textContent = new Date(history.timestamp * 1000).toLocaleTimeString();
+                        
+                        chatItemContent.appendChild(titleDiv);
+                        chatItemContent.appendChild(timeDiv);
+                        chatItem.appendChild(chatItemContent);
+                        
                         chatItem.onclick = () => {
                             loadChatHistory(history.id);
                         };
                         
+                        chatItem.dataset.id = history.id;
+                        chatItem.dataset.title = history.title;
+                        chatItem.dataset.timestamp = history.timestamp;
+                        
                         chatList.appendChild(chatItem);
                     });
+                    
+                    // 初始排序
+                    sortChatHistories();
                 })
                 .catch(error => {
                     console.error('Error loading chat histories:', error);
                 });
+            }
+            
+            // 排序聊天历史
+            function sortChatHistories() {
+                const sortBy = document.getElementById('chat-sort').value;
+                const chatItems = Array.from(chatList.querySelectorAll('.chat-item'));
+                
+                chatItems.sort((a, b) => {
+                    if (sortBy === 'newest') {
+                        return b.dataset.timestamp - a.dataset.timestamp;
+                    } else if (sortBy === 'oldest') {
+                        return a.dataset.timestamp - b.dataset.timestamp;
+                    } else {
+                        return a.dataset.title.localeCompare(b.dataset.title);
+                    }
+                });
+                
+                chatItems.forEach(item => chatList.appendChild(item));
             }
             
             // 初始化加载
@@ -305,16 +382,28 @@
                 });
             }
             
-            // Load initial message if coming from search
-            const urlParams = new URLSearchParams(window.location.search);
-            let initialQuery = urlParams.get('query');
-            if (initialQuery) {
-                // Remove (Z-Library) from filename and any ebook extensions
-                initialQuery = initialQuery.replace(/\s*\(Z-Library\)\s*/g, '');
-                initialQuery = removeEbookExtensions(initialQuery);
-                addMessage('user', initialQuery);
-                sendMessage(initialQuery);
-                userInput.value = '';
+            // 检查URL路径
+            const pathSegments = window.location.pathname.split('/');
+            let chatId = null;
+            
+            // 检查是否是/c/chat-id格式
+            if (pathSegments.length >= 3 && pathSegments[1] === 'c') {
+                chatId = pathSegments[2];
+                loadChatHistory(chatId);
+            }
+            // 否则检查查询参数
+            else {
+                const urlParams = new URLSearchParams(window.location.search);
+                let initialQuery = urlParams.get('query');
+                
+                if (initialQuery) {
+                    // Remove (Z-Library) from filename and any ebook extensions
+                    initialQuery = initialQuery.replace(/\s*\(Z-Library\)\s*/g, '');
+                    initialQuery = removeEbookExtensions(initialQuery);
+                    addMessage('user', initialQuery);
+                    sendMessage(initialQuery);
+                    userInput.value = '';
+                }
             }
             
             chatForm.addEventListener('submit', function(e) {
@@ -341,8 +430,11 @@
                         const previewContainer = document.querySelector('.preview-container');
                         preview.src = imageData;
                         previewContainer.style.display = 'block';
-                        addMessage('user', 'Analyze this image:');
-                        sendVlmMessage(imageData.split(',')[1]);
+                        
+                        // 获取base64数据部分
+                        const base64Data = imageData.split(',')[1];
+                        addMessage('user', 'Analyze this image:', null, base64Data);
+                        sendVlmMessage(base64Data);
                     };
                     reader.readAsDataURL(file);
                 }
@@ -352,17 +444,8 @@
                 // 保存当前聊天
                 saveCurrentChat();
                 
-                // 创建新聊天
-                currentChatId = 'chat-' + Date.now().toString();
-                localStorage.setItem(browserId + '-currentChatId', currentChatId);
-                messages = [];
-                chatHistory.innerHTML = '';
-                
-                // 更新历史记录
-                updateChatList();
-                
-                // 显示通知
-                showToast('New chat created');
+                // 直接跳转到主页
+                window.location.href = '/';
             });
             
             // 添加保存按钮事件监听
@@ -405,10 +488,32 @@
             
             // 保存当前聊天到服务器
             function saveCurrentChat() {
+                // 处理消息中的图片数据
+                const processedMessages = messages.map(msg => {
+                    if (msg.image_data) {
+                        return {
+                            role: msg.role,
+                            content: msg.content,
+                            image_data: msg.image_data
+                        };
+                    }
+                    return msg;
+                });
+                
+                // 设置标题
+                let title = 'New Chat';
+                if (messages.length > 0) {
+                    if (messages[0].image_data) {
+                        title = 'Image Analysis';
+                    } else {
+                        title = messages[0].content.substring(0, 30);
+                    }
+                }
+                
                 const payload = {
                     id: currentChatId,
-                    messages: messages,
-                    title: messages.length > 0 ? messages[0].content.substring(0, 30) : 'New Chat'
+                    messages: processedMessages,
+                    title: title
                 };
                 
                 fetch('/api/chat/history', {
@@ -430,64 +535,16 @@
                 });
             }
             
-            // 加载聊天历史列表
-            function loadChatHistories() {
-                fetch('/api/chat/histories')
-                .then(response => response.json())
-                .then(data => {
-                    const chatHistoryList = document.getElementById('chatHistoryList');
-                    chatHistoryList.innerHTML = '';
-                    
-                    data.histories.forEach(history => {
-                        const li = document.createElement('li');
-                        const a = document.createElement('a');
-                        a.className = 'dropdown-item d-flex justify-content-between align-items-center';
-                        a.href = '#';
-                        
-                        // 显示聊天标题和时间
-                        const titleSpan = document.createElement('span');
-                        titleSpan.textContent = history.title;
-                        
-                        const timeSpan = document.createElement('small');
-                        timeSpan.className = 'text-muted ms-2';
-                        timeSpan.textContent = new Date(history.timestamp * 1000).toLocaleString();
-                        
-                        // 添加删除按钮
-                        const deleteBtn = document.createElement('button');
-                        deleteBtn.className = 'btn btn-sm btn-outline-danger ms-2';
-                        deleteBtn.innerHTML = '&times;';
-                        deleteBtn.onclick = (e) => {
-                            e.stopPropagation();
-                            deleteChatHistory(history.id);
-                        };
-                        
-                        a.appendChild(titleSpan);
-                        a.appendChild(timeSpan);
-                        a.appendChild(deleteBtn);
-                        
-                        a.onclick = (e) => {
-                            e.preventDefault();
-                            loadChatHistory(history.id);
-                        };
-                        
-                        // 高亮当前聊天
-                        if (history.id === currentChatId) {
-                            a.classList.add('active');
-                        }
-                        
-                        li.appendChild(a);
-                        chatHistoryList.appendChild(li);
-                    });
-                })
-                .catch(error => {
-                    console.error('Error loading chat histories:', error);
-                });
-            }
             
             // 加载指定聊天历史
             function loadChatHistory(chatId) {
                 fetch(`/api/chat/history/${chatId}`)
-                .then(response => response.json())
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error('History not found');
+                    }
+                    return response.json();
+                })
                 .then(data => {
                     if (data.error) {
                         throw new Error(data.error);
@@ -495,12 +552,30 @@
                     
                     currentChatId = chatId;
                     messages = data.messages;
-                    renderMessages();
+                    
+                    // 清空聊天历史并重新渲染所有消息
+                    chatHistory.innerHTML = '';
+                    messages.forEach(msg => {
+                        if (msg.role === 'user') {
+                            addMessage('user', msg.content, null, msg.image_data);
+                        } else if (msg.role === 'assistant') {
+                            addMessage('bot', msg.content);
+                        }
+                    });
+                    
                     loadChatHistories();
+                    
+                    // 更新页面标题
+                    document.title = `${data.title || 'Chat'} - Doubao`;
                 })
                 .catch(error => {
                     console.error('Error loading chat history:', error);
                     showToast('Failed to load chat history');
+                    
+                    // 如果是从/c/路径加载失败，重定向到主页
+                    if (window.location.pathname.startsWith('/c/')) {
+                        window.location.href = '/';
+                    }
                 });
             }
             
@@ -531,11 +606,30 @@
                 }
             }
             
-            function addMessage(role, content, searchResults) {
+            function addMessage(role, content, searchResults, imageData) {
                 const messageDiv = document.createElement('div');
                 messageDiv.className = `message ${role}-message`;
                 
-                if (typeof content === 'string') {
+                if (imageData) {
+                    // 如果是图片消息
+                    const imgContainer = document.createElement('div');
+                    imgContainer.className = 'image-message';
+                    
+                    const img = document.createElement('img');
+                    img.src = `data:image/jpeg;base64,${imageData}`;
+                    img.style.maxWidth = '100%';
+                    img.style.maxHeight = '300px';
+                    img.style.borderRadius = '8px';
+                    img.style.marginTop = '8px';
+                    
+                    const text = document.createElement('div');
+                    text.textContent = content || 'Analyze this image:';
+                    
+                    imgContainer.appendChild(text);
+                    imgContainer.appendChild(img);
+                    messageDiv.appendChild(imgContainer);
+                } 
+                else if (typeof content === 'string') {
                     messageDiv.textContent = content;
                 } else {
                     messageDiv.innerHTML = content;
@@ -575,7 +669,10 @@
                 chatHistory.scrollTop = chatHistory.scrollHeight;
                 
                 if (role === 'user') {
-                    messages.push({role: 'user', content});
+                    const message = imageData ? 
+                        {role: 'user', content: content || 'Analyze this image:', image_data: imageData} : 
+                        {role: 'user', content};
+                    messages.push(message);
                 }
             }
             
