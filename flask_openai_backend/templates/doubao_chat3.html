@@ -598,7 +598,21 @@
                     img.style.borderRadius = '8px';
                     messageDiv.appendChild(img);
                 } else {
-                    messageDiv.textContent = content;
+                    // 检测并转换URL格式
+                    const urlPattern = /\*\*书名\*\*：(.*?) \*\*book_url\*\*：(https?:\/\/[^\s]+)/g;
+                    let processedContent = content;
+                    let match;
+                    
+                    while ((match = urlPattern.exec(content)) !== null) {
+                        const bookName = match[1];
+                        const bookUrl = match[2];
+                        processedContent = processedContent.replace(
+                            match[0], 
+                            `<a href="${bookUrl}" target="_blank" rel="noopener noreferrer">${bookName}</a>`
+                        );
+                    }
+                    
+                    messageDiv.innerHTML = processedContent;
                 }
                 
                 chatHistory.appendChild(messageDiv);

@@ -163,15 +163,58 @@ def process_zlib_search(query: str, result_type: str = "summary"):
         print(f"成功获取搜索结果，共{len(results.get('results', []))}条记录")
         
         try:
+            # 生成embedding（分块处理）
+            print("----- 生成embedding（分块处理）-----")
+            embedding_info = ""
+            try:
+                results_str = json.dumps(results, ensure_ascii=False)
+                chunk_size = 3000  # 安全阈值，避免超过4096限制
+                chunks = [results_str[i:i+chunk_size] for i in range(0, len(results_str), chunk_size)]
+                
+                all_embeddings = []
+                for i, chunk in enumerate(chunks):
+                    print(f"正在处理第{i+1}/{len(chunks)}块embedding...")
+                    embedding_resp = client.embeddings.create(
+                        model="doubao-embedding-large-text-240915",
+                        input=[chunk],
+                        encoding_format="float"
+                    )
+                    all_embeddings.extend(embedding_resp.data[0].embedding)
+                
+                embedding_info = f"\nEmbedding总维度: {len(all_embeddings)} (分{len(chunks)}块处理)"
+            except Exception as e:
+                print(f"生成embedding失败: {str(e)}")
+                embedding_info = ""
+            
+            # 优化prompt生成，限制输入长度
+            results_str = json.dumps(results, ensure_ascii=False)
+            if len(results_str) > 3000:  # 预留空间给其他prompt内容
+                # 只保留前10条结果
+                limited_results = {"results": results.get("results", [])[:10]}
+                results_str = json.dumps(limited_results, ensure_ascii=False)
+                print(f"输入过长，已截断至前10条结果，当前长度: {len(results_str)}")
+            
             # 调用doubao模型处理结果
-            prompt = f"输出格式为先是书名, 然后是book_url,请从以下JSON数据中提取书名和链接:\n{json.dumps(results, ensure_ascii=False)}"
+            prompt = f"输出格式为先是书名, 然后是book_url,请从以下JSON数据中提取书名和链接:\n{results_str}{embedding_info}"
             print(f"调用doubao模型处理结果,prompt长度: {len(prompt)}")
-            doubao_response = client.chat.completions.create(
-                model="doubao-1-5-lite-32k-250115",
-                messages=[{"role": "user", "content": prompt}],
-                temperature=0,
-                timeout=20
-            )
+            
+            try:
+                doubao_response = client.chat.completions.create(
+                    model="doubao-1-5-pro-256k-250115",
+                    messages=[{"role": "user", "content": prompt}],
+                    temperature=0,
+                    timeout=60
+                )
+            except Exception as e:
+                print(f"doubao模型处理失败: {str(e)}")
+                # 模型调用失败时返回原始结果
+                return {
+                    "content": json.dumps([
+                        {"title": item.get("title"), "book_url": item.get("book_url")} 
+                        for item in results.get("results", [])
+                    ], ensure_ascii=False),
+                    "raw_results": results
+                }
             
             # 返回原始结果和模型处理后的结果
             return {
