@@ -15,64 +15,126 @@ import re
 from dotenv import load_dotenv
 from requests import Response
 import requests
-from tools import tools, client, bot_client  # 导入工具定义
 
-# 数据库配置
-DB_CONFIG = {
-    'host': 'localhost',
-    'user': 'root',
-    'password': '13380008373',
-    'database': 'library',
-    'charset': 'utf8mb4',
-    'cursorclass': pymysql.cursors.DictCursor
-}
+# 初始化豆包客户端
+with open(os.path.join(os.path.dirname(__file__), 'templates', 'doubao.txt'), 'r') as f:
+    api_key = f.read().strip()
 
-def process_message(messages: list):
+# 合并的客户端初始化代码
+client = OpenAI(
+    base_url="https://ark.cn-beijing.volces.com/api/v3",
+    api_key=api_key
+)
+
+bot_client=OpenAI(
+    base_url="https://ark.cn-beijing.volces.com/api/v3/bots",
+    api_key=api_key
+)
+
+# 工具定义
+tools = [
+    {
+        "type": "function",
+        "function": {
+            "name": "google_cse_search",
+            "description": "使用Google Custom Search Engine API执行搜索",
+            "parameters": {
+                "type": "object",
+                "properties": {
+                    "query": {"type": "string", "description": "搜索关键词"},
+                    "cx": {"type": "string", "description": "搜索引擎ID", "default": "b7a4dfc41bb40428c"},
+                    "num": {"type": "integer", "description": "返回结果数量", "default": 5}
+                },
+                "required": ["query"]
+            }
+        }
+    },
+    {
+        "type": "function",
+        "function": {
+            "name": "url_analysis",
+            "description": "解析URL内容并提取关键信息",
+            "parameters": {
+                "type": "object",
+                "properties": {
+                    "url": {"type": "string", "description": "需要分析的URL"},
+                    "detail_level": {"type": "string", "enum": ["summary", "full"], "default": "summary"}
+                },
+                "required": ["url"]
+            }
+        }
+    },
+    {
+        "type": "function",
+        "function": {
+            "name": "web_search",
+            "description": "执行网络搜索并返回结果",
+            "parameters": {
+                "type": "object",
+                "properties": {
+                    "query": {"type": "string", "description": "搜索关键词"},
+                    "result_type": {"type": "string", "enum": ["summary", "detailed"], "default": "summary"}
+                },
+                "required": ["query"]
+            }
+        }
+    },
+    {
+        "type": "function",
+        "function": {
+            "name": "image_analysis",
+            "description": "分析图片内容，支持DATAURI格式的base64编码",
+            "parameters": {
+                "type": "object",
+                "properties": {
+                    "image_data": {"type": "string", "description": "DATAURI格式的base64编码图片"},
+                    "task": {"type": "string", "enum": ["describe", "analyze"], "default": "describe"}
+                },
+                "required": ["image_data"]
+            }
+        }
+    },
+    {
+        "type": "function",
+        "function": {
+            "name": "zlib_search",
+            "description": "在在线图书馆中搜索图书",
+            "parameters": {
+                "type": "object",
+                "properties": {
+                    "query": {"type": "string", "description": "搜索关键词"},
+                    "result_type": {"type": "string", "enum": ["summary", "detailed"], "default": "summary"}
+                },
+                "required": ["query"]
+            }
+        }
+    },
+    {
+        "type": "function",
+        "function": {
+            "name": "get_dlink",
+            "description": "获取图书的下载链接",
+            "parameters": {
+                "type": "object",
+                "properties": {
+                    "book_url": {"type": "string", "description": "图书的URL地址"}
+                },
+                "required": ["book_url"]
+            }
+        }
+    }
+]
+
+def process_message(prompt: str):
     """处理用户消息，自动判断是否使用工具"""
-    print(f"处理消息数量: {len(messages)}")
-    print(f"最后一条消息内容: {messages}")
-    
-    # 首先尝试使用工具模型
-    try:
-        response = client.chat.completions.create(
-            model="doubao-1-5-lite-32k-250115",
-            messages=messages,
-            tools=tools,
-            tool_choice="auto"
-        )
-        
-        # 打印token使用情况
-        if hasattr(response, 'usage'):
-            usage = response.usage
-            print(f"Token使用情况 - 输入: {usage.prompt_tokens} | 输出: {usage.completion_tokens} | 总计: {usage.total_tokens}")
-        
-        # 如果没有工具调用，则使用深度思考模型
-        if not response.choices[0].message.tool_calls:
-            print("未检测到工具调用，转入深度思考模型")
-            response = client.chat.completions.create(
-                model="doubao-1-5-thinking-pro-250415",
-                messages=messages,
-                base_url="https://ark.cn-beijing.volces.com/api/v3"
-            )
-            # 打印token使用情况
-            if hasattr(response, 'usage'):
-                usage = response.usage
-                print(f"Token使用情况 - 输入: {usage.prompt_tokens} | 输出: {usage.completion_tokens} | 总计: {usage.total_tokens}")
-            
-        return response
-        
-    except Exception as e:
-        print(f"工具模型调用失败: {str(e)}，尝试使用深度思考模型")
-        response = client.chat.completions.create(
-            model="doubao-1-5-thinking-pro-250415",
-            messages=messages,
-            base_url="https://ark.cn-beijing.volces.com/api/v3"
-        )
-        # 打印token使用情况
-        if hasattr(response, 'usage'):
-            usage = response.usage
-            print(f"Token使用情况 - 输入: {usage.prompt_tokens} | 输出: {usage.completion_tokens} | 总计: {usage.total_tokens}")
-        return response
+    print(f"调用模型: doubao-1-5-lite-32k-250115, 输入内容: {prompt[:100]}...")
+    response = client.chat.completions.create(
+        model="doubao-1-5-lite-32k-250115",
+        messages=[{"role": "user", "content": prompt}],
+        tools=tools,
+        tool_choice="auto"
+    )
+    return response
 
 def process_url(url: str):
     """处理URL分析请求"""
@@ -93,7 +155,7 @@ def process_url(url: str):
 def process_search(query: str):
     """处理搜索请求"""
     print(f"调用模型: bot-20250506042211-5bscp, 搜索内容: {query[:100]}...")
-    response = bot_client.chat.completions.create(
+    return bot_client.chat.completions.create(
         model="bot-20250506042211-5bscp",
         messages=[
             {"role": "system", "content": "你是豆包，是由字节跳动开发的 AI 人工智能助手"},
@@ -102,88 +164,18 @@ def process_search(query: str):
         tools=tools,
         tool_choice={"type": "function", "function": {"name": "web_search"}}
     )
-    # 打印原始JSON输出
-    print("豆包搜索原始JSON输出:")
-    print(json.dumps(response, indent=2, ensure_ascii=False, default=str))
-    
-    # 生成embedding（分块处理）
-    print("----- 生成embedding（分块处理）-----")
-    embedding_info = ""
-    try:
-        content_str = response.choices[0].message.content if response.choices[0].message.content else ""
-        chunk_size = 3000  # 安全阈值，避免超过4096限制
-        chunks = [content_str[i:i+chunk_size] for i in range(0, len(content_str), chunk_size)]
-        
-        all_embeddings = []
-        for i, chunk in enumerate(chunks):
-            print(f"正在处理第{i+1}/{len(chunks)}块embedding...")
-            embedding_resp = client.embeddings.create(
-                model="doubao-embedding-large-text-240915",
-                input=[chunk],
-                encoding_format="float"
-            )
-            all_embeddings.extend(embedding_resp.data[0].embedding)
-        
-        embedding_info = f"\nEmbedding总维度: {len(all_embeddings)} (分{len(chunks)}块处理)"
-    except Exception as e:
-        print(f"生成embedding失败: {str(e)}")
-        embedding_info = ""
-    
-    # 调用thinking-pro模型处理结果
-    prompt = f"请总结以下搜索结果:\n{content_str}{embedding_info}"
-    print(f"调用doubao-1-5-thinking-pro-250415处理结果,prompt长度: {len(prompt)}")
-    
-    try:
-        thinking_response = client.chat.completions.create(
-            model="doubao-1-5-thinking-pro-250415",
-            messages=[{"role": "user", "content": prompt}],
-            temperature=0,
-            timeout=60
-        )
-        return {
-            "content": thinking_response.choices[0].message.content,
-            "raw_response": json.loads(json.dumps(response, default=str))
-        }
-    except Exception as e:
-        print(f"thinking-pro模型处理失败: {str(e)}")
-        return {
-            "content": content_str,
-            "raw_response": json.loads(json.dumps(response, default=str))
-        }
 
 def process_image_data(image_data: str, task: str = "describe"):
     """处理图片分析请求"""
     if not image_data.startswith("data:image/"):
         raise ValueError("Invalid DATAURI format")
     print(f"调用模型: doubao-1-5-vision-pro-250328, 任务类型: {task}")
-    try:
-        return client.chat.completions.create(
-            model="doubao-1-5-vision-pro-250328",
-            messages=[
-                {
-                    "role": "user",
-                    "content": [
-                        {
-                            "type": "image_url",
-                            "image_url": {
-                                "url": image_data,
-                                "detail": "auto"
-                            }
-                        },
-                        {
-                            "type": "text",
-                            "text": f"请分析这张图片: {task}"
-                        }
-                    ]
-                }
-            ],
-            tools=tools,
-            tool_choice={"type": "function", "function": {"name": "image_analysis"}},
-            temperature=0.2
-        )
-    except Exception as e:
-        print(f"图片处理失败: {str(e)}")
-        raise
+    return client.chat.completions.create(
+        model="doubao-1-5-vision-pro-250328",
+        messages=[{"role": "user", "content": image_data}],
+        tools=tools,
+        tool_choice={"type": "function", "function": {"name": "image_analysis"}}
+    )
 
 def process_dlink_request(book_url: str):
     """处理下载链接请求"""
@@ -238,9 +230,6 @@ def process_google_cse(query: str, cx: str = "b7a4dfc41bb40428c", num: int = 5):
         )
         response.raise_for_status()
         results = response.json()
-        # 打印原始JSON输出
-        print("Google CSE原始JSON输出:")
-        print(json.dumps(results, indent=2, ensure_ascii=False))
         print(f"成功获取Google CSE搜索结果，共{len(results.get('items', []))}条记录")
         
         # 生成embedding（分块处理）
@@ -272,7 +261,7 @@ def process_google_cse(query: str, cx: str = "b7a4dfc41bb40428c", num: int = 5):
         
         try:
             doubao_response = client.chat.completions.create(
-                model="doubao-1-5-thinking-pro-250415",
+                model="doubao-1-5-pro-256k-250115",
                 messages=[{"role": "user", "content": prompt}],
                 temperature=0,
                 timeout=60
@@ -354,7 +343,7 @@ def process_zlib_search(query: str, result_type: str = "summary"):
             
             try:
                 doubao_response = client.chat.completions.create(
-                    model="doubao-1-5-thinking-pro-250415",
+                    model="doubao-1-5-pro-256k-250115",
                     messages=[{"role": "user", "content": prompt}],
                     temperature=0,
                     timeout=60
@@ -393,6 +382,11 @@ def process_zlib_search(query: str, result_type: str = "summary"):
         print(f"处理zlib_search时发生未知错误: {str(e)}")
         return {"error": f"处理搜索请求时发生错误: {str(e)}"}
 
+# 初始化各功能客户端
+vlm_client = OpenAI(
+    api_key=os.environ.get("ARK_API_KEY"),
+    base_url="https://ark.cn-beijing.volces.com/api/v3"
+)
 
 
 app = Flask(__name__)
@@ -414,6 +408,16 @@ CORS(app, resources={
 
 # 加载环境变量
 load_dotenv()
+
+# 数据库配置
+DB_CONFIG = {
+    'host': 'localhost',
+    'user': 'root',
+    'password': '13380008373',
+    'database': 'library',
+    'charset': 'utf8mb4',
+    'cursorclass': pymysql.cursors.DictCursor
+}
 
 def get_db_connection():
     """获取数据库连接"""
@@ -469,99 +473,44 @@ def doubao_chat_api():
             if not file:
                 return jsonify({'error': 'No file uploaded'}), 400
                 
-            # 验证并处理图片上传
+            # 处理图片上传
+            image_base64 = base64.b64encode(file.read()).decode('utf-8')
+            question = request.form.get('question', '请描述这张图片的内容')
+            
             try:
-                # 验证文件类型
-                if not file.filename.lower().endswith(('.png', '.jpg', '.jpeg', '.gif')):
-                    return jsonify({'error': '仅支持PNG/JPG/JPEG/GIF格式的图片'}), 400
-                
-                # 读取并验证图片大小(不超过5MB)
-                file.seek(0, os.SEEK_END)
-                file_size = file.tell()
-                if file_size > 5 * 1024 * 1024:
-                    return jsonify({'error': '图片大小不能超过5MB'}), 400
-                file.seek(0)
-                
-                # 编码图片并验证
-                image_base64 = base64.b64encode(file.read()).decode('utf-8')
-                if not image_base64 or len(image_base64) < 100:
-                    return jsonify({'error': '图片编码失败'}), 400
-                
-                question = request.form.get('question', '请描述这张图片的内容')
-                if not question or len(question) > 500:
-                    question = '请描述这张图片的内容'
-                
-                # 调用vision模型分析图片
-                try:
-                    # 确保图片数据格式正确
-                    if not image_base64 or len(image_base64) < 100:
-                        raise ValueError("Invalid image data")
-                        
-                    vision_response = client.chat.completions.create(
-                        model="doubao-1-5-vision-pro-250328",
-                        messages=[
-                            {
-                                "role": "user",
-                                "content": [
-                                    {
-                                        "type": "image_url",
-                                        "image_url": {
-                                            "url": f"data:{file.content_type};base64,{image_base64}",
-                                            "detail": "auto"
-                                        }
+                response = vlm_client.chat.completions.create(
+                    model="doubao-1.5-vision-pro-250328",
+                    messages=[
+                        {
+                            "role": "user",
+                            "content": [
+                                {
+                                    "type": "image_url",
+                                    "image_url": {
+                                        "url": f"data:image/jpeg;base64,{image_base64}"
                                     },
-                                    {
-                                        "type": "text",
-                                        "text": question
-                                    }
-                                ]
-                            }
-                        ],
-                        max_tokens=1024,
-                        temperature=0.2
-                    )
-                    
-                    # 将vision处理结果传递给tool处理
-                    tool_response = process_message(
-                        messages=[
-                            {
-                                "role": "system",
-                                "content": "你是豆包，是由字节跳动开发的 AI 人工智能助手"
-                            },
-                            {
-                                "role": "user",
-                                "content": vision_response.choices[0].message.content
-                            }
-                        ]
-                    )
-                    
-                    if not tool_response or not tool_response.choices:
-                        raise ValueError("Invalid tool response")
-                    
-                    return jsonify({
-                        'content': tool_response.choices[0].message.content,
-                        'is_image_response': True,
-                        'status': 'success'
-                    })
-                    
-                except Exception as tool_e:
-                    app.logger.error(f"Tool processing failed: {str(tool_e)}")
-                    return jsonify({
-                        'error': '图片处理失败',
-                        'message': str(tool_e),
-                        'is_image_response': True,
-                        'status': 'error'
-                    }), 500
+                                },
+                                {"type": "text", "text": question},
+                            ],
+                        }
+                    ],
+                    max_tokens=1024
+                )
+                
+                # 将VLM处理结果传递给tool处理
+                tool_response = process_message(
+                    prompt=response.choices[0].message.content
+                )
+                return jsonify({
+                    'content': tool_response.choices[0].message.content
+                })
                 
             except Exception as e:
-                error_detail = {
+                return jsonify({
                     'error': '图片处理失败',
                     'message': str(e),
-                    'traceback': traceback.format_exc(),
-                    'suggestion': '请检查图片格式和大小，或稍后再试'
-                }
-                app.logger.error(f"图片处理失败: {error_detail}")
-                return jsonify(error_detail), 500
+                    'traceback': traceback.format_exc()
+                }), 500
             
         else:
             # 处理JSON或表单数据
@@ -575,9 +524,8 @@ def doubao_chat_api():
             
             # 统一消息处理入口
             print("开始处理消息请求...")
-            print(f"收到消息数量: {len(data['messages'])}")
             response = process_message(
-                messages=data['messages']
+                prompt=data['messages'][-1]['content']
             )
             print(f"模型返回结果: {response.choices[0].message.content[:200]}...")
             
@@ -592,22 +540,6 @@ def doubao_chat_api():
                     print(f"检测到工具调用: web_search, 搜索内容: {search_args['query']}")
                     search_result = process_search(**search_args)
                     print(f"web_search返回结果: {search_result.choices[0].message.content[:200]}...")
-                    
-                    # 检查web_search是否返回有效结果
-                    if "没有找到" in search_result.choices[0].message.content or "未找到" in search_result.choices[0].message.content:
-                        print("web_search未找到结果，自动切换到Google CSE搜索")
-                        cse_result = process_google_cse(query=search_args['query'])
-                        if "error" in cse_result:
-                            return jsonify({
-                                'content': f"web_search未找到结果，且Google CSE搜索失败: {cse_result['error']}",
-                                'is_search_result': True
-                            })
-                        return jsonify({
-                            'content': f"web_search未找到结果，以下是Google CSE搜索结果:\n{cse_result['content']}",
-                            'is_search_result': True,
-                            'is_cse_fallback': True
-                        })
-                    
                     return jsonify({
                         'content': search_result.choices[0].message.content,
                         'is_search_result': True

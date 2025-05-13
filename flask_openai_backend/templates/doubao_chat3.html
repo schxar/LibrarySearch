@@ -627,19 +627,26 @@
                 }
             }
 
-            // Send text message
+            // Send text message with full context
             function sendMessage(message) {
                 saveCurrentChat();
+                
+                // Prepare full message history including system message
+                const fullMessages = [
+                    {"role": "system", "content": "你是豆包，是由字节跳动开发的 AI 人工智能助手"},
+                    ...messages.map(msg => ({
+                        role: msg.role,
+                        content: msg.content,
+                        ...(msg.image_data && {image_data: msg.image_data})
+                    })),
+                    {role: 'user', content: message}
+                ];
                 
                 fetch('/api/doubao/chat', {
                     method: 'POST',
                     headers: {'Content-Type': 'application/json'},
                     body: JSON.stringify({
-                        messages: [
-                            {"role": "system", "content": "你是豆包，是由字节跳动开发的 AI 人工智能助手"},
-                            ...messages,
-                            {role: 'user', content: message}
-                        ]
+                        messages: fullMessages
                     })
                 })
                 .then(response => response.json())
@@ -655,20 +662,49 @@
             // Send image message with prompt
             function sendVlmMessage(imageBase64, prompt) {
                 const formData = new FormData();
-                formData.append('file', dataURLtoBlob(`data:image/jpeg;base64,${imageBase64}`));
-                formData.append('question', prompt);
+                const blob = dataURLtoBlob(`data:image/jpeg;base64,${imageBase64}`);
+                formData.append('file', blob, 'upload.jpg');
+                formData.append('question', prompt || '请描述这张图片的内容');
                 
                 fetch('/api/doubao/chat', {
                     method: 'POST',
-                    body: formData
+                    body: formData,
+                    headers: {
+                        'Accept': 'application/json'
+                    }
                 })
-                .then(response => response.json())
+                .then(response => {
+                    if (!response.ok) {
+                        return response.json().then(err => {
+                            throw new Error(err.message || '图片上传失败');
+                        });
+                    }
+                    return response.json();
+                })
                 .then(data => {
+                    console.log('API响应数据:', data); // 调试日志
+                    
+                    if (data.status === 'error') {
+                        throw new Error(data.message || data.error || '图片处理失败');
+                    }
+                    
                     if (data.content) {
                         addMessage('bot', data.content);
                         messages.push({role: 'assistant', content: data.content});
                         saveCurrentChat();
+                    } else {
+                        throw new Error('服务器返回了空内容');
                     }
+                })
+                .catch(error => {
+                    console.error('图片处理错误:', error);
+                    addMessage('bot', `图片处理失败: ${error.message}`);
+                    
+                    // 自动重试一次
+                    setTimeout(() => {
+                        addMessage('bot', '正在尝试重新处理图片...');
+                        sendVlmMessage(imageBase64, prompt);
+                    }, 2000);
                 });
             }
 
@@ -699,7 +735,9 @@
 
                 const constraints = {
                     video: {
-                        facingMode: front ? 'user' : 'environment'
+                        facingMode: front ? 'user' : 'environment',
+                        width: { ideal: 1280 },
+                        height: { ideal: 720 }
                     }
                 };
 
@@ -707,19 +745,71 @@
                     stream = await navigator.mediaDevices.getUserMedia(constraints);
                     video.srcObject = stream;
                     usingFrontCamera = front;
+                    return true;
                 } catch (err) {
                     console.error('Error accessing camera:', err);
-                    alert('Could not access the camera. Please check permissions.');
-                    throw err;
+                    alert('无法访问摄像头，请检查权限设置或尝试其他设备: ' + err.message);
+                    return false;
                 }
             }
 
+            // 修复摄像头按钮点击事件
             cameraBtn.addEventListener('click', async () => {
                 try {
-                    await getCameraStream();
-                    cameraModal.show();
+                    const success = await getCameraStream();
+                    if (success) {
+                        cameraModal.show();
+                        
+                        // 监听模态框关闭事件
+                        cameraModal._element.addEventListener('hidden.bs.modal', () => {
+                            if (stream) {
+                                stream.getTracks().forEach(track => track.stop());
+                                stream = null;
+                            }
+                        });
+                    }
                 } catch (err) {
-                    console.error('Camera access failed:', err);
+                    console.error('摄像头初始化失败:', err);
+                    alert('摄像头初始化失败: ' + err.message);
+                }
+            });
+
+            // 切换摄像头
+            switchCameraBtn.addEventListener('click', async () => {
+                try {
+                    await getCameraStream(!usingFrontCamera);
+                } catch (err) {
+                    console.error('切换摄像头失败:', err);
+                }
+            });
+
+            // 拍照功能
+            captureBtn.addEventListener('click', () => {
+                if (!stream) return;
+                
+                try {
+                    // 设置canvas尺寸与视频相同
+                    canvas.width = video.videoWidth;
+                    canvas.height = video.videoHeight;
+                    
+                    // 绘制当前视频帧到canvas
+                    const context = canvas.getContext('2d');
+                    context.drawImage(video, 0, 0, canvas.width, canvas.height);
+                    
+                    // 获取base64图片数据
+                    const imageData = canvas.toDataURL('image/jpeg').split(',')[1];
+                    
+                    // 设置预览
+                    currentImageData = imageData;
+                    document.getElementById('preview-image').src = `data:image/jpeg;base64,${imageData}`;
+                    document.getElementById('image-prompt').value = '分析这张照片:';
+                    document.getElementById('image-preview-container').style.display = 'block';
+                    
+                    // 关闭模态框
+                    cameraModal.hide();
+                } catch (err) {
+                    console.error('拍照失败:', err);
+                    alert('拍照失败: ' + err.message);
                 }
             });
 
