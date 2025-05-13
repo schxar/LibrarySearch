@@ -36,6 +36,22 @@ tools = [
     {
         "type": "function",
         "function": {
+            "name": "google_cse_search",
+            "description": "使用Google Custom Search Engine API执行搜索",
+            "parameters": {
+                "type": "object",
+                "properties": {
+                    "query": {"type": "string", "description": "搜索关键词"},
+                    "cx": {"type": "string", "description": "搜索引擎ID", "default": "b7a4dfc41bb40428c"},
+                    "num": {"type": "integer", "description": "返回结果数量", "default": 5}
+                },
+                "required": ["query"]
+            }
+        }
+    },
+    {
+        "type": "function",
+        "function": {
             "name": "url_analysis",
             "description": "解析URL内容并提取关键信息",
             "parameters": {
@@ -92,6 +108,20 @@ tools = [
                 "required": ["query"]
             }
         }
+    },
+    {
+        "type": "function",
+        "function": {
+            "name": "get_dlink",
+            "description": "获取图书的下载链接",
+            "parameters": {
+                "type": "object",
+                "properties": {
+                    "book_url": {"type": "string", "description": "图书的URL地址"}
+                },
+                "required": ["book_url"]
+            }
+        }
     }
 ]
 
@@ -146,6 +176,119 @@ def process_image_data(image_data: str, task: str = "describe"):
         tools=tools,
         tool_choice={"type": "function", "function": {"name": "image_analysis"}}
     )
+
+def process_dlink_request(book_url: str):
+    """处理下载链接请求"""
+    print(f"调用GetDLinkController获取下载链接: {book_url[:100]}...")
+    try:
+        # 调用GetDLinkController的/getdlink接口
+        response = requests.post(
+            "http://localhost:8080/getdlink",
+            json={"bookUrl": book_url},
+            headers={"Content-Type": "application/json"},
+            timeout=60
+        )
+        response.raise_for_status()
+        result = response.json()
+        
+        if "downloadLink" in result:
+            print(f"成功获取下载链接: {result['downloadLink']}")
+            return {
+                "content": result["downloadLink"],
+                "raw_response": result
+            }
+        else:
+            error_msg = result.get("error", "Unknown error")
+            print(f"获取下载链接失败: {error_msg}")
+            return {
+                "error": error_msg,
+                "raw_response": result
+            }
+            
+    except requests.exceptions.RequestException as req_e:
+        print(f"GetDLinkController请求失败: {str(req_e)}")
+        return {"error": f"下载服务不可用: {str(req_e)}"}
+    except Exception as e:
+        print(f"处理get_dlink时发生未知错误: {str(e)}")
+        return {"error": f"处理下载请求时发生错误: {str(e)}"}
+
+def process_google_cse(query: str, cx: str = "b7a4dfc41bb40428c", num: int = 5):
+    """处理Google CSE搜索请求"""
+    print(f"调用Google CSE API搜索: {query[:100]}...")
+    try:
+        # 调用Google CSE API
+        response = requests.get(
+            "https://www.googleapis.com/customsearch/v1",
+            params={
+                "q": query,
+                "cx": cx,
+                "key": "AIzaSyCa4mngFulV3OzlW3Dw2Y-4xAJ3DsupgMg",
+                "num": num
+            },
+            headers={"Content-Type": "application/json"},
+            timeout=60
+        )
+        response.raise_for_status()
+        results = response.json()
+        print(f"成功获取Google CSE搜索结果，共{len(results.get('items', []))}条记录")
+        
+        # 生成embedding（分块处理）
+        print("----- 生成embedding（分块处理）-----")
+        embedding_info = ""
+        try:
+            results_str = json.dumps(results, ensure_ascii=False)
+            chunk_size = 3000  # 安全阈值，避免超过4096限制
+            chunks = [results_str[i:i+chunk_size] for i in range(0, len(results_str), chunk_size)]
+            
+            all_embeddings = []
+            for i, chunk in enumerate(chunks):
+                print(f"正在处理第{i+1}/{len(chunks)}块embedding...")
+                embedding_resp = client.embeddings.create(
+                    model="doubao-embedding-large-text-240915",
+                    input=[chunk],
+                    encoding_format="float"
+                )
+                all_embeddings.extend(embedding_resp.data[0].embedding)
+            
+            embedding_info = f"\nEmbedding总维度: {len(all_embeddings)} (分{len(chunks)}块处理)"
+        except Exception as e:
+            print(f"生成embedding失败: {str(e)}")
+            embedding_info = ""
+        
+        # 调用doubao模型处理结果
+        prompt = f"请总结以下Google搜索结果:\n{json.dumps(results, ensure_ascii=False)}{embedding_info}"
+        print(f"调用doubao模型处理结果,prompt长度: {len(prompt)}")
+        
+        try:
+            doubao_response = client.chat.completions.create(
+                model="doubao-1-5-pro-256k-250115",
+                messages=[{"role": "user", "content": prompt}],
+                temperature=0,
+                timeout=60
+            )
+            return {
+                "content": doubao_response.choices[0].message.content,
+                "raw_results": results
+            }
+        except Exception as e:
+            print(f"doubao模型处理失败: {str(e)}")
+            return {
+                "content": json.dumps([
+                    {
+                        "title": item.get("title"), 
+                        "link": item.get("link"),
+                        "snippet": item.get("snippet")
+                    } 
+                    for item in results.get("items", [])
+                ], ensure_ascii=False),
+                "raw_results": results
+            }
+    except requests.exceptions.RequestException as req_e:
+        print(f"Google CSE API请求失败: {str(req_e)}")
+        return {"error": f"Google搜索服务不可用: {str(req_e)}"}
+    except Exception as e:
+        print(f"处理google_cse时发生未知错误: {str(e)}")
+        return {"error": f"处理Google搜索请求时发生错误: {str(e)}"}
 
 def process_zlib_search(query: str, result_type: str = "summary"):
     """处理在线图书馆搜索请求"""
@@ -247,11 +390,19 @@ vlm_client = OpenAI(
 
 
 app = Flask(__name__)
+app.config.update(
+    SESSION_COOKIE_SECURE=True,
+    SESSION_COOKIE_HTTPONLY=True,
+    SESSION_COOKIE_SAMESITE='None',  # 允许跨站请求
+    SECRET_KEY=os.environ.get('FLASK_SECRET_KEY', 'default-secret-key')
+)
+
 CORS(app, resources={
     r"/api/*": {
         "origins": "*",
         "methods": ["GET", "POST", "OPTIONS"],
-        "allow_headers": ["Content-Type"]
+        "allow_headers": ["Content-Type"],
+        "supports_credentials": True  # 允许跨域携带cookie
     }
 })
 
@@ -371,34 +522,12 @@ def doubao_chat_api():
             if not data or 'messages' not in data:
                 return jsonify({'error': '缺少必要参数'}), 400
             
-            # 检查最后一条用户消息是否包含URL
-            last_message = data['messages'][-1]['content']
-            url_pattern = re.compile(
-                r'http[s]?://(?:[a-zA-Z]|[0-9]|[$-_@.&+]|[!*\\(\\),]|(?:%[0-9a-fA-F][0-9a-fA-F]))+'
+            # 统一消息处理入口
+            print("开始处理消息请求...")
+            response = process_message(
+                prompt=data['messages'][-1]['content']
             )
-            url_match = url_pattern.search(last_message)
-            
-            if url_match:
-                # 通过tool_client处理URL分析
-                url = url_match.group()
-                response = process_url(url)
-                
-                result = {
-                    'content': response.choices[0].message.content,
-                    'is_url_response': True
-                }
-                
-                if hasattr(response, "references"):
-                    result['references'] = response.references
-                    
-                return jsonify(result)
-            else:
-                # 统一消息处理入口
-                print("开始处理普通消息请求...")
-                response = process_message(
-                    prompt=data['messages'][-1]['content']
-                )
-                print(f"模型返回结果: {response.choices[0].message.content[:200]}...")
+            print(f"模型返回结果: {response.choices[0].message.content[:200]}...")
             
             # 处理工具调用
             print("检查是否需要处理工具调用...")
@@ -407,7 +536,10 @@ def doubao_chat_api():
                 # 这里添加工具调用处理逻辑
                 tool_call = response.choices[0].message.tool_calls[0]
                 if tool_call.function.name == "web_search":
-                    search_result = process_search(**json.loads(tool_call.function.arguments))
+                    search_args = json.loads(tool_call.function.arguments)
+                    print(f"检测到工具调用: web_search, 搜索内容: {search_args['query']}")
+                    search_result = process_search(**search_args)
+                    print(f"web_search返回结果: {search_result.choices[0].message.content[:200]}...")
                     return jsonify({
                         'content': search_result.choices[0].message.content,
                         'is_search_result': True
@@ -431,6 +563,24 @@ def doubao_chat_api():
                     return jsonify({
                         'content': zlib_result["content"],
                         'is_zlib_response': True
+                    })
+                elif tool_call.function.name == "google_cse_search":
+                    cse_args = json.loads(tool_call.function.arguments)
+                    print(f"检测到工具调用: google_cse_search, 搜索内容: {cse_args['query']}")
+                    cse_result = process_google_cse(**cse_args)
+                    if "error" in cse_result:
+                        return jsonify({"error": cse_result["error"]}), 500
+                    return jsonify({
+                        'content': cse_result["content"],
+                        'is_cse_response': True
+                    })
+                elif tool_call.function.name == "get_dlink":
+                    dlink_result = process_dlink_request(**json.loads(tool_call.function.arguments))
+                    if "error" in dlink_result:
+                        return jsonify({"error": dlink_result["error"]}), 500
+                    return jsonify({
+                        'content': dlink_result["content"],
+                        'is_dlink_response': True
                     })
                 
                 if data.get('stream', False):

@@ -55,3 +55,4 @@ doubao.txt
 /flask_openai_backend/ChatHistory
 flask_openai_backend/ChatHistory/chat-1746996933642.json
 *.docx
+*.doc
