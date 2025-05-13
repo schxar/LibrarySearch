@@ -13,6 +13,10 @@ from openai import OpenAI
 import re
 from dotenv import load_dotenv
 from requests import Response
+from .tool_client import client as tool_client, process_message, process_url, process_search, process_image_data
+from .embedding_client import client as embedding_client
+from .vlm_client import create_vlm_client
+from .text_client import create_text_client
 
 app = Flask(__name__)
 CORS(app, resources={
@@ -40,17 +44,13 @@ DB_CONFIG = {
 with open(os.path.join(os.path.dirname(__file__), 'templates', 'doubao.txt'), 'r') as f:
     api_key = f.read().strip()
 
-# VLM客户端配置 (用于图片处理)
-vlm_client = OpenAI(
-    api_key=api_key,
-    base_url="https://ark.cn-beijing.volces.com/api/v3"
-)
+# 配置所有客户端使用统一API Key
+tool_client.api_key = api_key
+embedding_client.api_key = api_key
 
-# 文本模型客户端配置 (用于普通聊天和搜索)
-text_client = OpenAI(
-    api_key=api_key,
-    base_url="https://ark.cn-beijing.volces.com/api/v3/bots"
-)
+# 初始化各功能客户端
+vlm_client = create_vlm_client(api_key)
+text_client = create_text_client(api_key)
 
 def get_db_connection():
     """获取数据库连接"""
@@ -165,22 +165,9 @@ def doubao_chat_api():
             url_match = url_pattern.search(last_message)
             
             if url_match:
-                # 如果包含URL，调用专门的URL解析模型
+                # 通过tool_client处理URL分析
                 url = url_match.group()
-                response = text_client.chat.completions.create(
-                    model="bot-20250506034902-4psdn",
-                    messages=[
-                        {
-                            "role": "system", 
-                            "content": "你是一个专业的URL内容解析器，请解析用户提供的URL内容，返回标题和主要内容"
-                        },
-                        {
-                            "role": "user",
-                            "content": f"请解析以下URL内容并返回标题和主要内容：{url}"
-                        }
-                    ],
-                    max_tokens=1024
-                )
+                response = process_url(url)
                 
                 result = {
                     'content': response.choices[0].message.content,
@@ -192,16 +179,21 @@ def doubao_chat_api():
                     
                 return jsonify(result)
             else:
-                # 处理普通聊天
-                response = text_client.chat.completions.create(
-                    model="bot-20250506042211-5bscp",
-                    messages=[
-                        {"role": "system", "content": "你是豆包，是由字节跳动开发的 AI 人工智能助手"},
-                        *data['messages']
-                    ],
-                    stream=data.get('stream', False),
-                    max_tokens=1024
-                )
+                # 统一消息处理入口
+            response = process_message(
+                prompt=data['messages'][-1]['content']
+            )
+            
+            # 处理工具调用
+            if response.choices[0].message.tool_calls:
+                # 这里添加工具调用处理逻辑
+                tool_call = response.choices[0].message.tool_calls[0]
+                if tool_call.function.name == "web_search":
+                    return process_search(**json.loads(tool_call.function.arguments))
+                elif tool_call.function.name == "url_analysis":
+                    return process_url(**json.loads(tool_call.function.arguments))
+                elif tool_call.function.name == "image_analysis":
+                    return process_image_data(**json.loads(tool_call.function.arguments))
                 
                 if data.get('stream', False):
                     # 流式响应
@@ -242,22 +234,15 @@ def doubao_websearch():
         return jsonify({"error": "请求体必须包含query参数"}), 400
     
     try:
-        response = text_client.chat.completions.create(
-            model="bot-20250506042211-5bscp",
-            messages=[
-                {
-                    "role": "user",
-                    "content": f"请帮我搜索关于'{data['query']}'的信息，返回格式为JSON数组，每个结果包含title和url字段"
-                }
-            ]
+        response = process_search(
+            query=data['query'],
+            result_type="detailed"
         )
-        
-        result = response.choices[0].message.content
         try:
-            parsed_result = json.loads(result)
+            parsed_result = json.loads(response['content'])
             return jsonify(parsed_result)
         except json.JSONDecodeError:
-            return jsonify({"content": result})
+            return jsonify({"content": response['content']})
     except Exception as e:
         return jsonify({"error": str(e)}), 500
 
