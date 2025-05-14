@@ -28,6 +28,38 @@ DB_CONFIG = {
     'cursorclass': pymysql.cursors.DictCursor
 }
 
+def evaluate_tool_results(context: list, tool_response: str):
+    """评估工具结果是否满足用户需求"""
+    print("开始评估工具结果...")
+    try:
+        evaluation_prompt = f"""
+        请根据以下用户请求上下文和工具返回结果，生成一个完整、流畅的最终回答：
+        
+        用户原始请求：
+        {json.dumps(context, ensure_ascii=False)}
+        
+        工具返回的原始结果：
+        {tool_response}
+        
+        请：
+        1. 保持原始信息的准确性
+        2. 用自然语言整合所有相关信息
+        3. 确保回答流畅易读
+        4. 不要添加额外的评估或建议
+        """
+        
+        evaluation = client.chat.completions.create(
+            model="doubao-1-5-thinking-pro-250415",
+            messages=[{"role": "user", "content": evaluation_prompt}]
+        )
+        
+        print("评估结果:", evaluation.choices[0].message.content)
+        return evaluation.choices[0].message.content
+        
+    except Exception as e:
+        print(f"评估工具结果失败: {str(e)}")
+        return "评估工具结果时发生错误"
+
 def process_message(messages: list):
     """处理用户消息，自动判断是否使用工具"""
     print(f"处理消息数量: {len(messages)}")
@@ -52,23 +84,37 @@ def process_message(messages: list):
             print("未检测到工具调用，转入深度思考模型")
             response = client.chat.completions.create(
                 model="doubao-1-5-thinking-pro-250415",
-                messages=messages,
-                base_url="https://ark.cn-beijing.volces.com/api/v3"
+                messages=messages,               
             )
             # 打印token使用情况
             if hasattr(response, 'usage'):
                 usage = response.usage
                 print(f"Token使用情况 - 输入: {usage.prompt_tokens} | 输出: {usage.completion_tokens} | 总计: {usage.total_tokens}")
             
+            return response
+            
+        # 如果有工具调用，则处理工具结果并评估
+        tool_response = response.choices[0].message.content
+        evaluation = evaluate_tool_results(messages, tool_response)
+        
+        # 将评估结果附加到工具响应中
+        enhanced_response = f"""
+        {tool_response}
+        
+        === 评估报告 ===
+        {evaluation}
+        """
+        
+        # 创建一个新的响应对象包含评估结果
+        response.choices[0].message.content = enhanced_response
         return response
         
     except Exception as e:
         print(f"工具模型调用失败: {str(e)}，尝试使用深度思考模型")
         response = client.chat.completions.create(
-            model="doubao-1-5-thinking-pro-250415",
-            messages=messages,
-            base_url="https://ark.cn-beijing.volces.com/api/v3"
-        )
+                model="doubao-1-5-thinking-pro-250415",
+                messages=messages,
+            )
         # 打印token使用情况
         if hasattr(response, 'usage'):
             usage = response.usage
@@ -78,18 +124,59 @@ def process_message(messages: list):
 def process_url(url: str):
     """处理URL分析请求"""
     print(f"调用模型: bot-20250506034902-4psdn, 分析URL: {url[:100]}...")
-    return bot_client.chat.completions.create(
-        model="bot-20250506034902-4psdn",
-        messages=[
-            {
-                "role": "system", 
-                "content": "你是一个专业的URL内容解析器，请解析用户提供的URL内容，返回标题和主要内容"
-            },
-            {"role": "user", "content": f"请分析以下URL: {url}"}
-        ],
-        tools=tools,
-        tool_choice={"type": "function", "function": {"name": "url_analysis"}}
-    )
+    
+    # 使用selenium获取页面源码
+    from selenium import webdriver
+    from selenium.webdriver.chrome.service import Service
+    from webdriver_manager.chrome import ChromeDriverManager
+    from selenium.webdriver.chrome.options import Options
+    
+    try:
+        print("正在使用selenium获取页面源码...")
+        options = Options()
+        # 使用项目内的持久化profile目录
+        profile_dir = os.path.join(os.path.dirname(__file__), "chrome-profiles", "GetDLinkImpl")
+        options.add_argument(f"user-data-dir={profile_dir}")
+        # Remove "--headless" if you want to see browser actions
+        # options.add_argument("--headless") 
+        options.add_argument("--disable-gpu")
+        options.add_argument("--no-sandbox")
+        
+        driver = webdriver.Chrome(service=Service(ChromeDriverManager().install()), options=options)
+        driver.get(url)
+        page_source = driver.page_source
+        driver.quit()
+        
+        print("页面源码获取成功，开始解析...")
+        # 将页面源码与URL一起发送给模型
+        response = bot_client.chat.completions.create(
+            model="bot-20250506034902-4psdn",
+            messages=[
+                {
+                    "role": "system", 
+                    "content": "你是一个专业的URL内容解析器，请解析用户提供的URL内容和页面源码，返回标题和主要内容"
+                },
+                {"role": "user", "content": f"请分析以下URL: {url}\n页面源码:\n{page_source[:10000]}"}
+            ],
+            tools=tools,
+            tool_choice={"type": "function", "function": {"name": "url_analysis"}}
+        )
+        return response
+        
+    except Exception as e:
+        print(f"selenium获取页面源码失败: {str(e)}，回退到原始URL分析")
+        return bot_client.chat.completions.create(
+            model="bot-20250506034902-4psdn",
+            messages=[
+                {
+                    "role": "system", 
+                    "content": "你是一个专业的URL内容解析器，请解析用户提供的URL内容，返回标题和主要内容"
+                },
+                {"role": "user", "content": f"请分析以下URL: {url}"}
+            ],
+            tools=tools,
+            tool_choice={"type": "function", "function": {"name": "url_analysis"}}
+        )
 
 
 def process_image_data(image_data: str, task: str = "describe"):
@@ -178,6 +265,16 @@ def process_google_cse(query: str, cx: str = "b7a4dfc41bb40428c", num: int = 5):
             "google_cse": results,
             "doubao": doubao_results
         }
+
+        # 如果是JSON请求，评估结果是否满足用户需求
+        if request.content_type == 'application/json':
+            data = request.get_json()
+            context = data.get('messages', [])
+            evaluation = evaluate_tool_results(context, json.dumps(combined_results, ensure_ascii=False))
+            return {
+                "content": evaluation,
+                "raw_results": results
+            }
         
         # 生成embedding（分块处理）
         print("----- 生成embedding（分块处理）-----")
@@ -202,34 +299,45 @@ def process_google_cse(query: str, cx: str = "b7a4dfc41bb40428c", num: int = 5):
             print(f"生成embedding失败: {str(e)}")
             embedding_info = ""
         
-        # 调用doubao模型处理结果
-        prompt = f"请总结以下Google和豆包搜索结果:\nGoogle CSE结果:\n{json.dumps(results, ensure_ascii=False)}\n豆包搜索结果:\n{doubao_results}{embedding_info}"
-        print(f"调用doubao模型处理结果,prompt长度: {len(prompt)}")
-        
-        try:
-            doubao_response = client.chat.completions.create(
-                model="doubao-1-5-thinking-pro-250415",
-                messages=[{"role": "user", "content": prompt}],
-                temperature=0,
-                timeout=60
-            )
-            return {
-                "content": doubao_response.choices[0].message.content,
-                "raw_results": results
-            }
-        except Exception as e:
-            print(f"doubao模型处理失败: {str(e)}")
-            return {
-                "content": json.dumps([
-                    {
-                        "title": item.get("title"), 
-                        "link": item.get("link"),
-                        "snippet": item.get("snippet")
-                    } 
-                    for item in results.get("items", [])
-                ], ensure_ascii=False),
-                "raw_results": results
-            }
+            # 调用doubao模型处理结果
+            prompt = f"请总结以下Google和豆包搜索结果:\nGoogle CSE结果:\n{json.dumps(results, ensure_ascii=False)}\n豆包搜索结果:\n{doubao_results}{embedding_info}"
+            print(f"调用doubao模型处理结果,prompt长度: {len(prompt)}")
+            
+            try:
+                doubao_response = client.chat.completions.create(
+                    model="doubao-1-5-lite-32k-250115",
+                    messages=[{"role": "user", "content": prompt}],
+                    temperature=0,
+                    timeout=60
+                )
+                
+                # 如果是JSON请求，评估结果是否满足用户需求
+                if request.content_type == 'application/json':
+                    data = request.get_json()
+                    context = data.get('messages', [])
+                    evaluation = evaluate_tool_results(context, doubao_response.choices[0].message.content)
+                    return {
+                        "content": evaluation,
+                        "raw_results": results
+                    }
+                
+                return {
+                    "content": doubao_response.choices[0].message.content,
+                    "raw_results": results
+                }
+            except Exception as e:
+                print(f"doubao模型处理失败: {str(e)}")
+                return {
+                    "content": json.dumps([
+                        {
+                            "title": item.get("title"), 
+                            "link": item.get("link"),
+                            "snippet": item.get("snippet")
+                        } 
+                        for item in results.get("items", [])
+                    ], ensure_ascii=False),
+                    "raw_results": results
+                }
     except requests.exceptions.RequestException as req_e:
         print(f"Google CSE API请求失败: {str(req_e)}")
         return {"error": f"Google搜索服务不可用: {str(req_e)}"}
@@ -480,27 +588,16 @@ def doubao_chat_api():
                 if tool_call.function.name == "web_search":
                     search_args = json.loads(tool_call.function.arguments)
                     print(f"检测到工具调用: web_search, 搜索内容: {search_args['query']}")
-                    search_result = process_search(**search_args)
-                    print(f"web_search返回结果: {search_result.choices[0].message.content[:200]}...")
-                    
-                    # 检查web_search是否返回有效结果
-                    if "没有找到" in search_result.choices[0].message.content or "未找到" in search_result.choices[0].message.content:
-                        print("web_search未找到结果，自动切换到Google CSE搜索")
-                        cse_result = process_google_cse(query=search_args['query'])
-                        if "error" in cse_result:
-                            return jsonify({
-                                'content': f"web_search未找到结果，且Google CSE搜索失败: {cse_result['error']}",
-                                'is_search_result': True
-                            })
+                    cse_result = process_google_cse(query=search_args['query'])
+                    if "error" in cse_result:
                         return jsonify({
-                            'content': f"web_search未找到结果，以下是Google CSE搜索结果:\n{cse_result['content']}",
-                            'is_search_result': True,
-                            'is_cse_fallback': True
+                            'content': f"Google CSE搜索失败: {cse_result['error']}",
+                            'is_search_result': True
                         })
-                    
                     return jsonify({
-                        'content': search_result.choices[0].message.content,
-                        'is_search_result': True
+                        'content': cse_result['content'],
+                        'is_search_result': True,
+                        'is_cse_fallback': False
                     })
                 elif tool_call.function.name == "url_analysis":
                     url_result = process_url(**json.loads(tool_call.function.arguments))
@@ -827,5 +924,4 @@ def delete_chat_history(history_id):
         return jsonify({'error': str(e)}), 500
 
 if __name__ == '__main__':
-    test_combined_search()
     app.run(host='0.0.0.0', port=10806, debug=False)
