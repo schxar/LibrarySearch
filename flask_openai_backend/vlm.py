@@ -70,8 +70,8 @@ class VLMService:
         # 验证文件大小(不超过5MB)
         file.seek(0, os.SEEK_END)
         file_size = file.tell()
-        if file_size > 5 * 1024 * 1024:
-            return {"error": "图片大小不能超过5MB"}
+        if file_size > 10 * 1024 * 1024:
+            return {"error": "图片大小不能超过10MB"}
         file.seek(0)
         
         # 编码图片
