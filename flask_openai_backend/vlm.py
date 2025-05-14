@@ -11,7 +11,7 @@ class VLMService:
             api_key=os.environ.get("ARK_API_KEY"),
             base_url="https://ark.cn-beijing.volces.com/api/v3"
         )
-        self.model_name = "doubao-1.5-vision-pro-250328"
+        self.model_name = "doubao-1-5-thinking-vision-pro-250428"
 
     def analyze_image(self, image_data: str, prompt: str = "请描述这张图片的内容"):
         """

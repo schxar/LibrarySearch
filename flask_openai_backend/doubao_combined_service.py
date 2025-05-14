@@ -16,6 +16,7 @@ from dotenv import load_dotenv
 from requests import Response
 import requests
 from tools import tools, client, bot_client  # 导入工具定义
+from vlm import vlm_service
 
 # 数据库配置
 DB_CONFIG = {
@@ -153,37 +154,8 @@ def process_search(query: str):
 
 def process_image_data(image_data: str, task: str = "describe"):
     """处理图片分析请求"""
-    if not image_data.startswith("data:image/"):
-        raise ValueError("Invalid DATAURI format")
-    print(f"调用模型: doubao-1-5-vision-pro-250328, 任务类型: {task}")
-    try:
-        return client.chat.completions.create(
-            model="doubao-1-5-vision-pro-250328",
-            messages=[
-                {
-                    "role": "user",
-                    "content": [
-                        {
-                            "type": "image_url",
-                            "image_url": {
-                                "url": image_data,
-                                "detail": "auto"
-                            }
-                        },
-                        {
-                            "type": "text",
-                            "text": f"请分析这张图片: {task}"
-                        }
-                    ]
-                }
-            ],
-            tools=tools,
-            tool_choice={"type": "function", "function": {"name": "image_analysis"}},
-            temperature=0.2
-        )
-    except Exception as e:
-        print(f"图片处理失败: {str(e)}")
-        raise
+    print(f"调用VLM服务分析图片，任务类型: {task}")
+    return vlm_service.analyze_image(image_data, task)
 
 def process_dlink_request(book_url: str):
     """处理下载链接请求"""
@@ -491,67 +463,21 @@ def doubao_chat_api():
                 if not question or len(question) > 500:
                     question = '请描述这张图片的内容'
                 
-                # 调用vision模型分析图片
-                try:
-                    # 确保图片数据格式正确
-                    if not image_base64 or len(image_base64) < 100:
-                        raise ValueError("Invalid image data")
-                        
-                    vision_response = client.chat.completions.create(
-                        model="doubao-1-5-vision-pro-250328",
-                        messages=[
-                            {
-                                "role": "user",
-                                "content": [
-                                    {
-                                        "type": "image_url",
-                                        "image_url": {
-                                            "url": f"data:{file.content_type};base64,{image_base64}",
-                                            "detail": "auto"
-                                        }
-                                    },
-                                    {
-                                        "type": "text",
-                                        "text": question
-                                    }
-                                ]
-                            }
-                        ],
-                        max_tokens=1024,
-                        temperature=0.2
-                    )
-                    
-                    # 将vision处理结果传递给tool处理
-                    tool_response = process_message(
-                        messages=[
-                            {
-                                "role": "system",
-                                "content": "你是豆包，是由字节跳动开发的 AI 人工智能助手"
-                            },
-                            {
-                                "role": "user",
-                                "content": vision_response.choices[0].message.content
-                            }
-                        ]
-                    )
-                    
-                    if not tool_response or not tool_response.choices:
-                        raise ValueError("Invalid tool response")
-                    
-                    return jsonify({
-                        'content': tool_response.choices[0].message.content,
-                        'is_image_response': True,
-                        'status': 'success'
-                    })
-                    
-                except Exception as tool_e:
-                    app.logger.error(f"Tool processing failed: {str(tool_e)}")
-                    return jsonify({
-                        'error': '图片处理失败',
-                        'message': str(tool_e),
-                        'is_image_response': True,
-                        'status': 'error'
-                    }), 500
+                # 调用VLM服务分析图片并直接返回结果
+                vlm_response = vlm_service.analyze_image(
+                    image_data=f"data:{file.content_type};base64,{image_base64}",
+                    prompt=question
+                )
+                
+                if "error" in vlm_response:
+                    return jsonify(vlm_response), 500
+                
+                # 直接返回VLM处理结果
+                return jsonify({
+                    'content': vlm_response["content"],
+                    'is_image_response': True,
+                    'is_direct_vlm_response': True
+                })
                 
             except Exception as e:
                 error_detail = {
