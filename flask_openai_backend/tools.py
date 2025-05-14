@@ -67,21 +67,6 @@ tools = [
     {
         "type": "function",
         "function": {
-            "name": "web_search",
-            "description": "执行网络搜索并返回结果",
-            "parameters": {
-                "type": "object",
-                "properties": {
-                    "query": {"type": "string", "description": "搜索关键词"},
-                    "result_type": {"type": "string", "enum": ["summary", "detailed"], "default": "summary"}
-                },
-                "required": ["query"]
-            }
-        }
-    },
-    {
-        "type": "function",
-        "function": {
             "name": "image_analysis",
             "description": "分析图片内容，支持DATAURI格式的base64编码",
             "parameters": {

@@ -91,66 +91,6 @@ def process_url(url: str):
         tool_choice={"type": "function", "function": {"name": "url_analysis"}}
     )
 
-def process_search(query: str):
-    """处理搜索请求"""
-    print(f"调用模型: bot-20250506042211-5bscp, 搜索内容: {query[:100]}...")
-    response = bot_client.chat.completions.create(
-        model="bot-20250506042211-5bscp",
-        messages=[
-            {"role": "system", "content": "你是豆包，是由字节跳动开发的 AI 人工智能助手"},
-            {"role": "user", "content": f"请搜索: {query}"}
-        ],
-        tools=tools,
-        tool_choice={"type": "function", "function": {"name": "web_search"}}
-    )
-    # 打印原始JSON输出
-    print("豆包搜索原始JSON输出:")
-    print(json.dumps(response, indent=2, ensure_ascii=False, default=str))
-    
-    # 生成embedding（分块处理）
-    print("----- 生成embedding（分块处理）-----")
-    embedding_info = ""
-    try:
-        content_str = response.choices[0].message.content if response.choices[0].message.content else ""
-        chunk_size = 3000  # 安全阈值，避免超过4096限制
-        chunks = [content_str[i:i+chunk_size] for i in range(0, len(content_str), chunk_size)]
-        
-        all_embeddings = []
-        for i, chunk in enumerate(chunks):
-            print(f"正在处理第{i+1}/{len(chunks)}块embedding...")
-            embedding_resp = client.embeddings.create(
-                model="doubao-embedding-large-text-240915",
-                input=[chunk],
-                encoding_format="float"
-            )
-            all_embeddings.extend(embedding_resp.data[0].embedding)
-        
-        embedding_info = f"\nEmbedding总维度: {len(all_embeddings)} (分{len(chunks)}块处理)"
-    except Exception as e:
-        print(f"生成embedding失败: {str(e)}")
-        embedding_info = ""
-    
-    # 调用thinking-pro模型处理结果
-    prompt = f"请总结以下搜索结果:\n{content_str}{embedding_info}"
-    print(f"调用doubao-1-5-thinking-pro-250415处理结果,prompt长度: {len(prompt)}")
-    
-    try:
-        thinking_response = client.chat.completions.create(
-            model="doubao-1-5-thinking-pro-250415",
-            messages=[{"role": "user", "content": prompt}],
-            temperature=0,
-            timeout=60
-        )
-        return {
-            "content": thinking_response.choices[0].message.content,
-            "raw_response": json.loads(json.dumps(response, default=str))
-        }
-    except Exception as e:
-        print(f"thinking-pro模型处理失败: {str(e)}")
-        return {
-            "content": content_str,
-            "raw_response": json.loads(json.dumps(response, default=str))
-        }
 
 def process_image_data(image_data: str, task: str = "describe"):
     """处理图片分析请求"""
@@ -215,11 +155,35 @@ def process_google_cse(query: str, cx: str = "b7a4dfc41bb40428c", num: int = 5):
         print(json.dumps(results, indent=2, ensure_ascii=False))
         print(f"成功获取Google CSE搜索结果，共{len(results.get('items', []))}条记录")
         
+        # 调用豆包bot-20250506042211-5bscp获取搜索结果
+        print(f"调用豆包bot-20250506042211-5bscp搜索: {query[:100]}...")
+        doubao_response = bot_client.chat.completions.create(
+            model="bot-20250506042211-5bscp",
+            messages=[
+                {
+                    "role": "system",
+                    "content": "你是一个专业的搜索引擎，请根据用户查询返回相关搜索结果"
+                },
+                {
+                    "role": "user",
+                    "content": query
+                }
+            ]
+        )
+        doubao_results = doubao_response.choices[0].message.content
+        print(f"豆包搜索结果: {doubao_results[:200]}...")
+        
+        # 合并Google CSE和豆包搜索结果
+        combined_results = {
+            "google_cse": results,
+            "doubao": doubao_results
+        }
+        
         # 生成embedding（分块处理）
         print("----- 生成embedding（分块处理）-----")
         embedding_info = ""
         try:
-            results_str = json.dumps(results, ensure_ascii=False)
+            results_str = json.dumps(combined_results, ensure_ascii=False)
             chunk_size = 3000  # 安全阈值，避免超过4096限制
             chunks = [results_str[i:i+chunk_size] for i in range(0, len(results_str), chunk_size)]
             
@@ -239,7 +203,7 @@ def process_google_cse(query: str, cx: str = "b7a4dfc41bb40428c", num: int = 5):
             embedding_info = ""
         
         # 调用doubao模型处理结果
-        prompt = f"请总结以下Google搜索结果:\n{json.dumps(results, ensure_ascii=False)}{embedding_info}"
+        prompt = f"请总结以下Google和豆包搜索结果:\nGoogle CSE结果:\n{json.dumps(results, ensure_ascii=False)}\n豆包搜索结果:\n{doubao_results}{embedding_info}"
         print(f"调用doubao模型处理结果,prompt长度: {len(prompt)}")
         
         try:
@@ -862,5 +826,6 @@ def delete_chat_history(history_id):
     except Exception as e:
         return jsonify({'error': str(e)}), 500
 
-
-app.run(host='0.0.0.0', port=10806, debug=False)
+if __name__ == '__main__':
+    test_combined_search()
+    app.run(host='0.0.0.0', port=10806, debug=False)
