@@ -627,20 +627,25 @@
                 }
             }
 
-            // Send text message with full context
+            // Send text message with context (without image data in old messages)
             function sendMessage(message) {
                 saveCurrentChat();
                 
-                // Prepare full message history including system message
+                // Prepare messages: system + old context (without image data) + new user message
                 const fullMessages = [
                     {"role": "system", "content": "你是豆包，是由字节跳动开发的 AI 人工智能助手"},
                     ...messages.map(msg => ({
                         role: msg.role,
-                        content: msg.content,
-                        ...(msg.image_data && {image_data: msg.image_data})
+                        content: msg.content
                     })),
                     {role: 'user', content: message}
                 ];
+                
+                console.log('Sending message with context:', {
+                    system: fullMessages[0],
+                    oldContext: fullMessages.slice(1, -1),
+                    newMessage: fullMessages[fullMessages.length - 1]
+                });
                 
                 fetch('/api/doubao/chat', {
                     method: 'POST',
@@ -659,12 +664,30 @@
                 });
             }
 
-            // Send image message with prompt
+            // Send image message with prompt (without image data in old messages)
             function sendVlmMessage(imageBase64, prompt) {
                 const formData = new FormData();
                 const blob = dataURLtoBlob(`data:image/jpeg;base64,${imageBase64}`);
                 formData.append('file', blob, 'upload.jpg');
+                
+                // Prepare context messages without image data
+                const contextMessages = [
+                    {"role": "system", "content": "你是豆包，是由字节跳动开发的 AI 人工智能助手"},
+                    ...messages.map(msg => ({
+                        role: msg.role,
+                        content: msg.content
+                    }))
+                ];
+                
+                // Add current prompt as new user message
                 formData.append('question', prompt || '请描述这张图片的内容');
+                formData.append('context', JSON.stringify(contextMessages));
+                
+                console.log('Sending image with context:', {
+                    image: 'base64 data...',
+                    context: contextMessages,
+                    prompt: prompt
+                });
                 
                 fetch('/api/doubao/chat', {
                     method: 'POST',
