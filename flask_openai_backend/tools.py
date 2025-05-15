@@ -5,6 +5,7 @@ import os
 import pymysql
 from openai import OpenAI
 import requests
+import urllib
 from vlm import vlm_service
 
 # 数据库配置
@@ -39,7 +40,7 @@ tools = [
         "type": "function",
         "function": {
             "name": "google_cse_search",
-            "description": "使用Google Custom Search Engine API执行搜索",
+            "description": "使用Google Custom Search Engine API执行搜索,解析URL内容并提取关键信息,支持搜索url和各种网页",
             "parameters": {
                 "type": "object",
                 "properties": {
@@ -48,36 +49,6 @@ tools = [
                     "num": {"type": "integer", "description": "返回结果数量", "default": 5}
                 },
                 "required": ["query"]
-            }
-        }
-    },
-    {
-        "type": "function",
-        "function": {
-            "name": "url_analysis",
-            "description": "解析URL内容并提取关键信息",
-            "parameters": {
-                "type": "object",
-                "properties": {
-                    "url": {"type": "string", "description": "需要分析的URL"},
-                    "detail_level": {"type": "string", "enum": ["summary", "full"], "default": "summary"}
-                },
-                "required": ["url"]
-            }
-        }
-    },
-    {
-        "type": "function",
-        "function": {
-            "name": "image_analysis",
-            "description": "分析图片内容，支持DATAURI格式的base64编码",
-            "parameters": {
-                "type": "object",
-                "properties": {
-                    "image_data": {"type": "string", "description": "DATAURI格式的base64编码图片"},
-                    "task": {"type": "string", "enum": ["describe", "analyze"], "default": "describe"}
-                },
-                "required": ["image_data"]
             }
         }
     },
@@ -194,7 +165,7 @@ def evaluate_tool_results(context: list, tool_response: str):
         """
         
         evaluation = client.chat.completions.create(
-            model="doubao-1-5-thinking-pro-250415",
+            model="doubao-1-5-thinking-vision-pro-250428",
             messages=[{"role": "user", "content": evaluation_prompt}]
         )
         
@@ -260,7 +231,7 @@ def context_retrieval(query: str, context: list, request=None):
         
         # 5. 调用模型生成响应
         response = client.chat.completions.create(
-            model="doubao-1-5-thinking-pro-250415",
+            model="doubao-1-5-thinking-vision-pro-250428",
             messages=[{"role": "user", "content": prompt}],
             max_tokens=1000  # 限制响应长度
         )
@@ -301,85 +272,7 @@ def process_image_data(image_data: str, task: str = "describe", request=None):
     
     return result
 
-def process_url(url: str, request=None):
-    """处理URL分析请求"""
-    print(f"调用模型: bot-20250506034902-4psdn, 分析URL: {url[:100]}...")
-    
-    # 使用selenium获取页面源码
-    from selenium import webdriver
-    from selenium.webdriver.chrome.service import Service
-    from webdriver_manager.chrome import ChromeDriverManager
-    from selenium.webdriver.chrome.options import Options
-    
-    try:
-        print("正在使用selenium获取页面源码...")
-        options = Options()
-        # 使用项目内的持久化profile目录
-        profile_dir = os.path.join(os.path.dirname(__file__), "chrome-profiles", "GetDLinkImpl")
-        options.add_argument(f"user-data-dir={profile_dir}")
-        # Remove "--headless" if you want to see browser actions
-        # options.add_argument("--headless") 
-        options.add_argument("--disable-gpu")
-        options.add_argument("--no-sandbox")
-        
-        driver = webdriver.Chrome(service=Service(ChromeDriverManager().install()), options=options)
-        driver.get(url)
-        page_source = driver.page_source
-        driver.quit()
-        
-        print("页面源码获取成功，开始解析...")
-        # 将页面源码与URL一起发送给模型
-        response = bot_client.chat.completions.create(
-            model="bot-20250506034902-4psdn",
-            messages=[
-                {
-                    "role": "system", 
-                    "content": "你是一个专业的URL内容解析器，请解析用户提供的URL内容和页面源码，返回标题和主要内容"
-                },
-                {"role": "user", "content": f"请分析以下URL: {url}\n页面源码:\n{page_source[:10000]}"}
-            ],
-            tools=tools,
-            tool_choice={"type": "function", "function": {"name": "url_analysis"}}
-        )
-        
-        # 评估结果
-        if request and request.content_type == 'application/json':
-            data = request.get_json()
-            context = data.get('messages', [])
-            evaluation = evaluate_tool_results(context, json.dumps(response, ensure_ascii=False))
-            return {
-                "content": evaluation,
-                "raw_response": response
-            }
-        
-        return response
-        
-    except Exception as e:
-        print(f"selenium获取页面源码失败: {str(e)}，回退到原始URL分析")
-        response = bot_client.chat.completions.create(
-            model="bot-20250506034902-4psdn",
-            messages=[
-                {
-                    "role": "system", 
-                    "content": "你是一个专业的URL内容解析器，请解析用户提供的URL内容，返回标题和主要内容"
-                },
-                {"role": "user", "content": f"请分析以下URL: {url}"}
-            ],
-            tools=tools,
-            tool_choice={"type": "function", "function": {"name": "url_analysis"}}
-        )
-        
-        # 评估结果
-        if request and request.content_type == 'application/json':
-            data = request.get_json()
-            context = data.get('messages', [])
-            evaluation = evaluate_tool_results(context, json.dumps(response, ensure_ascii=False))
-            return {
-                "content": evaluation,
-                "raw_response": response
-            }
-        
-        return response
+
 
 def process_dlink_request(book_url: str, request=None):
     """处理下载链接请求"""
@@ -479,7 +372,7 @@ def process_zlib_search(query: str, result_type: str = "summary", request=None):
             
             try:
                 doubao_response = client.chat.completions.create(
-                    model="doubao-1-5-thinking-pro-250415",
+                    model="doubao-1-5-thinking-vision-pro-250428",
                     messages=[{"role": "user", "content": prompt}],
                     temperature=0,
                     timeout=60
@@ -527,51 +420,375 @@ def process_zlib_search(query: str, result_type: str = "summary", request=None):
         print(f"处理zlib_search时发生未知错误: {str(e)}")
         return {"error": f"处理搜索请求时发生错误: {str(e)}"}
 
-def process_google_cse(query: str, cx: str = "b7a4dfc41bb40428c", num: int = 5, request=None):
-    """处理Google CSE搜索请求"""
-    print(f"调用Google CSE API搜索: {query[:100]}...")
+def evaluate_tools_for_url(query, cse_results=None, doubao_results=None, url_analysis=None, page_analysis=None):
+    """评估各工具对特定URL的价值"""
+    print(f"评估URL: {query}")
+    
+    evaluations = []
+    
+    # 评估CSE搜索
+    cse_eval_prompt = f"""
+    基于以下Google CSE搜索结果，评估对URL {query} 使用Google CSE搜索是否有价值？
+    搜索结果: {json.dumps(cse_results, ensure_ascii=False)[:2000] if cse_results else "无结果"}
+    请根据搜索结果的相关性和质量判断，只需回答1(有价值)或0(无价值)
+    """
+    cse_evaluation = client.chat.completions.create(
+        model="doubao-1-5-lite-32k-250115",
+        messages=[{"role": "user", "content": cse_eval_prompt}],
+        temperature=0
+    )
+    cse_result = cse_evaluation.choices[0].message.content.strip()
+    evaluations.append('1' if cse_result not in ['0', '1'] else cse_result)
+    
+    # 评估豆包搜索
+    doubao_eval_prompt = f"""
+    基于以下豆包搜索结果，评估对URL {query} 使用豆包搜索是否有价值？
+    搜索结果: {doubao_results[:2000] if doubao_results else "无结果"}
+    请根据搜索结果的相关性和质量判断，只需回答1(有价值)或0(无价值)
+    """
+    doubao_evaluation = client.chat.completions.create(
+        model="doubao-1-5-lite-32k-250115",
+        messages=[{"role": "user", "content": doubao_eval_prompt}],
+        temperature=0
+    )
+    doubao_result = doubao_evaluation.choices[0].message.content.strip()
+    evaluations.append('1' if doubao_result not in ['0', '1'] else doubao_result)
+    
+    # 评估URL分析
+    url_eval_prompt = f"""
+    基于以下URL分析结果，评估对URL {query} 使用豆包URL分析是否有价值？
+    分析结果: {url_analysis[:2000] if url_analysis else "无结果"}
+    请根据分析结果的深度和有用性判断，只需回答1(有价值)或0(无价值)
+    """
+    url_evaluation = client.chat.completions.create(
+        model="doubao-1-5-lite-32k-250115",
+        messages=[{"role": "user", "content": url_eval_prompt}],
+        temperature=0
+    )
+    url_result = url_evaluation.choices[0].message.content.strip()
+    evaluations.append('1' if url_result not in ['0', '1'] else url_result)
+    
+    # 评估页面分析
+    page_eval_prompt = f"""
+    基于以下页面分析结果，评估对URL {query} 使用selenium页面分析是否有价值？
+    分析结果: {page_analysis[:2000] if page_analysis else "无结果"}
+    请根据分析结果的深度和有用性判断，只需回答1(有价值)或0(无价值)
+    """
+    page_evaluation = client.chat.completions.create(
+        model="doubao-1-5-lite-32k-250115",
+        messages=[{"role": "user", "content": page_eval_prompt}],
+        temperature=0
+    )
+    page_result = page_evaluation.choices[0].message.content.strip()
+    evaluations.append('1' if page_result not in ['0', '1'] else page_result)
+    
+    result = " ".join(evaluations)
+    print(f"评估结果: {result}")
+    return result
+
+def load_cse_config():
+    """加载CSE配置"""
+    config_path = os.path.join(os.path.dirname(__file__), 'CseConfig.txt')
+    if os.path.exists(config_path):
+        with open(config_path, 'r') as f:
+            return json.load(f)
+    return {}
+
+def save_cse_config(config):
+    """保存CSE配置"""
+    config_path = os.path.join(os.path.dirname(__file__), 'CseConfig.txt')
+    with open(config_path, 'w') as f:
+        json.dump(config, f)
+
+def is_url(input_str):
+    """检查输入是否为URL"""
     try:
-        # 调用Google CSE API
-        response = requests.get(
-            "https://www.googleapis.com/customsearch/v1",
-            params={
-                "q": query,
-                "cx": cx,
-                "key": "AIzaSyCa4mngFulV3OzlW3Dw2Y-4xAJ3DsupgMg",
-                "num": num
-            },
-            headers={"Content-Type": "application/json"},
-            timeout=60
-        )
-        response.raise_for_status()
-        results = response.json()
-        # 打印原始JSON输出
-        print("Google CSE原始JSON输出:")
-        print(json.dumps(results, indent=2, ensure_ascii=False))
-        print(f"成功获取Google CSE搜索结果，共{len(results.get('items', []))}条记录")
-        
-        # 调用豆包bot-20250506042211-5bscp获取搜索结果
-        print(f"调用豆包bot-20250506042211-5bscp搜索: {query[:100]}...")
-        doubao_response = bot_client.chat.completions.create(
-            model="bot-20250506042211-5bscp",
-            messages=[
-                {
-                    "role": "system",
-                    "content": "你是一个专业的搜索引擎，请根据用户查询返回相关搜索结果"
+        result = urllib.parse.urlparse(input_str)
+        return all([result.scheme, result.netloc])
+    except:
+        return False
+
+def get_main_domain(url):
+    """提取主域名(包含scheme)"""
+    try:
+        parsed = urllib.parse.urlparse(url)
+        if not all([parsed.scheme, parsed.netloc]):
+            return url
+        return f"{parsed.scheme}://{parsed.netloc}"
+    except:
+        return url
+
+def process_google_cse(query: str, cx: str = "b7a4dfc41bb40428c", num: int = 5, request=None, 
+                      config: str = None):
+    """处理Google CSE搜索请求
+    Args:
+        query: 搜索关键词或URL
+        cx: 搜索引擎ID
+        num: 返回结果数量
+        request: 请求对象
+        config: 配置选项，格式为"是否使用豆包搜索 是否使用CSE搜索 是否使用豆包URL分析 是否使用selenium分析"
+                (0表示不使用，1表示使用)
+    """
+    print(f"调用Google CSE API搜索: {query[:100]}...")
+    
+    # 解析配置选项
+    use_doubao_search = 1
+    use_cse_search = 1
+    use_doubao_url_analysis = 1
+    use_selenium_analysis = 1
+    
+    # 如果是URL，检查是否有配置
+    if is_url(query):
+        main_domain = get_main_domain(query)
+        cse_config = load_cse_config()
+        if main_domain in cse_config:
+            config = cse_config[main_domain]
+            if config:
+                try:
+                    config_parts = config.split()
+                    if len(config_parts) >= 4:
+                        use_doubao_search = int(config_parts[0])
+                        use_cse_search = int(config_parts[1])
+                        use_doubao_url_analysis = int(config_parts[2])
+                        use_selenium_analysis = int(config_parts[3])
+                except Exception as e:
+                    print(f"解析配置选项失败: {str(e)}, 使用默认配置")
+        try:
+            config_parts = config.split()
+            if len(config_parts) >= 4:
+                use_doubao_search = int(config_parts[0])
+                use_cse_search = int(config_parts[1])
+                use_doubao_url_analysis = int(config_parts[2])
+                use_selenium_analysis = int(config_parts[3])
+        except Exception as e:
+            print(f"解析配置选项失败: {str(e)}, 使用默认配置")
+    
+    # 处理Google CSE搜索
+    results = {}
+    if use_cse_search:
+        try:
+            response = requests.get(
+                "https://www.googleapis.com/customsearch/v1",
+                params={
+                    "q": query,
+                    "cx": cx,
+                    "key": "AIzaSyCa4mngFulV3OzlW3Dw2Y-4xAJ3DsupgMg",
+                    "num": num
                 },
-                {
-                    "role": "user",
-                    "content": query
-                }
-            ]
-        )
-        doubao_results = doubao_response.choices[0].message.content
-        print(f"豆包搜索结果: {doubao_results[:200]}...")
+                headers={"Content-Type": "application/json"},
+                timeout=60
+            )
+            response.raise_for_status()
+            results = response.json()
+            print("Google CSE原始JSON输出:")
+            print(json.dumps(results, indent=2, ensure_ascii=False))
+            print(f"成功获取Google CSE搜索结果，共{len(results.get('items', []))}条记录")
+        except requests.exceptions.RequestException as req_e:
+            print(f"Google CSE API请求失败: {str(req_e)}")
+            if not use_doubao_search:
+                return {"error": f"Google搜索服务不可用: {str(req_e)}"}
+    
+    # 处理豆包搜索
+    doubao_results = None
+    if use_doubao_search:
+        try:
+            print(f"调用豆包bot-20250506042211-5bscp搜索: {query[:100]}...")
+            doubao_response = bot_client.chat.completions.create(
+                model="bot-20250506042211-5bscp",
+                messages=[
+                    {
+                        "role": "system",
+                        "content": "你是一个专业的搜索引擎，请根据用户查询返回相关搜索结果"
+                    },
+                    {
+                        "role": "user",
+                        "content": query
+                    }
+                ]
+            )
+            doubao_results = doubao_response.choices[0].message.content
+            print(f"豆包搜索结果: {doubao_results[:200]}...")
+        except Exception as e:
+            print(f"豆包搜索失败: {str(e)}")
+    
+    # 检查query是否是URL
+    url_analysis = None
+    page_analysis = None
+    try:
+        parsed = urllib.parse.urlparse(query)
+        if all([parsed.scheme, parsed.netloc]):
+            # URL分析
+            if use_doubao_url_analysis:
+                try:
+                    print("检测到URL输入，调用bot进行URL解析...")
+                    url_response = bot_client.chat.completions.create(
+                        model="bot-20250506042211-5bscp",
+                        messages=[
+                            {
+                                "role": "system",
+                                "content": "你是一个专业的URL内容解析器，请解析用户提供的URL内容"
+                            },
+                            {
+                                "role": "user",
+                                "content": f"请分析以下URL: {query}"
+                            }
+                        ]
+                    )
+                    url_analysis = url_response.choices[0].message.content
+                    print(f"URL解析结果: {url_analysis[:200]}...")
+                except Exception as e:
+                    print(f"URL分析失败: {str(e)}")
+            
+            # Selenium分析
+            if use_selenium_analysis:
+                try:
+                    print("启动selenium获取网页内容...")
+                    from selenium import webdriver
+                    from selenium.webdriver.chrome.options import Options
+                    
+                    profile_dir = os.path.join(os.path.dirname(__file__), "chrome-profiles", "GetDLinkImpl")
+                    os.makedirs(profile_dir, exist_ok=True)
+                    
+                    options = Options()
+                    options.add_argument(f"user-data-dir={profile_dir}")
+                    options.add_argument("--headless")
+                    options.add_argument("--disable-gpu")
+                    options.add_argument("--no-sandbox")
+                    
+                    driver = webdriver.Chrome(options=options)
+                    try:
+                        driver.get(query)
+                        
+                        # 添加显式等待，确保页面完全加载
+                        from selenium.webdriver.support.ui import WebDriverWait
+                        from selenium.webdriver.support import expected_conditions as EC
+                        
+                        # 等待页面标题不为空（基本加载完成）
+                        WebDriverWait(driver, 30).until(
+                            lambda d: d.title != ""
+                        )
+                        
+                        # 等待主要DOM元素加载完成
+                        WebDriverWait(driver, 30).until(
+                            EC.presence_of_element_located(("xpath", "//body"))
+                        )
+                        
+                        # 等待jQuery/AJAX请求完成（如果页面使用jQuery）
+                        try:
+                            WebDriverWait(driver, 30).until(
+                                lambda d: d.execute_script("return jQuery.active == 0")
+                            )
+                        except:
+                            pass  # 页面未使用jQuery则忽略
+                            
+                        # 等待页面完全加载
+                        WebDriverWait(driver, 30).until(
+                            lambda d: d.execute_script("return document.readyState == 'complete'")
+                        )
+                        
+                        page_content = driver.page_source
+                        print(f"获取到网页内容，长度: {len(page_content)}字符")
+                        
+                        if page_content and use_doubao_url_analysis:
+                            print("调用doubao模型分析网页内容...")
+                            page_analysis_resp = client.chat.completions.create(
+                                model="doubao-1-5-lite-32k-250115",
+                                messages=[
+                                    {
+                                        "role": "system",
+                                        "content": "你是一个专业的网页内容分析器，请分析以下网页内容"
+                                    },
+                                    {
+                                        "role": "user",
+                                        "content": f"请分析以下网页内容:\n{page_content[:10000]}"
+                                    }
+                                ],
+                                temperature=0,
+                                timeout=60
+                            )
+                            page_analysis = page_analysis_resp.choices[0].message.content
+                            print(f"网页内容分析结果: {page_analysis[:200]}...")
+                    finally:
+                        driver.quit()
+                except Exception as e:
+                    print(f"Selenium分析失败: {str(e)}")
+    except Exception as e:
+        print(f"URL处理时发生错误: {str(e)}")
+    
+    # 合并结果
+    combined_results = {
+        "google_cse": results if use_cse_search else "N/A",
+        "doubao": doubao_results if use_doubao_search else "N/A",
+        "url_analysis": url_analysis if use_doubao_url_analysis else "N/A",
+        "page_analysis": page_analysis if use_selenium_analysis and use_doubao_url_analysis else "N/A"
+    }
+
+    # 如果是新URL且没有配置，则在生成结果后自动配置
+    if is_url(query) and main_domain not in cse_config:
+        print(f"检测到新URL主域名: {main_domain}, 开始自动配置...")
+        # 测试工具组合
+        test_configs = [
+            "1 1 1 1",  # 全部启用
+        ]
+        best_config = None
         
-        # 合并Google CSE和豆包搜索结果
-        combined_results = {
-            "google_cse": results,
-            "doubao": doubao_results
+        for test_config in test_configs:
+            config_parts = test_config.split()
+            temp_use_doubao_search = int(config_parts[0])
+            temp_use_cse_search = int(config_parts[1])
+            temp_use_doubao_url_analysis = int(config_parts[2])
+            temp_use_selenium_analysis = int(config_parts[3])
+            
+            best_config = evaluate_tools_for_url(
+                query,
+                cse_results=results,
+                doubao_results=doubao_results,
+                url_analysis=url_analysis,
+                page_analysis=page_analysis
+            )
+            print(f"测试配置 {test_config} 评估结果: {best_config}")
+            
+            # 保存最佳配置(使用主域名作为键)
+            cse_config[main_domain] = best_config
+            save_cse_config(cse_config)
+            break
+
+    # 如果是JSON请求，评估结果是否满足用户需求
+    if request and request.content_type == 'application/json':
+        data = request.get_json()
+        context = data.get('messages', [])
+        evaluation = evaluate_tool_results(context, json.dumps(combined_results, ensure_ascii=False))
+        return {
+            "content": evaluation,
+            "raw_results": results
+        }
+    
+    # 生成最终响应
+    try:
+        prompt = "搜索结果总结:\n"
+        if use_cse_search and results.get('items'):
+            prompt += f"Google CSE结果({len(results['items'])}条):\n"
+            for i, item in enumerate(results['items'][:3]):
+                prompt += f"{i+1}. {item.get('title')}\n{item.get('link')}\n\n"
+        
+        if use_doubao_search and doubao_results:
+            prompt += f"\n豆包搜索结果:\n{doubao_results}\n"
+        
+        if use_doubao_url_analysis and url_analysis:
+            prompt += f"\nURL分析结果:\n{url_analysis}\n"
+        
+        if use_selenium_analysis and use_doubao_url_analysis and page_analysis:
+            prompt += f"\n网页内容分析:\n{page_analysis}\n"
+        
+        return {
+            "content": prompt,
+            "raw_results": results
+        }
+    except Exception as e:
+        print(f"生成最终响应失败: {str(e)}")
+        return {
+            "content": json.dumps(combined_results, ensure_ascii=False),
+            "raw_results": results
         }
 
         # 如果是JSON请求，评估结果是否满足用户需求

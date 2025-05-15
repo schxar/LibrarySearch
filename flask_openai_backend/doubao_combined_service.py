@@ -15,7 +15,7 @@ import re
 from dotenv import load_dotenv
 from requests import Response
 import requests
-from tools import tools, client, bot_client, evaluate_tool_results, process_url, process_image_data, process_dlink_request, process_google_cse, process_zlib_search  # 导入工具定义和评估函数
+from tools import tools, client, bot_client, evaluate_tool_results, process_image_data, process_dlink_request, process_google_cse, process_zlib_search  # 导入工具定义和评估函数
 from vlm import vlm_service
 
 # 合并工具列表
@@ -250,7 +250,18 @@ def doubao_chat_api():
                 if tool_call.function.name == "web_search":
                     search_args = json.loads(tool_call.function.arguments)
                     print(f"检测到工具调用: web_search, 搜索内容: {search_args['query']}")
-                    cse_result = process_google_cse(query=search_args['query'], request=request)
+                    # 根据URL决定配置选项
+                    if 'query' in search_args and search_args['query'].startswith('http'):
+                        if 'bilibili.com' in search_args['query']:
+                            config = "0 0 0 1"  # 只使用selenium分析
+                        elif 'youtube.com' in search_args['query']:
+                            config = "0 1 0 0"  # 只使用CSE搜索
+                        else:
+                            config = None  # 使用默认配置
+                    else:
+                        config = None
+                    
+                    cse_result = process_google_cse(query=search_args['query'], request=request, config=config)
                     if "error" in cse_result:
                         return jsonify({
                             'content': f"Google CSE搜索失败: {cse_result['error']}",
@@ -260,12 +271,6 @@ def doubao_chat_api():
                         'content': cse_result['content'],
                         'is_search_result': True,
                         'is_cse_fallback': False
-                    })
-                elif tool_call.function.name == "url_analysis":
-                    url_result = process_url(**json.loads(tool_call.function.arguments))
-                    return jsonify({
-                        'content': url_result.choices[0].message.content,
-                        'is_url_response': True
                     })
                 elif tool_call.function.name == "image_analysis":
                     image_result = process_image_data(**json.loads(tool_call.function.arguments))
@@ -284,7 +289,18 @@ def doubao_chat_api():
                 elif tool_call.function.name == "google_cse_search":
                     cse_args = json.loads(tool_call.function.arguments)
                     print(f"检测到工具调用: google_cse_search, 搜索内容: {cse_args['query']}")
-                    cse_result = process_google_cse(**cse_args, request=request)
+                    # 根据URL决定配置选项
+                    if 'query' in cse_args and isinstance(cse_args['query'], str) and cse_args['query'].startswith('http'):
+                        if 'bilibili.com' in cse_args['query']:
+                            config = "0 0 1 1"  # 使用selenium分析和豆包URL分析
+                        elif 'youtube.com' in cse_args['query']:
+                            config = "0 1 0 0"  # 只使用CSE搜索
+                        else:
+                            config = None  # 使用默认配置
+                    else:
+                        config = None
+                    
+                    cse_result = process_google_cse(**cse_args, request=request, config=config)
                     if "error" in cse_result:
                         return jsonify({"error": cse_result["error"]}), 500
                     return jsonify({
@@ -334,26 +350,6 @@ def doubao_chat_api():
             'error': error_msg,
             'message': str(e)
         }), 500
-
-@app.route('/api/doubao/websearch', methods=['POST'])
-def doubao_websearch():
-    """豆包web搜索API接口"""
-    data = request.get_json()
-    if not data or not data.get('query'):
-        return jsonify({"error": "请求体必须包含query参数"}), 400
-    
-    try:
-        response = process_search(
-            query=data['query'],
-            result_type="detailed"
-        )
-        try:
-            parsed_result = json.loads(response['content'])
-            return jsonify(parsed_result)
-        except json.JSONDecodeError:
-            return jsonify({"content": response['content']})
-    except Exception as e:
-        return jsonify({"error": str(e)}), 500
 
 @app.route('/api/doubao/url_parse', methods=['POST'])
 def doubao_url_parse():

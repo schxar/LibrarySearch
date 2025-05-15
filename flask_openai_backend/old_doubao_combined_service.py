@@ -567,7 +567,18 @@ def doubao_chat_api():
                 elif tool_call.function.name == "google_cse_search":
                     cse_args = json.loads(tool_call.function.arguments)
                     print(f"检测到工具调用: google_cse_search, 搜索内容: {cse_args['query']}")
-                    cse_result = process_google_cse(**cse_args)
+                    # 根据URL决定配置选项
+                    if 'query' in cse_args and isinstance(cse_args['query'], str) and cse_args['query'].startswith('http'):
+                        if 'bilibili.com' in cse_args['query']:
+                            config = "0 0 0 1"  # 只使用selenium分析
+                        elif 'youtube.com' in cse_args['query']:
+                            config = "0 1 0 0"  # 只使用CSE搜索
+                        else:
+                            config = None  # 使用默认配置
+                    else:
+                        config = None
+                    
+                    cse_result = process_google_cse(**cse_args, config=config)
                     if "error" in cse_result:
                         return jsonify({"error": cse_result["error"]}), 500
                     return jsonify({
