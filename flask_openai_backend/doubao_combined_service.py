@@ -38,7 +38,7 @@ def process_message(messages: list):
     
     # 分析最后一条用户消息内容，判断是否需要搜索
     last_user_message = next((msg for msg in reversed(messages) if msg["role"] == "user"), None)
-    
+
     # 首先尝试使用工具模型
     try:
         # 使用包含上下文检索工具的完整工具列表
@@ -365,7 +365,7 @@ def doubao_url_parse():
     try:
         # 调用豆包API解析URL内容
         response = bot_client.chat.completions.create(
-            model="bot-20250506034902-4psdn",
+            model="bot-20250515081441-s9mgt",
             messages=[
                 {
                     "role": "system",
