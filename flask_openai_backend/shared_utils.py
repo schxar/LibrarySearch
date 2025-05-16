@@ -98,8 +98,7 @@ HTML_LOGIN = """
 
     <!-- New Button for NotebookLM -->
     <div class="mt-4 text-center">
-        <a href="https://schxar.picp.vip/doubao_chat" target="_blank" class="btn btn-success">Go to Chat</a>
-        <a href="https://313m929k61.vicp.fun/" target="_blank" class="btn btn-info ms-2">Search Homepage</a>
+        <a href="https://313m929k61.vicp.fun/" target="_blank" class="btn btn-info ms-2">Go to Chat</a>
         <a href="https://schxar.picp.vip/download_history" target="_blank" class="btn btn-info ms-2">Download history</a>
     </div>
 
