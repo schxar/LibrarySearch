@@ -1,0 +1,9 @@
+graph TD
+    A[用户提交工单表单] --> B(浏览器发送 HTTP POST /submit_ticket);
+    B --> C(Flask 后端接收请求);
+    C --> D(Flask: 获取工单详情和用户邮箱);
+    D --> E(Flask: 计算书籍哈希);
+    D --> F(Flask: 连接 MySQL 数据库);
+    F --> G(Flask: 插入工单记录到 NotebookLMAudioRequests 表);
+    G --> H(Flask 发送响应到浏览器);
+    H --> I(浏览器显示提交结果);
