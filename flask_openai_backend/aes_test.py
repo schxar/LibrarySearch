@@ -1,4 +1,16 @@
-from flask import Flask, request, jsonify, render_template_string
+from flask import Flask, request, jsonify, render_template_string, render_template
+import pymysql
+
+def get_db_connection():
+    """获取数据库连接"""
+    return pymysql.connect(
+        host='localhost',
+        user='root',
+        password='13380008373',
+        database='library',
+        charset='utf8mb4',
+        cursorclass=pymysql.cursors.DictCursor
+    )
 from Crypto.Cipher import AES, PKCS1_OAEP
 from Crypto.Util.Padding import pad, unpad
 from Crypto.PublicKey import RSA
@@ -251,6 +263,58 @@ def decrypt_data():
         })
     except Exception as e:
         return jsonify({'error': str(e)}), 500
+
+@app.route('/download_history', methods=['GET', 'POST'])
+def download_history():
+    """查询下载记录"""
+    if request.method == 'GET':
+        return render_template('download_history_form_copy.html')
+        
+    if request.method == 'POST':
+        # 处理加密数据
+        data = request.get_json()
+        if not data or 'encrypted_aes_key' not in data or 'encrypted_email' not in data:
+            return jsonify({'error': '缺少加密参数'}), 400
+        
+        try:
+            # 解密AES密钥
+            aes_key = rsa.decrypt_aes_key(data['encrypted_aes_key'])
+            # 解密邮箱
+            user_email = SimpleAES.decrypt(data['encrypted_email'], aes_key)
+        except Exception as e:
+            return jsonify({'error': f'解密失败: {str(e)}'}), 400
+
+        try:
+            conn = get_db_connection()
+            with conn.cursor() as cursor:
+                # 查询下载记录
+                cursor.execute('''
+                    SELECT filename, download_date 
+                    FROM DownloadHistory 
+                    WHERE user_email = %s 
+                    ORDER BY download_date DESC
+                ''', (user_email,))
+                records = cursor.fetchall()
+                
+                if not records:
+                    return jsonify({'error': '没有找到该邮箱的下载记录'}), 404
+                
+                # 格式化日期时间
+                formatted_records = [{
+                    'filename': record['filename'],
+                    'download_date': record['download_date'].strftime('%Y-%m-%d %H:%M:%S')
+                } for record in records]
+                
+                return jsonify({
+                    'email': user_email,
+                    'records': formatted_records
+                })
+        except Exception as e:
+            app.logger.error(f"查询下载记录失败: {str(e)}")
+            return jsonify({'error': '查询失败，请稍后重试'}), 500
+        finally:
+            if 'conn' in locals():
+                conn.close()
 
 # 启动应用
 if __name__ == '__main__':
