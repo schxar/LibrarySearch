@@ -1,3 +1,4 @@
+```mermaid
 graph TD
     A[搜索触发 (e.g., 来自聊天)] --> B(Flask: 调用 zlib_search 工具);
     B --> C(Flask 发送 HTTP GET /search 到 Java 后端);
@@ -15,3 +16,4 @@ graph TD
     L --> N(Java: 准备并返回搜索结果给 Flask);
     N --> O(Flask: 接收并处理结果<br/>(可选使用模型));
     O --> P(Flask: 发送结果到浏览器);
+```

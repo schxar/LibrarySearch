@@ -1,3 +1,4 @@
+```mermaid
 graph TD
     A[User Interface] --> B{Flask Main App<br>(Port 10805)}: Requests (Web Pages, Some APIs);
     B --> C{Flask Doubao/Chat Service<br>(Port 10806)}: Forwards API Requests<br>(e.g., /api/doubao/chat) [1-3];
@@ -44,3 +45,4 @@ graph TD
     style J fill:#ddd,stroke:#333,stroke-width:2px
     style K fill:#eee,stroke:#333,stroke-width:2px
     style L fill:#eee,stroke:#333,stroke-width:2px
+```
