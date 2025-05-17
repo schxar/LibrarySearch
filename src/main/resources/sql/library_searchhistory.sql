@@ -30,16 +30,6 @@ CREATE TABLE `searchhistory` (
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB AUTO_INCREMENT=7 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
-
---
--- Dumping data for table `searchhistory`
---
-
-LOCK TABLES `searchhistory` WRITE;
-/*!40000 ALTER TABLE `searchhistory` DISABLE KEYS */;
-INSERT INTO `searchhistory` VALUES (1,'tschxar@gmail.com','114514','2025-01-09 17:38:08'),(2,'tschxar@gmail.com','114514','2025-01-09 17:38:11'),(4,'tschxar@gmail.com','666666','2025-01-09 17:38:38'),(5,'tschxar@gmail.com','fork','2025-01-13 21:15:39'),(6,'tschxar@gmail.com','chain','2025-01-13 21:15:47');
-/*!40000 ALTER TABLE `searchhistory` ENABLE KEYS */;
-UNLOCK TABLES;
 /*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;
 
 /*!40101 SET SQL_MODE=@OLD_SQL_MODE */;
@@ -50,4 +40,4 @@ UNLOCK TABLES;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2025-05-15  5:52:13
+-- Dump completed on 2025-05-17  6:00:51
