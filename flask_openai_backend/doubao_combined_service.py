@@ -133,9 +133,25 @@ def login_required(f):
         return f(*args, **kwargs)
     return decorated_function
 
+@app.route('/signin', methods=['GET'])
+def signin():
+    """显示Clerk登录页面"""
+    return render_template('signin.html')
+
+@app.route('/set_user_session', methods=['POST'])
+def set_user_session():
+    """处理Clerk登录后的session设置"""
+    email = request.json.get('email')
+    if email:
+        session['user_email'] = email
+        return jsonify({'status': 'success'})
+    return jsonify({'status': 'error', 'message': 'Email is required'}), 400
+
 @app.route('/', methods=['GET'])
 def handle_chat_page():
     """处理主聊天页面请求"""
+    if 'user_email' not in session:
+        return redirect(url_for('signin'))
     query = request.args.get('query', '')
     return render_template('doubao_chat3.html', query=query)
 

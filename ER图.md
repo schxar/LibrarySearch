@@ -3,23 +3,34 @@ erDiagram
     %% 数据库ER图
     DOWNLOAD_HISTORY ||--o{ SEARCH_RECOMMENDATIONS : "生成"
     DOWNLOAD_HISTORY {
-        string email_hash PK "加密邮箱哈希"
-        string filename "文件名"
-        datetime download_date "下载时间"
+        string email_hash
+        string filename
+        datetime download_date
     }
     
     SEARCH_RECOMMENDATIONS {
-        string email_hash PK,FK "加密邮箱哈希"
-        string search_terms "推荐搜索词(逗号分隔)"
+        string email_hash
+        string search_terms
     }
     
     SEARCH_HISTORY {
-        string hash PK "查询哈希"
-        string originalQuery "原始查询"
-        int weight "权重"
-        date searchDate "查询日期"
-        string userId "用户ID(可选)"
+        string hash
+        string originalQuery
+        int weight
+        date searchDate
+        string userId
     }
+
+    USER {
+        string user_id
+        string email
+        string password_hash
+        datetime create_time
+    }
+
+    DOWNLOAD_HISTORY }|--|| USER : "属于"
+    SEARCH_RECOMMENDATIONS }|--|| USER : "属于"
+    SEARCH_HISTORY }|--|| USER : "属于"
 ```
 
 ### 数据库结构说明
@@ -51,6 +62,7 @@ erDiagram
 
 ### 关系说明
 - 下载历史表与搜索推荐表是一对多关系
-- 系统通过加密邮箱哈希关联用户数据
+- 所有表都与USER表建立多对一关系
+- 系统通过用户ID关联数据
 - 搜索历史通过哈希值唯一标识查询
-- 未明确定义独立的用户表
+- 用户表存储核心账户信息
