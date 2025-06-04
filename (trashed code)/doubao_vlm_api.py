@@ -8,7 +8,7 @@ app = Flask(__name__)
 # 初始化OpenAI客户端
 client = OpenAI(
     base_url="https://ark.cn-beijing.volces.com/api/v3",
-    api_key=os.environ.get("ARK_API_KEY", "a7854105-6233-412f-bdd7-b399ebf30e46")
+    api_key=os.environ.get("ARK_API_KEY")
 )
 
 @app.route('/api/doubao/vlm', methods=['POST'])

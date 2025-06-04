@@ -58,3 +58,5 @@ flask_openai_backend/ChatHistory/chat-1746996933642.json
 *.doc
 /flask_openai_backend/images
 /flask_openai_backend/chrome-profiles
+flask_openai_backend.zip
+/edge_search
